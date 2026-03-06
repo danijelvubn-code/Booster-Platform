@@ -26,8 +26,8 @@ const account = {
   planStart: "Jan 1, 2026",
   planEnd: "Mar 31, 2026",
   daysRemaining: 42,
-  totalCredits: 5_000_000,
-  creditsUsed: 2_850_000,
+  totalTokens: 5_000_000,
+  tokensUsed: 2_850_000,
   billingCycleStart: "Jan 1",
   billingCycleEnd: "Jan 31",
   cycleUsage: 1_120_000,
@@ -52,7 +52,7 @@ const fmt = (n: number) => {
   return n.toLocaleString();
 };
 
-const creditsPct = Math.round((account.creditsUsed / account.totalCredits) * 100);
+const tokensPct = Math.round((account.tokensUsed / account.totalTokens) * 100);
 
 const barColor = (pct: number) => {
   if (pct < 60) return "bg-success";
@@ -74,7 +74,7 @@ const Account = () => {
   const [hardCap, setHardCap] = useState(account.hardCap);
 
   const nearExpiry = account.daysRemaining <= 14;
-  const alertTriggered = creditsPct >= account.alertThreshold;
+  const alertTriggered = tokensPct >= account.alertThreshold;
 
   return (
     <div className="container py-8 space-y-8 max-w-4xl">
@@ -150,47 +150,47 @@ const Account = () => {
         )}
       </section>
 
-      {/* ─── 2. Credits & Usage ───────────────────────────────── */}
+      {/* ─── 2. Tokens & Usage ───────────────────────────────── */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
             <CreditCard className="h-5 w-5 text-primary" />
-            Credits
+            Tokens
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
             <div>
               <p className="text-xs text-muted-foreground">Total Allocated</p>
-              <p className="text-xl font-bold">{fmt(account.totalCredits)} credits</p>
+              <p className="text-xl font-bold">{fmt(account.totalTokens)} tokens</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Used</p>
-              <p className="text-xl font-bold">{fmt(account.creditsUsed)} credits</p>
+              <p className="text-xl font-bold">{fmt(account.tokensUsed)} tokens</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Remaining</p>
-              <p className="text-xl font-bold">{fmt(account.totalCredits - account.creditsUsed)} credits</p>
+              <p className="text-xl font-bold">{fmt(account.totalTokens - account.tokensUsed)} tokens</p>
             </div>
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Usage</span>
-              <span className={`font-semibold ${barTextColor(creditsPct)}`}>{creditsPct}%</span>
+              <span className={`font-semibold ${barTextColor(tokensPct)}`}>{tokensPct}%</span>
             </div>
             <div className="h-3 bg-muted rounded-full overflow-hidden">
               <div
-                className={`h-full rounded-full transition-all ${barColor(creditsPct)}`}
-                style={{ width: `${creditsPct}%` }}
+                className={`h-full rounded-full transition-all ${barColor(tokensPct)}`}
+                style={{ width: `${tokensPct}%` }}
               />
             </div>
           </div>
 
-          {creditsPct >= 60 && (
+          {tokensPct >= 60 && (
             <div className="flex items-center gap-2 rounded-lg border border-warning/30 bg-warning/10 px-4 py-2.5 text-sm text-warning font-medium">
               <AlertTriangle className="h-4 w-4 shrink-0" />
-              Warning: You have used {creditsPct}% of your allocation.
+              Warning: You have used {tokensPct}% of your allocation.
             </div>
           )}
         </CardContent>
@@ -208,11 +208,11 @@ const Account = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <p className="text-xs text-muted-foreground">Usage This Cycle</p>
-              <p className="text-lg font-bold">{fmt(account.cycleUsage)} credits</p>
+              <p className="text-lg font-bold">{fmt(account.cycleUsage)} tokens</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Estimated Remaining</p>
-              <p className="text-lg font-bold">{fmt(account.cycleEstRemaining)} credits</p>
+              <p className="text-lg font-bold">{fmt(account.cycleEstRemaining)} tokens</p>
             </div>
           </div>
           <Button variant="outline" size="sm" className="gap-1.5">
@@ -237,7 +237,7 @@ const Account = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Endpoint</TableHead>
-                <TableHead className="text-right">Credits Used</TableHead>
+                <TableHead className="text-right">Tokens Used</TableHead>
                 <TableHead className="text-right">% of Total</TableHead>
               </TableRow>
             </TableHeader>
@@ -309,7 +309,7 @@ const Account = () => {
             <div className="flex items-center justify-between">
               <div>
                 <Label htmlFor="hard-cap">Hard Cap</Label>
-                <p className="text-xs text-muted-foreground">Block all requests once the credit limit is reached</p>
+                <p className="text-xs text-muted-foreground">Block all requests once the token limit is reached</p>
               </div>
               <Switch
                 id="hard-cap"

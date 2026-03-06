@@ -30,9 +30,12 @@ const Login = () => {
         {/* Branding overlay */}
         <div className="relative z-10 flex flex-col items-center w-full h-full">
           <div className="flex-1 flex items-center justify-center text-center">
-            <div className="flex items-center justify-center gap-3">
-              <Zap className="h-[168px] w-[168px] text-primary fill-primary" />
-              <span className="text-9xl font-bold text-white tracking-tight">booster</span>
+            <div className="flex flex-col items-center justify-center gap-2">
+              <div className="flex items-center justify-center gap-3">
+                <Zap className="h-[168px] w-[168px] text-primary fill-primary" />
+                <span className="text-9xl font-bold text-white tracking-tight">booster</span>
+              </div>
+              <span className="text-lg font-medium text-white/50 tracking-widest uppercase">Beta Version</span>
             </div>
           </div>
           <div className="pb-12 text-center">

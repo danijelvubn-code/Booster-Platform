@@ -111,7 +111,7 @@ const notifColor = {
 
 const navItems = [
   { label: "Overview", path: "/overview", icon: LayoutDashboard, alsoActive: [] as string[], tooltip: "" },
-  { label: "Endpoints", path: "/endpoints", icon: Box, alsoActive: ["/deploy", "/logs", "/playground"], tooltip: "" },
+  { label: "Inference Endpoints", path: "/endpoints", icon: Box, alsoActive: ["/deploy", "/logs", "/playground"], tooltip: "" },
   { label: "Model Cosmos", path: "/cosmos", icon: Sparkles, alsoActive: [] as string[], tooltip: "Your model library — browse, compare & deploy models" },
   { label: "Observe", path: "/observe", icon: Eye, alsoActive: [] as string[], tooltip: "" },
   { label: "Recommendations", path: "/recommendations", icon: Lightbulb, alsoActive: [] as string[], tooltip: "" },

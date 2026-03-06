@@ -198,65 +198,6 @@ const AppLayout = () => {
           {/* Theme Toggle */}
           <ThemeToggle />
 
-          {/* Notifications */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="sm" className="relative h-8 w-8 p-0">
-                <Bell className="h-4 w-4" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-destructive text-destructive-foreground text-[10px] flex items-center justify-center font-medium">
-                    {unreadCount}
-                  </span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-96 p-0">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-                <span className="text-sm font-semibold">Notifications</span>
-                {unreadCount > 0 && (
-                  <Button variant="ghost" size="sm" className="h-6 text-xs px-2" onClick={markAllRead}>
-                    Mark all read
-                  </Button>
-                )}
-              </div>
-              <div className="max-h-80 overflow-auto">
-                {notifications.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-8">No notifications</p>
-                ) : (
-                  notifications.map((n) => {
-                    const NIcon = notifIcon[n.type];
-                    return (
-                      <div
-                        key={n.id}
-                        className={cn(
-                          "flex items-start gap-3 px-4 py-3 border-b border-border last:border-b-0 transition-colors",
-                          !n.read && "bg-primary/5"
-                        )}
-                      >
-                        <NIcon className={cn("h-4 w-4 mt-0.5 shrink-0", notifColor[n.type])} />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <p className={cn("text-sm font-medium truncate", !n.read && "font-semibold")}>{n.title}</p>
-                            {!n.read && <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />}
-                          </div>
-                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{n.message}</p>
-                          <p className="text-[10px] text-muted-foreground mt-1">{n.time}</p>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 w-6 p-0 shrink-0 text-muted-foreground hover:text-destructive"
-                          onClick={() => dismissNotif(n.id)}
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-            </PopoverContent>
-          </Popover>
 
           {/* User area */}
           <DropdownMenu>

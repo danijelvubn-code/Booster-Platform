@@ -51,8 +51,8 @@ const marginTrend = Array.from({ length: 6 }, (_, i) => ({
   margin: Math.round(18 + Math.sin(i * 0.7) * 5 + i * 0.8),
 }));
 
-// Credit burn velocity
-const burnBaseline = 4200; // credits/day rolling 7d avg
+// Token burn velocity
+const burnBaseline = 4200; // tokens/day rolling 7d avg
 const burnCurrent = 5100;
 const burnRatio = Math.round((burnCurrent / burnBaseline) * 100);
 const burnAlert = burnRatio > 300;

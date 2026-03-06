@@ -1,43 +1,27 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { models } from "@/data/mockData";
-import type { PerformanceProfile } from "@/components/PerformanceProfileStep";
 import { DollarSign, Leaf } from "lucide-react";
 
 interface CostTransparencyPanelProps {
   modelId: string;
-  performanceProfile: PerformanceProfile;
   monthlyBudget: string;
   guardrailsEnabled: number;
 }
 
-const profileCostTier: Record<PerformanceProfile, { label: string; multiplier: number }> = {
-  "best-effort": { label: "Lowest infra cost", multiplier: 1 },
-  premium: { label: "Moderate infra cost", multiplier: 1.5 },
-  enterprise: { label: "Dedicated infra premium", multiplier: 2.5 },
-};
-
-const profileLabels: Record<PerformanceProfile, string> = {
-  "best-effort": "Best Effort",
-  premium: "Steady State",
-  enterprise: "High Throughput",
-};
-
 const CostTransparencyPanel = ({
   modelId,
-  performanceProfile,
   monthlyBudget,
   guardrailsEnabled,
 }: CostTransparencyPanelProps) => {
   const model = models.find((m) => m.id === modelId);
   const budget = parseInt(monthlyBudget) || 0;
-  const tier = profileCostTier[performanceProfile];
 
   const avgCostPer1K = model
     ? ((model.inputCostPer1M + model.outputCostPer1M) / 2) / 1000
     : 0;
 
-  const estimatedMonthlyCost = (budget / 1000) * avgCostPer1K * tier.multiplier;
+  const estimatedMonthlyCost = (budget / 1000) * avgCostPer1K;
 
   return (
     <Card className="sticky top-8">
@@ -72,14 +56,6 @@ const CostTransparencyPanel = ({
         ) : (
           <p className="text-xs text-muted-foreground italic">Select a model to see cost details.</p>
         )}
-
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Profile tier</span>
-          <span className="font-medium">{profileLabels[performanceProfile]}</span>
-        </div>
-        <p className="text-xs text-muted-foreground">{tier.label}</p>
-
-        <Separator />
 
         {budget > 0 && model ? (
           <div className="flex justify-between">

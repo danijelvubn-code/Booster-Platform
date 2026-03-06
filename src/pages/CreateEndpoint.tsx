@@ -206,8 +206,7 @@ const CreateEndpoint = () => {
     if (!selectedModel) return "—";
     const budget = parseInt(config.monthlyBudget) || 0;
     const avg = ((selectedModel.inputCostPer1M + selectedModel.outputCostPer1M) / 2) / 1000;
-    const multiplier = config.performanceProfile === "enterprise" ? 2.5 : config.performanceProfile === "premium" ? 1.5 : 1;
-    return `~$${((budget / 1000) * avg * multiplier).toFixed(0)}`;
+    return `~$${((budget / 1000) * avg).toFixed(0)}`;
   };
 
   return (
@@ -482,20 +481,10 @@ const CreateEndpoint = () => {
                     </Card>
                     <Card className="bg-muted/50">
                       <CardContent className="p-4 space-y-2">
-                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Performance</p>
-                        <div className="flex items-center gap-2">
-                          <Zap className="h-3.5 w-3.5 text-primary" />
-                          <Badge variant="secondary" className="capitalize">{profileSpecs.label} — {profileSpecs.subtitle}</Badge>
-                        </div>
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Infrastructure</p>
                         <div className="flex items-center gap-1 text-sm">
                           <Globe className="h-3.5 w-3.5 text-muted-foreground" /> {config.region}
                         </div>
-                        {config.confidentialCompute && (
-                          <div className="flex items-center gap-1 text-sm text-primary">
-                            <Lock className="h-3.5 w-3.5" /> Confidential Compute
-                          </div>
-                        )}
-                        <p className="text-xs text-muted-foreground">SLA: {profileSpecs.specs.find(s => s.label === "SLA")?.value}</p>
                       </CardContent>
                     </Card>
                     <Card className="bg-muted/50">
@@ -546,7 +535,6 @@ const CreateEndpoint = () => {
           <div className="lg:col-span-1">
             <CostTransparencyPanel
               modelId={config.modelId}
-              performanceProfile={config.performanceProfile}
               monthlyBudget={config.monthlyBudget}
               guardrailsEnabled={enabledGuardrailCount}
             />

@@ -248,11 +248,6 @@ const Cosmos = () => {
               ))}
             </div>
             <div className="flex gap-2 mt-4">
-              {compareModels.length > 0 && (
-                <Button size="sm" variant="outline" className="gap-1" onClick={() => generateComparisonReport(compareModels)}>
-                  <FileDown className="h-3.5 w-3.5" /> Download Report
-                </Button>
-              )}
               {compareIds.length > 0 && (
                 <Button size="sm" variant="ghost" onClick={() => setCompareIds([])}>Clear All</Button>
               )}

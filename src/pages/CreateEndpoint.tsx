@@ -410,55 +410,6 @@ const CreateEndpoint = () => {
                       </p>
                     )}
                    </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label>Hard Limit Enforcement</Label>
-                      <p className="text-xs text-muted-foreground">When this endpoint's token budget is reached, new requests are blocked. Otherwise, requests are throttled until the account-level budget is hit.</p>
-                    </div>
-                    <Switch
-                      checked={config.hardCap}
-                      onCheckedChange={(v) => updateConfig("hardCap", v)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Soft Limit Threshold (%)</Label>
-                    <Input
-                      type="number"
-                      value={config.alertThreshold}
-                      onChange={(e) => updateConfig("alertThreshold", e.target.value)}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Dashboard alert at this usage level. No traffic impact.
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label>Email Notifications</Label>
-                      <p className="text-xs text-muted-foreground">Receive alerts when thresholds are crossed</p>
-                    </div>
-                    <Switch
-                      checked={config.emailAlerts}
-                      onCheckedChange={(v) => updateConfig("emailAlerts", v)}
-                    />
-                  </div>
-                  <Separator />
-                  <Separator />
-                  <div className="space-y-2">
-                    <Label>Throughput Safety Guard</Label>
-                    <div className="rounded-md border border-border bg-muted/50 p-3 space-y-1">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">RPM Limit</span>
-                        <span className="font-medium">{profileSpecs.specs.find(s => s.label === "RPM")?.value}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">TPM Limit</span>
-                        <span className="font-medium">{profileSpecs.specs.find(s => s.label === "TPM")?.value}</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground pt-1">
-                        System-enforced based on selected profile.
-                      </p>
-                    </div>
-                  </div>
                 </>
               )}
 

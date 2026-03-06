@@ -15,14 +15,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Search, UserCog, Building2, Shield, AlertTriangle, Coins, BarChart3, TrendingUp, TrendingDown, Package } from "lucide-react";
 
-// --- Mock Credit Pools (purchased from third-party providers) ---
-const mockCreditPools = [
-  { id: "cp-1", provider: "OpenAI", model: "GPT-4o", totalCredits: 5_000_000, usedCredits: 3_420_000, costPerMillion: 5_000, purchaseDate: "2025-01-15", expiryDate: "2025-07-15" },
-  { id: "cp-2", provider: "OpenAI", model: "GPT-4o Mini", totalCredits: 20_000_000, usedCredits: 12_800_000, costPerMillion: 300, purchaseDate: "2025-01-10", expiryDate: "2025-07-10" },
-  { id: "cp-3", provider: "Anthropic", model: "Claude 3.5 Sonnet", totalCredits: 8_000_000, usedCredits: 4_150_000, costPerMillion: 3_000, purchaseDate: "2025-02-01", expiryDate: "2025-08-01" },
-  { id: "cp-4", provider: "Mistral AI", model: "Mistral Large", totalCredits: 15_000_000, usedCredits: 6_300_000, costPerMillion: 2_000, purchaseDate: "2024-12-20", expiryDate: "2025-06-20" },
-  { id: "cp-5", provider: "Mistral AI", model: "Codestral", totalCredits: 10_000_000, usedCredits: 7_900_000, costPerMillion: 1_000, purchaseDate: "2025-01-05", expiryDate: "2025-07-05" },
-  { id: "cp-6", provider: "Google", model: "Gemini 1.5 Pro", totalCredits: 4_000_000, usedCredits: 1_200_000, costPerMillion: 3_500, purchaseDate: "2025-02-10", expiryDate: "2025-08-10" },
+// --- Mock Token Pools (purchased from third-party providers) ---
+const mockTokenPools = [
+  { id: "cp-1", provider: "OpenAI", model: "GPT-4o", totalTokens: 5_000_000, usedTokens: 3_420_000, costPerMillion: 5_000, purchaseDate: "2025-01-15", expiryDate: "2025-07-15" },
+  { id: "cp-2", provider: "OpenAI", model: "GPT-4o Mini", totalTokens: 20_000_000, usedTokens: 12_800_000, costPerMillion: 300, purchaseDate: "2025-01-10", expiryDate: "2025-07-10" },
+  { id: "cp-3", provider: "Anthropic", model: "Claude 3.5 Sonnet", totalTokens: 8_000_000, usedTokens: 4_150_000, costPerMillion: 3_000, purchaseDate: "2025-02-01", expiryDate: "2025-08-01" },
+  { id: "cp-4", provider: "Mistral AI", model: "Mistral Large", totalTokens: 15_000_000, usedTokens: 6_300_000, costPerMillion: 2_000, purchaseDate: "2024-12-20", expiryDate: "2025-06-20" },
+  { id: "cp-5", provider: "Mistral AI", model: "Codestral", totalTokens: 10_000_000, usedTokens: 7_900_000, costPerMillion: 1_000, purchaseDate: "2025-01-05", expiryDate: "2025-07-05" },
+  { id: "cp-6", provider: "Google", model: "Gemini 1.5 Pro", totalTokens: 4_000_000, usedTokens: 1_200_000, costPerMillion: 3_500, purchaseDate: "2025-02-10", expiryDate: "2025-08-10" },
 ];
 
 // --- Mock per-tenant usage breakdown ---
@@ -40,11 +40,11 @@ const mockTenantUsage = [
 ];
 
 const mockTenants = [
-  { id: "t-1", name: "The Space Dreams", plan: "Enterprise", endpoints: 4, creditsUsed: 1_620_000, owner: "Bob Martinez", email: "bob@spacedreams.ai" },
-  { id: "t-2", name: "Acme Corp", plan: "Growth", endpoints: 2, creditsUsed: 890_000, owner: "Alice Johnson", email: "alice@acme.com" },
-  { id: "t-3", name: "NovaTech Labs", plan: "Enterprise", endpoints: 6, creditsUsed: 3_200_000, owner: "Carlos Rivera", email: "carlos@novatech.io" },
-  { id: "t-4", name: "FinServ AI", plan: "Starter", endpoints: 1, creditsUsed: 120_000, owner: "Diana Chen", email: "diana@finservai.com" },
-  { id: "t-5", name: "HealthBridge", plan: "Growth", endpoints: 3, creditsUsed: 1_450_000, owner: "Ethan Park", email: "ethan@healthbridge.co" },
+  { id: "t-1", name: "The Space Dreams", plan: "Enterprise", endpoints: 4, tokensUsed: 1_620_000, owner: "Bob Martinez", email: "bob@spacedreams.ai" },
+  { id: "t-2", name: "Acme Corp", plan: "Growth", endpoints: 2, tokensUsed: 890_000, owner: "Alice Johnson", email: "alice@acme.com" },
+  { id: "t-3", name: "NovaTech Labs", plan: "Enterprise", endpoints: 6, tokensUsed: 3_200_000, owner: "Carlos Rivera", email: "carlos@novatech.io" },
+  { id: "t-4", name: "FinServ AI", plan: "Starter", endpoints: 1, tokensUsed: 120_000, owner: "Diana Chen", email: "diana@finservai.com" },
+  { id: "t-5", name: "HealthBridge", plan: "Growth", endpoints: 3, tokensUsed: 1_450_000, owner: "Ethan Park", email: "ethan@healthbridge.co" },
 ];
 
 const fmt = (n: number) => {
@@ -95,7 +95,7 @@ const AdminConsole = () => {
       <Tabs defaultValue="tenants" className="space-y-6">
         <TabsList>
           <TabsTrigger value="tenants" className="gap-1.5"><Building2 className="h-3.5 w-3.5" />Tenants</TabsTrigger>
-          <TabsTrigger value="credits" className="gap-1.5"><Coins className="h-3.5 w-3.5" />Credit Pools</TabsTrigger>
+          <TabsTrigger value="credits" className="gap-1.5"><Coins className="h-3.5 w-3.5" />Token Pools</TabsTrigger>
           <TabsTrigger value="usage" className="gap-1.5"><BarChart3 className="h-3.5 w-3.5" />Usage by Tenant</TabsTrigger>
         </TabsList>
 
@@ -127,7 +127,7 @@ const AdminConsole = () => {
                     <TableHead>Plan</TableHead>
                     <TableHead>Owner</TableHead>
                     <TableHead className="text-right">Endpoints</TableHead>
-                    <TableHead className="text-right">Credits Used</TableHead>
+                    <TableHead className="text-right">Tokens Used</TableHead>
                     <TableHead className="text-right">Action</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -157,7 +157,7 @@ const AdminConsole = () => {
                           </div>
                         </TableCell>
                         <TableCell className="text-right">{t.endpoints}</TableCell>
-                        <TableCell className="text-right">{fmt(t.creditsUsed)}</TableCell>
+                        <TableCell className="text-right">{fmt(t.tokensUsed)}</TableCell>
                         <TableCell className="text-right">
                           <Button
                             size="sm"
@@ -185,8 +185,8 @@ const AdminConsole = () => {
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
                   <Package className="h-4 w-4" /> Total Purchased
                 </div>
-                <p className="text-2xl font-bold">{fmt(mockCreditPools.reduce((s, p) => s + p.totalCredits, 0))}</p>
-                <p className="text-xs text-muted-foreground mt-1">across {mockCreditPools.length} pools</p>
+                <p className="text-2xl font-bold">{fmt(mockTokenPools.reduce((s, p) => s + p.totalTokens, 0))}</p>
+                <p className="text-xs text-muted-foreground mt-1">across {mockTokenPools.length} pools</p>
               </CardContent>
             </Card>
             <Card>
@@ -194,9 +194,9 @@ const AdminConsole = () => {
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
                   <BarChart3 className="h-4 w-4" /> Total Consumed
                 </div>
-                <p className="text-2xl font-bold">{fmt(mockCreditPools.reduce((s, p) => s + p.usedCredits, 0))}</p>
+                <p className="text-2xl font-bold">{fmt(mockTokenPools.reduce((s, p) => s + p.usedTokens, 0))}</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {Math.round((mockCreditPools.reduce((s, p) => s + p.usedCredits, 0) / mockCreditPools.reduce((s, p) => s + p.totalCredits, 0)) * 100)}% utilization
+                  {Math.round((mockTokenPools.reduce((s, p) => s + p.usedTokens, 0) / mockTokenPools.reduce((s, p) => s + p.totalTokens, 0)) * 100)}% utilization
                 </p>
               </CardContent>
             </Card>
@@ -206,7 +206,7 @@ const AdminConsole = () => {
                   <Coins className="h-4 w-4" /> Total Spend
                 </div>
                 <p className="text-2xl font-bold">
-                  €{fmt(mockCreditPools.reduce((s, p) => s + Math.round((p.totalCredits / 1_000_000) * p.costPerMillion), 0))}
+                  €{fmt(mockTokenPools.reduce((s, p) => s + Math.round((p.totalTokens / 1_000_000) * p.costPerMillion), 0))}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">lifetime provider cost</p>
               </CardContent>
@@ -215,7 +215,7 @@ const AdminConsole = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Credit Pools from Providers</CardTitle>
+              <CardTitle className="text-base">Token Pools from Providers</CardTitle>
               <CardDescription>Tokens purchased from third-party LLM providers and their consumption status</CardDescription>
             </CardHeader>
             <CardContent>
@@ -231,8 +231,8 @@ const AdminConsole = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {mockCreditPools.map((pool) => {
-                    const pct = Math.round((pool.usedCredits / pool.totalCredits) * 100);
+                  {mockTokenPools.map((pool) => {
+                    const pct = Math.round((pool.usedTokens / pool.totalTokens) * 100);
                     const color = pct > 85 ? "text-destructive" : pct > 60 ? "text-warning" : "text-green-500";
                     return (
                       <TableRow key={pool.id}>
@@ -240,8 +240,8 @@ const AdminConsole = () => {
                           <p className="font-medium">{pool.model}</p>
                           <p className="text-xs text-muted-foreground">{pool.provider}</p>
                         </TableCell>
-                        <TableCell className="text-right font-mono text-sm">{fmt(pool.totalCredits)}</TableCell>
-                        <TableCell className="text-right font-mono text-sm">{fmt(pool.usedCredits)}</TableCell>
+                        <TableCell className="text-right font-mono text-sm">{fmt(pool.totalTokens)}</TableCell>
+                        <TableCell className="text-right font-mono text-sm">{fmt(pool.usedTokens)}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <Progress value={pct} className="h-2 flex-1" />

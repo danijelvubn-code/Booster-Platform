@@ -86,7 +86,7 @@ const PlaygroundPanel = ({
       {showCreditNotice && (
         <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-muted/60 text-xs text-muted-foreground">
           <Info className="h-3.5 w-3.5 shrink-0" />
-          <span>Playground interactions consume credits from your account balance.</span>
+          <span>Playground interactions consume tokens from your account balance.</span>
         </div>
       )}
 

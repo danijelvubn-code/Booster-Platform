@@ -35,7 +35,7 @@ const Login = () => {
                 <Zap className="h-[168px] w-[168px] text-primary fill-primary" />
                 <span className="text-9xl font-bold text-white tracking-tight">booster</span>
               </div>
-              <span className="text-lg font-medium text-white/50 tracking-widest uppercase">Beta Version</span>
+              <span className="text-sm font-semibold tracking-widest uppercase px-4 py-1.5 rounded-full bg-primary/20 text-primary border border-primary/30">Beta Version</span>
             </div>
           </div>
           <div className="pb-12 text-center">

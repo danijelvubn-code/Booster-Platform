@@ -46,8 +46,8 @@ const EndpointDetail = () => {
   if (!ep) {
     return (
       <div className="container py-8">
-        <p>Endpoint not found.</p>
-        <Button asChild variant="ghost"><Link to="/endpoints">← Back to Endpoints</Link></Button>
+        <p>Inference Endpoint not found.</p>
+        <Button asChild variant="ghost"><Link to="/endpoints">← Back to Inference Endpoints</Link></Button>
       </div>
     );
   }
@@ -59,7 +59,7 @@ const EndpointDetail = () => {
   return (
     <div className="container py-8 space-y-6">
       <Button asChild variant="ghost" size="sm" className="-ml-3">
-        <Link to="/endpoints"><ArrowLeft className="h-4 w-4 mr-1" /> Endpoints</Link>
+        <Link to="/endpoints"><ArrowLeft className="h-4 w-4 mr-1" /> Inference Endpoints</Link>
       </Button>
 
       <div className="flex items-start justify-between">

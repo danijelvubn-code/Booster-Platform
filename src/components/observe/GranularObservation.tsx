@@ -166,7 +166,7 @@ const GranularObservation = () => {
     format(dateTo, "yyyy-MM-dd") === format(endOfMonth(new Date()), "yyyy-MM-dd");
 
   // Metric hierarchy breadcrumb
-  const hierarchyLevel = keyFilter !== "all" ? "Key / API" : modelFilter !== "all" ? "Model" : endpointFilter !== "all" ? "Endpoint" : "Tenant / Account";
+  const hierarchyLevel = keyFilter !== "all" ? "Key / API" : modelFilter !== "all" ? "Model" : endpointFilter !== "all" ? "Inference Endpoint" : "Tenant / Account";
 
   return (
     <div className="space-y-6">
@@ -174,7 +174,7 @@ const GranularObservation = () => {
       <div className="flex items-center gap-2 flex-wrap">
         <Layers className="h-4 w-4 text-muted-foreground" />
         <span className="text-xs text-muted-foreground">Metric Level:</span>
-        {["Tenant / Account", "Endpoint", "Key / API", "Model"].map((level) => (
+        {["Tenant / Account", "Inference Endpoint", "Key / API", "Model"].map((level) => (
           <Badge
             key={level}
             variant={level === hierarchyLevel ? "default" : "outline"}
@@ -188,9 +188,9 @@ const GranularObservation = () => {
       {/* Filters */}
       <div className="flex gap-3 flex-wrap">
         <Select value={endpointFilter} onValueChange={(v) => { setEndpointFilter(v); setModelFilter("all"); setKeyFilter("all"); }}>
-          <SelectTrigger className="w-48"><SelectValue placeholder="Endpoint" /></SelectTrigger>
+          <SelectTrigger className="w-48"><SelectValue placeholder="Inference Endpoint" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Endpoints</SelectItem>
+            <SelectItem value="all">All Inference Endpoints</SelectItem>
             {endpoints.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
           </SelectContent>
         </Select>
@@ -259,7 +259,7 @@ const GranularObservation = () => {
             {[
               keyFilter !== "all" && `Key: ${availableKeys.find((k) => k.id === keyFilter)?.name || "Key"}`,
               modelFilter !== "all" && `Model: ${modelFilter}`,
-              endpointFilter !== "all" && `Endpoint: ${endpoints.find((s) => s.id === endpointFilter)?.name}`,
+              endpointFilter !== "all" && `Inference Endpoint: ${endpoints.find((s) => s.id === endpointFilter)?.name}`,
             ].filter(Boolean).join(" · ")}
           </Badge>
         )}

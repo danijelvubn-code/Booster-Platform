@@ -31,9 +31,9 @@ const OnboardingModal = () => {
           <div className="bg-muted rounded-lg p-6 space-y-3">
             {[
               { label: "Tenant", desc: "Your organization account", color: "bg-primary text-primary-foreground" },
-              { label: "Endpoints", desc: "Isolated projects with API endpoint URLs", color: "bg-primary/80 text-primary-foreground" },
+              { label: "Inference Endpoints", desc: "Isolated projects with API endpoint URLs", color: "bg-primary/80 text-primary-foreground" },
               { label: "Model Cosmos", desc: "Your model library — browse, compare & deploy", color: "bg-primary/60 text-primary-foreground" },
-              { label: "Models", desc: "Versioned model instances in an endpoint", color: "bg-primary/50 text-primary-foreground" },
+              { label: "Models", desc: "Versioned model instances in an inference endpoint", color: "bg-primary/50 text-primary-foreground" },
               { label: "Default", desc: "Serves 100% of live traffic", color: "bg-primary/40 text-primary-foreground" },
             ].map((step, i) => (
               <div key={step.label} className="flex items-center gap-3">
@@ -51,7 +51,7 @@ const OnboardingModal = () => {
 
           <p className="text-sm text-muted-foreground">
             Browse available models in <strong>Model Cosmos</strong> — your model library. 
-            Each <strong>Endpoint</strong> has one stable URL. The <strong>Default</strong> model 
+            Each <strong>Inference Endpoint</strong> has one stable URL. The <strong>Default</strong> model 
             serves all live traffic. Your input data and model responses are <strong>never</strong> used 
             to train our models and will not be shared with other users or third parties.
           </p>

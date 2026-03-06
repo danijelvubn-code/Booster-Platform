@@ -156,7 +156,7 @@ const Overview = () => {
       </div>
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">Endpoint Portfolio</h2>
+          <h2 className="text-xl font-semibold">Inference Endpoint Portfolio</h2>
           <Button variant="ghost" size="sm" asChild>
             <Link to="/observe">
               Go to Observe <ArrowRight className="ml-1 h-4 w-4" />
@@ -183,7 +183,7 @@ const Overview = () => {
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">{ep.monthlySpend.toLocaleString()} tokens/mo</span>
                     <span className={`font-medium ${ep.budgetUsed >= 85 ? "text-destructive" : ep.budgetUsed >= 60 ? "text-warning" : "text-success"}`}>
-                      {ep.budgetUsed}% of endpoint budget
+                      {ep.budgetUsed}% of budget
                     </span>
                   </div>
                   {/* Budget bar */}

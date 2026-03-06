@@ -51,18 +51,18 @@ const Endpoints = () => {
     if (idx !== -1) endpoints.splice(idx, 1);
     setDeleteTarget(null);
     forceRender((n) => n + 1);
-    toast({ title: "Endpoint Deleted", description: `"${name}" has been removed.` });
+    toast({ title: "Inference Endpoint Deleted", description: `"${name}" has been removed.` });
   };
 
   return (
     <div className="container py-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Endpoints</h1>
-          <p className="text-muted-foreground">Manage your isolated project endpoints and their deployments.</p>
+          <h1 className="text-3xl font-bold tracking-tight">Inference Endpoints</h1>
+          <p className="text-muted-foreground">Manage your isolated inference endpoints and their deployments.</p>
         </div>
         <Button asChild>
-          <Link to="/endpoints/new"><Plus className="h-4 w-4 mr-1" /> Deploy Endpoint</Link>
+          <Link to="/endpoints/new"><Plus className="h-4 w-4 mr-1" /> Deploy Inference Endpoint</Link>
         </Button>
       </div>
 
@@ -83,14 +83,14 @@ const Endpoints = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => navigate(`/endpoints/${ep.id}/edit`)}>
-                    <Pencil className="h-4 w-4 mr-2" /> Edit Endpoint
+                    <Pencil className="h-4 w-4 mr-2" /> Edit Inference Endpoint
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className="text-destructive focus:text-destructive"
                     onClick={() => setDeleteTarget(ep.id)}
                   >
-                    <Trash2 className="h-4 w-4 mr-2" /> Delete Endpoint
+                    <Trash2 className="h-4 w-4 mr-2" /> Delete Inference Endpoint
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -138,9 +138,9 @@ const Endpoints = () => {
       <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Endpoint</AlertDialogTitle>
+            <AlertDialogTitle>Delete Inference Endpoint</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{endpointToDelete?.name}"? This will remove all deployments and data associated with this endpoint. This action cannot be undone.
+              Are you sure you want to delete "{endpointToDelete?.name}"? This will remove all deployments and data associated with this inference endpoint. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

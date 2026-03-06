@@ -717,16 +717,6 @@ const GuidedModelSelection = () => {
                   </div>
                 </div>
 
-                <Separator />
-
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">Deployment preference</p>
-                  <div className="grid gap-2">
-                    {DEPLOY_PREF.map((dp) => (
-                      <OptionCard key={dp} label={dp} selected={state.deploymentPref === dp} onClick={() => update("deploymentPref", dp)} />
-                    ))}
-                  </div>
-                </div>
               </div>
             </>
           )}

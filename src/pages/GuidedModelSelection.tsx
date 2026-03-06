@@ -365,6 +365,7 @@ const GuidedModelSelection = () => {
       <div className="flex items-center justify-between">
         <Button variant="ghost" size="sm" className="-ml-3" onClick={() => navigate("/cosmos")}>
           <ArrowLeft className="h-4 w-4 mr-1" /> Model Cosmos
+        </Button>
       </div>
 
 

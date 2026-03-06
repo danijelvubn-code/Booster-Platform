@@ -90,7 +90,7 @@ const ModelSearchSelect = ({ value, onChange }: { value: string; onChange: (id: 
 
 type WizardMode = "simple" | "expert";
 const simpleSteps = ["Basic Setup", "Review & Deploy"];
-const expertSteps = ["Basic Setup", "Performance Profile", "Safety & Guardrails", "Budget & Usage Controls", "Review & Deploy"];
+const expertSteps = ["Basic Setup", "Safety & Guardrails", "Budget & Usage Controls", "Review & Deploy"];
 
 /* Simple mode defaults */
 const SIMPLE_DEFAULTS = {
@@ -200,7 +200,7 @@ const CreateEndpoint = () => {
   const profileSpecs = getProfileSpecs(activeProfile);
   const enabledGuardrailCount = countEnabledGuardrails(guardrails);
 
-  const showCostPanel = wizardMode === "expert" && step >= 1 && step <= 3;
+  const showCostPanel = wizardMode === "expert" && step >= 1 && step <= 2;
 
   const estimatedCost = () => {
     if (!selectedModel) return "—";
@@ -389,21 +389,14 @@ const CreateEndpoint = () => {
                 </>
               )}
 
-              {/* Step 1: Performance Profile (Expert only) */}
-              {wizardMode === "expert" && step === 1 && (
-                <PerformanceProfileStep
-                  value={config.performanceProfile}
-                  onChange={(v) => updateConfig("performanceProfile", v)}
-                />
-              )}
 
-              {/* Step 2: Guardrails (Expert only) */}
-              {wizardMode === "expert" && step === 2 && (
+              {/* Step 1: Guardrails (Expert only) */}
+              {wizardMode === "expert" && step === 1 && (
                 <GuardrailsStep state={guardrails} onChange={setGuardrails} />
               )}
 
-              {/* Step 3: Budget & Usage Controls (Expert only) */}
-              {wizardMode === "expert" && step === 3 && (
+              {/* Step 2: Budget & Usage Controls (Expert only) */}
+              {wizardMode === "expert" && step === 2 && (
                 <>
                   <div className="space-y-2">
                     <Label>Monthly Token Budget</Label>

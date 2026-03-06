@@ -109,16 +109,6 @@ const EditEndpoint = () => {
             </CardContent>
           </Card>
 
-          {/* Performance Profile */}
-          <Card>
-            <CardHeader><CardTitle>Performance Profile</CardTitle></CardHeader>
-            <CardContent>
-              <PerformanceProfileStep
-                value={config.performanceProfile}
-                onChange={(v) => updateConfig("performanceProfile", v)}
-              />
-            </CardContent>
-          </Card>
 
           {/* Safety & Guardrails */}
           <Card>
@@ -201,7 +191,6 @@ const EditEndpoint = () => {
         <div className="lg:col-span-1">
           <CostTransparencyPanel
             modelId={config.modelId}
-            performanceProfile={config.performanceProfile}
             monthlyBudget={config.monthlyBudget}
             guardrailsEnabled={enabledGuardrailCount}
           />

@@ -410,8 +410,8 @@ const Cosmos = () => {
                           : model.status === "Sunsetting"
                           ? "This model is sunsetting — consider alternatives for new deployments"
                           : model.status === "Beta"
-                          ? "Deploy (Beta — no SLAs, testing phase)"
-                          : "Deploy Endpoint"}
+                          ? "Deploy Inference Endpoint (Beta — no SLAs, testing phase)"
+                          : "Deploy Inference Endpoint"}
                       </TooltipContent>
                     </Tooltip>
                   </div>

@@ -344,7 +344,7 @@ const Cosmos = () => {
                       <span>{model.tokensPerSecond} tok/s</span>
                     </div>
                     <div className="text-xs">
-                      <span className="text-muted-foreground">In:</span> {model.inputCostPer1M}cr/1M <span className="text-muted-foreground">Out:</span> {model.outputCostPer1M}cr/1M
+                      <span className="text-muted-foreground">In:</span> €{model.inputCostPer1M}/1M <span className="text-muted-foreground">Out:</span> €{model.outputCostPer1M}/1M
                     </div>
                     <div className="flex items-center gap-1">
                       <Leaf className="h-3.5 w-3.5 text-success" />

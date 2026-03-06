@@ -397,22 +397,6 @@ const Cosmos = () => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 shrink-0"
-                          asChild
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Link to={`/playground?model=${model.id}`}>
-                            <Play className="h-4 w-4" />
-                          </Link>
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Try in Playground</TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
                           className={`h-8 w-8 shrink-0 ${model.status === "Deprecated" ? "opacity-30 cursor-not-allowed" : model.status === "Sunsetting" ? "text-warning" : ""}`}
                           disabled={model.status === "Deprecated"}
                           onClick={(e) => { e.stopPropagation(); e.preventDefault(); if (model.status !== "Deprecated") navigate(`/endpoints/new?model=${model.id}`); }}

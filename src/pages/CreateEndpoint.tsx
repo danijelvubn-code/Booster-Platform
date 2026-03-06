@@ -384,16 +384,6 @@ const CreateEndpoint = () => {
                           </Select>
                         </div>
                       )}
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <Label>Confidential Compute</Label>
-                          <p className="text-xs text-muted-foreground">Isolated execution environment (Dedicated Instance only)</p>
-                        </div>
-                        <Switch
-                          checked={config.confidentialCompute}
-                          onCheckedChange={(v) => updateConfig("confidentialCompute", v)}
-                        />
-                      </div>
                     </>
                   )}
                 </>

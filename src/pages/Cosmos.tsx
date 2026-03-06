@@ -302,27 +302,7 @@ const Cosmos = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    {model.availableVersions && model.availableVersions.length > 1 ? (
-                      <div onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
-                        <Select
-                          value={selectedVersions[model.id] || model.version}
-                          onValueChange={(v) => setSelectedVersions((prev) => ({ ...prev, [model.id]: v }))}
-                        >
-                          <SelectTrigger className="h-5 w-auto gap-1 border-none bg-muted/50 px-1.5 py-0 text-xs text-muted-foreground hover:bg-muted focus:ring-0 focus:ring-offset-0">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {model.availableVersions.map((v) => (
-                              <SelectItem key={v} value={v} className="text-xs">
-                                v{v}{v === model.version ? " (latest)" : ""}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    ) : (
-                      <p className="text-xs text-muted-foreground">v{model.version}</p>
-                    )}
+                    <p className="text-xs text-muted-foreground">v{model.version}</p>
                     <span className="text-xs text-muted-foreground">•</span>
                     <p className="text-xs text-muted-foreground">{(model.contextLength / 1000).toFixed(0)}k ctx</p>
                     <span className="text-xs text-muted-foreground">•</span>

@@ -21,9 +21,9 @@ const Help = () => (
         <div className="bg-muted rounded-lg p-6 space-y-4">
           {[
             { icon: Shield, label: "Tenant", desc: "Your organization. One tenant per account with isolated data and billing." },
-            { icon: Box, label: "Endpoints", desc: "Isolated project environments, each with a stable API endpoint URL." },
+            { icon: Box, label: "Inference Endpoints", desc: "Isolated project environments, each with a stable API endpoint URL." },
             { icon: Sparkles, label: "Model Cosmos", desc: "Your model library. Browse, compare, and deploy models from a curated catalog." },
-            { icon: Layers, label: "Models", desc: "Versioned model instances within an Endpoint. Can be Default, Shadow, Test, or Inactive." },
+            { icon: Layers, label: "Models", desc: "Versioned model instances within an Inference Endpoint. Can be Default, Shadow, Test, or Inactive." },
             { icon: Zap, label: "Default Model", desc: "The active model serving 100% of live traffic for an Endpoint." },
           ].map((item, i) => (
             <div key={item.label} className="flex items-start gap-3">

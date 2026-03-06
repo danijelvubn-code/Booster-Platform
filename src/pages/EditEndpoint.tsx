@@ -37,8 +37,8 @@ const EditEndpoint = () => {
   if (!ep) {
     return (
       <div className="container py-8">
-        <p>Endpoint not found.</p>
-        <Button variant="ghost" onClick={() => navigate("/endpoints")}>← Back to Endpoints</Button>
+        <p>Inference Endpoint not found.</p>
+        <Button variant="ghost" onClick={() => navigate("/endpoints")}>← Back to Inference Endpoints</Button>
       </div>
     );
   }
@@ -54,18 +54,18 @@ const EditEndpoint = () => {
   const handleSave = () => {
     ep.name = config.name;
     ep.type = config.targetSpace as "Production" | "POC" | "Demo";
-    toast({ title: "Endpoint Updated", description: `"${config.name}" has been saved.` });
+    toast({ title: "Inference Endpoint Updated", description: `"${config.name}" has been saved.` });
     navigate(`/endpoints/${endpointId}`);
   };
 
   return (
     <div className="container py-8 max-w-5xl space-y-6">
       <Button variant="ghost" size="sm" className="-ml-3" onClick={() => navigate(`/endpoints/${endpointId}`)}>
-        <ArrowLeft className="h-4 w-4 mr-1" /> Back to Endpoint
+        <ArrowLeft className="h-4 w-4 mr-1" /> Back to Inference Endpoint
       </Button>
 
       <div>
-        <h1 className="text-2xl font-bold">Edit Endpoint</h1>
+        <h1 className="text-2xl font-bold">Edit Inference Endpoint</h1>
         <p className="text-muted-foreground text-sm mt-1">Update the configuration for {ep.name}</p>
       </div>
 
@@ -76,7 +76,7 @@ const EditEndpoint = () => {
             <CardHeader><CardTitle>Basic Setup</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Endpoint Name</Label>
+                <Label>Inference Endpoint Name</Label>
                 <Input value={config.name} onChange={(e) => updateConfig("name", e.target.value)} />
               </div>
               <div className="space-y-2">

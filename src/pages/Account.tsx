@@ -225,7 +225,7 @@ const Account = () => {
       {/* ─── 4. Usage Breakdown ────────────────────────────────── */}
       <Card>
         <CardHeader className="flex-row items-center justify-between">
-          <CardTitle className="text-lg">Usage by Endpoint</CardTitle>
+          <CardTitle className="text-lg">Usage by Inference Endpoint</CardTitle>
           <Button variant="ghost" size="sm" asChild>
             <Link to="/observe" className="gap-1">
               View detailed analytics <ArrowRight className="h-4 w-4" />
@@ -236,7 +236,7 @@ const Account = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Endpoint</TableHead>
+                <TableHead>Inference Endpoint</TableHead>
                 <TableHead className="text-right">Tokens Used</TableHead>
                 <TableHead className="text-right">% of Total</TableHead>
               </TableRow>

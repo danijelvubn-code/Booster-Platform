@@ -182,7 +182,7 @@ const CreateEndpoint = () => {
       deployments[newEndpointId] = [];
     }
     toast({
-      title: "Endpoint Deployed",
+      title: "Inference Endpoint Deployed",
       description: `"${config.name}" has been deployed successfully.`,
     });
     navigate(`/endpoints/${newEndpointId}`);
@@ -212,13 +212,13 @@ const CreateEndpoint = () => {
   return (
     <div className="container py-8 max-w-5xl space-y-6">
       <Button variant="ghost" size="sm" className="-ml-3" onClick={() => navigate("/endpoints")}>
-        <ArrowLeft className="h-4 w-4 mr-1" /> Endpoints
+        <ArrowLeft className="h-4 w-4 mr-1" /> Inference Endpoints
       </Button>
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Deploy Endpoint</h1>
-          <p className="text-muted-foreground text-sm mt-1">Configure and deploy a model endpoint with performance, safety, and budget controls.</p>
+          <h1 className="text-2xl font-bold">Deploy Inference Endpoint</h1>
+          <p className="text-muted-foreground text-sm mt-1">Configure and deploy a model inference endpoint with safety and budget controls.</p>
         </div>
         <div className="flex items-center gap-1 rounded-lg border border-border p-1 bg-muted/50">
           <button
@@ -286,7 +286,7 @@ const CreateEndpoint = () => {
                           className="flex-1"
                           onClick={() => setDeployMode("new")}
                         >
-                          New Endpoint
+                          New Inference Endpoint
                         </Button>
                         <Button
                           variant={deployMode === "existing" ? "default" : "outline"}
@@ -294,7 +294,7 @@ const CreateEndpoint = () => {
                           className="flex-1"
                           onClick={() => setDeployMode("existing")}
                         >
-                          Existing Endpoint
+                          Existing Inference Endpoint
                         </Button>
                       </div>
                     </div>
@@ -303,9 +303,9 @@ const CreateEndpoint = () => {
                   {deployMode === "existing" ? (
                     <>
                       <div className="space-y-2">
-                        <Label>Select Endpoint</Label>
+                        <Label>Select Inference Endpoint</Label>
                         <Select value={existingEndpointId} onValueChange={setExistingEndpointId}>
-                          <SelectTrigger><SelectValue placeholder="Choose an endpoint…" /></SelectTrigger>
+                          <SelectTrigger><SelectValue placeholder="Choose an inference endpoint…" /></SelectTrigger>
                           <SelectContent>
                             {endpoints.map((ep) => (
                               <SelectItem key={ep.id} value={ep.id}>
@@ -331,7 +331,7 @@ const CreateEndpoint = () => {
                   ) : (
                     <>
                       <div className="space-y-2">
-                        <Label>Endpoint Name</Label>
+                        <Label>Inference Endpoint Name</Label>
                         <Input
                           placeholder="e.g. Claims Processing"
                           value={config.name}
@@ -424,7 +424,7 @@ const CreateEndpoint = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <Card className="bg-muted/50">
                       <CardContent className="p-4 space-y-2">
-                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Endpoint</p>
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Inference Endpoint</p>
                         <p className="font-semibold">{config.name}</p>
                         <Badge variant="secondary">{config.targetSpace}</Badge>
                         {selectedModel && <p className="text-sm">{selectedModel.name}</p>}
@@ -510,7 +510,7 @@ const CreateEndpoint = () => {
           </Button>
         ) : (
           <Button onClick={handleCreate} disabled={!config.name.trim()}>
-            <Rocket className="h-4 w-4 mr-1" /> Deploy Endpoint
+            <Rocket className="h-4 w-4 mr-1" /> Deploy Inference Endpoint
           </Button>
         )}
       </div>

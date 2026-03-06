@@ -252,16 +252,16 @@ const DeployWizard = () => {
       </Button>
 
       <div>
-        <h1 className="text-2xl font-bold">Add {selectedModel?.name || "Model"} to Endpoint</h1>
+        <h1 className="text-2xl font-bold">Add {selectedModel?.name || "Model"} to Inference Endpoint</h1>
         <p className="text-muted-foreground text-sm mt-1">{selectedModel?.provider} • v{selectedModel?.version}</p>
       </div>
 
       <Card>
         <CardContent className="p-6 space-y-5">
           <div className="space-y-2">
-            <Label>Target Endpoint</Label>
+            <Label>Target Inference Endpoint</Label>
             <Select value={config.endpoint} onValueChange={(v) => updateConfig("endpoint", v)}>
-              <SelectTrigger><SelectValue placeholder="Select endpoint" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder="Select inference endpoint" /></SelectTrigger>
               <SelectContent>{endpoints.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
             </Select>
           </div>

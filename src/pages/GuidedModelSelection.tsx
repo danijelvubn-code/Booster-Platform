@@ -366,12 +366,6 @@ const GuidedModelSelection = () => {
         <Button variant="ghost" size="sm" className="-ml-3" onClick={() => navigate("/cosmos")}>
           <ArrowLeft className="h-4 w-4 mr-1" /> Model Cosmos
         </Button>
-        <div className="flex items-center gap-2">
-          {/* Load saved profile */}
-          <Popover open={showLoadPopover} onOpenChange={setShowLoadPopover}>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="relative">
-                <FolderOpen className="h-4 w-4 mr-1" /> Saved Profiles
                 {savedProfiles.length > 0 && (
                   <span className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center">
                     {savedProfiles.length}

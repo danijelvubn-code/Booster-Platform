@@ -384,25 +384,6 @@ const CreateEndpoint = () => {
                           </Select>
                         </div>
                       )}
-                      <div className="space-y-2">
-                        <Label>Region</Label>
-                        {wizardMode === "simple" ? (
-                          <div className="rounded-md border border-border bg-muted/50 px-3 py-2 text-sm text-muted-foreground flex items-center justify-between">
-                            <span>Scaleway — France</span>
-                            <Badge variant="outline" className="text-[10px]">Auto-selected</Badge>
-                          </div>
-                        ) : (
-                          <Select value={config.region} onValueChange={(v) => updateConfig("region", v)}>
-                            <SelectTrigger><SelectValue /></SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="scaleway-fr">Scaleway — France</SelectItem>
-                              <SelectItem value="scaleway-nl">Scaleway — Netherlands</SelectItem>
-                              <SelectItem value="scaleway-pl">Scaleway — Poland</SelectItem>
-                              <SelectItem value="oxigen-es">Oxigen — Spain</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        )}
-                      </div>
                       <div className="flex items-center justify-between">
                         <div>
                           <Label>Confidential Compute</Label>

@@ -79,7 +79,6 @@ const defaultState: WizardState = {
 const stepsMeta = [
   { title: "Use Case", icon: Target },
   { title: "Objective", icon: Sparkles },
-  { title: "Usage Pattern", icon: Activity },
   { title: "Performance", icon: Gauge },
   { title: "Guardrails", icon: Shield },
   { title: "Cost", icon: DollarSign },
@@ -308,7 +307,6 @@ const GuidedModelSelection = () => {
     switch (step) {
       case 0: return state.useCase.length > 0;
       case 1: return state.objective.length > 0;
-      case 2: return state.monthlyVolume.length > 0;
       default: return true;
     }
   };
@@ -479,23 +477,9 @@ const GuidedModelSelection = () => {
             </>
           )}
 
-          {/* Screen 3: Expected Usage Pattern */}
+
+          {/* Screen 3: Performance Expectations */}
           {step === 2 && (
-            <>
-              <div>
-                <h2 className="text-lg font-semibold">How do you expect this endpoint to be used?</h2>
-                <p className="text-sm text-muted-foreground">
-                  This helps us size performance requirements.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-              </div>
-            </>
-          )}
-
-          {/* Screen 4: Performance Expectations */}
-          {step === 3 && (
             <>
               <div>
                 <h2 className="text-lg font-semibold">Performance Expectations</h2>
@@ -528,8 +512,8 @@ const GuidedModelSelection = () => {
             </>
           )}
 
-          {/* Screen 5: Guardrails & Compliance */}
-          {step === 4 && (
+          {/* Screen 4: Guardrails & Compliance */}
+          {step === 3 && (
             <>
               <div>
                 <h2 className="text-lg font-semibold">Compliance & Safety Requirements</h2>
@@ -572,8 +556,8 @@ const GuidedModelSelection = () => {
             </>
           )}
 
-          {/* Screen 6: Cost Sensitivity */}
-          {step === 5 && (
+          {/* Screen 5: Cost Sensitivity */}
+          {step === 4 && (
             <>
               <div>
                 <h2 className="text-lg font-semibold">Budget Sensitivity</h2>
@@ -602,8 +586,8 @@ const GuidedModelSelection = () => {
             </>
           )}
 
-          {/* Screen 7: Results */}
-          {step === 6 && (
+          {/* Screen 6: Results */}
+          {step === 5 && (
             <>
               <div>
                 <h2 className="text-lg font-semibold">Recommended Models for Your Use Case</h2>

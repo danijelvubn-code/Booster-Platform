@@ -491,16 +491,6 @@ const GuidedModelSelection = () => {
 
               <div className="space-y-4">
 
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">Traffic Pattern</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {TRAFFIC.map((t) => (
-                      <OptionCard key={t} label={t} selected={state.trafficPattern === t} onClick={() => update("trafficPattern", t)} />
-                    ))}
-                  </div>
-                </div>
-
-                <Separator />
 
                 <div className="space-y-2">
                   <p className="text-sm font-medium">Is this production-facing?</p>

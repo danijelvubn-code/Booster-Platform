@@ -412,43 +412,6 @@ const GranularObservation = () => {
         </TabsContent>
 
 
-        <TabsContent value="budget" className="space-y-4 mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {endpoints.map((ep) => (
-              <Card key={ep.id}>
-                <CardContent className="p-5">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="font-semibold">{ep.name}</p>
-                    <Badge variant="outline" className={
-                      ep.budgetUsed >= 85 ? "border-destructive/30 text-destructive" :
-                      ep.budgetUsed >= 60 ? "border-warning/30 text-warning" :
-                      "border-success/30 text-success"
-                    }>
-                      {ep.budgetUsed}%
-                    </Badge>
-                  </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full ${
-                        ep.budgetUsed >= 85 ? "bg-destructive" :
-                        ep.budgetUsed >= 60 ? "bg-warning" : "bg-success"
-                      }`}
-                      style={{ width: `${ep.budgetUsed}%` }}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between mt-2">
-                    <p className="text-sm text-muted-foreground">
-                      {Math.round(ep.tokenBudget * ep.budgetUsed / 100).toLocaleString()} / {ep.tokenBudget.toLocaleString()} tokens
-                    </p>
-                    <p className="text-xs text-muted-foreground/70">
-                      {Math.round(ep.tokenBudget * ep.budgetUsed / 100 / 1000).toLocaleString()} / {(ep.tokenBudget / 1000).toLocaleString()} cr
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
 
         <TabsContent value="logs" className="mt-4">
           {endpointFilter !== "all" ? (

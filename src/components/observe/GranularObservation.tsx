@@ -246,14 +246,9 @@ const GranularObservation = () => {
           </div>
         )}
 
-        {(endpointFilter !== "all" || modelFilter !== "all" || keyFilter !== "all") && (
+        {endpointFilter !== "all" && (
           <Badge variant="secondary" className="self-center text-xs">
-            Viewing:{" "}
-            {[
-              keyFilter !== "all" && `Key: ${availableKeys.find((k) => k.id === keyFilter)?.name || "Key"}`,
-              modelFilter !== "all" && `Model: ${modelFilter}`,
-              endpointFilter !== "all" && `Inference Endpoint: ${endpoints.find((s) => s.id === endpointFilter)?.name}`,
-            ].filter(Boolean).join(" · ")}
+            Viewing: {endpoints.find((s) => s.id === endpointFilter)?.name} · Model: {endpoints.find((s) => s.id === endpointFilter)?.defaultDeployment}
           </Badge>
         )}
       </div>

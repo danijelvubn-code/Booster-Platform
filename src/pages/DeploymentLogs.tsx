@@ -34,21 +34,6 @@ const DeploymentLogs = () => {
             </p>
           )}
         </div>
-        <div className="w-[220px]">
-          <Select value={modelFilter} onValueChange={setModelFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="All Models" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Models</SelectItem>
-              {deps.map((dep) => (
-                <SelectItem key={dep.id} value={dep.id}>
-                  {dep.model} <span className="text-muted-foreground text-xs">({dep.name})</span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
       </div>
 
       <SessionLogsList sessions={filteredSessions} />

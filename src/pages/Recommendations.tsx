@@ -38,19 +38,6 @@ const Recommendations = () => {
       <h1 className="text-3xl font-bold tracking-tight">Recommendations</h1>
       <p className="text-muted-foreground">AI-powered optimization suggestions across your portfolio.</p>
 
-      {/* Promo banner */}
-      <Card className="border-primary/20 bg-primary/5">
-        <CardContent className="p-4 flex items-center gap-3">
-          <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-            <Sparkles className="h-4 w-4 text-primary" />
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-semibold">Deploy in Shadow & monitor for 15 days — free</p>
-            <p className="text-xs text-muted-foreground">Test any recommendation risk-free with real traffic before committing. No additional cost during the trial period.</p>
-          </div>
-          <Button size="sm" variant="outline" className="shrink-0 border-primary/30 text-primary hover:bg-primary/10">Learn More</Button>
-        </CardContent>
-      </Card>
 
       <div className="space-y-4">
         {recommendations.map((rec) => {

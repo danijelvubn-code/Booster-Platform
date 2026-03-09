@@ -180,11 +180,8 @@ const Overview = () => {
                     <Shield className="h-3.5 w-3.5" />
                     {ep.defaultDeployment}
                   </div>
-                  <div className="flex items-center justify-between text-sm">
+                  <div className="text-sm">
                     <span className="text-muted-foreground">{ep.monthlySpend.toLocaleString()} tokens/mo</span>
-                    <span className={`font-medium ${ep.budgetUsed >= 85 ? "text-destructive" : ep.budgetUsed >= 60 ? "text-warning" : "text-success"}`}>
-                      {ep.budgetUsed}% of budget
-                    </span>
                   </div>
                 </CardContent>
               </Card>

@@ -307,7 +307,6 @@ const GuidedModelSelection = () => {
     switch (step) {
       case 0: return state.useCase.length > 0;
       case 1: return state.objective.length > 0;
-      case 2: return state.monthlyVolume.length > 0;
       default: return true;
     }
   };

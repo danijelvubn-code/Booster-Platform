@@ -159,6 +159,8 @@ const CreateEndpoint = () => {
       budgetUsed: 0,
       health: "OK",
       monthlySpend: 0,
+      inputTokens: 0,
+      outputTokens: 0,
       endpoint: endpointUrl,
       tokenBudget: parseInt(config.monthlyBudget) || 1_000_000,
       performanceProfile: config.performanceProfile,

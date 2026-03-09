@@ -112,35 +112,6 @@ const Account = () => {
           ))}
         </div>
 
-        <Card>
-          <CardContent className="p-4 space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <Gauge className="h-4 w-4 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold">Rate Limits</p>
-                <p className="text-xs text-muted-foreground">Based on your {account.performanceProfile} profile</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-lg border bg-muted/30 p-3">
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
-                  <Zap className="h-3 w-3" />
-                  Requests per Minute
-                </div>
-                <p className="text-lg font-bold">{account.rpmLimit.toLocaleString()} <span className="text-xs font-normal text-muted-foreground">RPM</span></p>
-              </div>
-              <div className="rounded-lg border bg-muted/30 p-3">
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
-                  <Zap className="h-3 w-3" />
-                  Tokens per Minute
-                </div>
-                <p className="text-lg font-bold">{fmt(account.tpmLimit)} <span className="text-xs font-normal text-muted-foreground">TPM</span></p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
 
         {nearExpiry && (
           <div className="flex items-center gap-2 rounded-lg border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-warning font-medium">

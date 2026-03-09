@@ -79,7 +79,6 @@ const defaultState: WizardState = {
 const stepsMeta = [
   { title: "Use Case", icon: Target },
   { title: "Objective", icon: Sparkles },
-  { title: "Guardrails", icon: Shield },
   { title: "Cost", icon: DollarSign },
   { title: "Results", icon: Check },
 ];

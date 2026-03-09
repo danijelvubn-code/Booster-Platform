@@ -374,7 +374,7 @@ const GranularObservation = () => {
         <TabsList>
           <TabsTrigger value="usage">Usage</TabsTrigger>
           
-          <TabsTrigger value="budget">Budget</TabsTrigger>
+          
           <TabsTrigger value="logs">Logs</TabsTrigger>
         </TabsList>
 

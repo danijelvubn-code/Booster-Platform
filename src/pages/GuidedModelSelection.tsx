@@ -79,7 +79,6 @@ const defaultState: WizardState = {
 const stepsMeta = [
   { title: "Use Case", icon: Target },
   { title: "Objective", icon: Sparkles },
-  { title: "Guardrails", icon: Shield },
   { title: "Cost", icon: DollarSign },
   { title: "Results", icon: Check },
 ];
@@ -477,52 +476,8 @@ const GuidedModelSelection = () => {
           )}
 
 
-          {/* Screen 3: Guardrails & Compliance */}
+          {/* Screen 3: Cost Sensitivity */}
           {step === 2 && (
-            <>
-              <div>
-                <h2 className="text-lg font-semibold">Compliance & Safety Requirements</h2>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">Does this workload involve sensitive data?</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <OptionCard label="Yes" selected={state.sensitiveData === true} onClick={() => update("sensitiveData", true)} />
-                    <OptionCard label="No" selected={state.sensitiveData === false} onClick={() => update("sensitiveData", false)} />
-                  </div>
-                </div>
-
-                {state.sensitiveData && (
-                  <>
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium">Select data types</p>
-                      <div className="flex flex-wrap gap-2">
-                        {DATA_TYPES.map((dt) => (
-                          <ChipToggle key={dt} label={dt} selected={state.dataTypes.includes(dt)} onClick={() => toggleDataType(dt)} />
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                <Separator />
-
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">Do you require moderation?</p>
-                  <div className="grid gap-2">
-                    {MODERATION.map((mod) => (
-                      <OptionCard key={mod} label={mod} selected={state.moderation === mod} onClick={() => update("moderation", mod)} />
-                    ))}
-                  </div>
-                </div>
-
-              </div>
-            </>
-          )}
-
-          {/* Screen 4: Cost Sensitivity */}
-          {step === 3 && (
             <>
               <div>
                 <h2 className="text-lg font-semibold">Budget Sensitivity</h2>
@@ -551,8 +506,8 @@ const GuidedModelSelection = () => {
             </>
           )}
 
-          {/* Screen 5: Results */}
-          {step === 4 && (
+          {/* Screen 4: Results */}
+          {step === 3 && (
             <>
               <div>
                 <h2 className="text-lg font-semibold">Recommended Models for Your Use Case</h2>

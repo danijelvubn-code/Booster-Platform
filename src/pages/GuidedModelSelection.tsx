@@ -477,23 +477,9 @@ const GuidedModelSelection = () => {
             </>
           )}
 
-          {/* Screen 3: Expected Usage Pattern */}
+
+          {/* Screen 3: Performance Expectations */}
           {step === 2 && (
-            <>
-              <div>
-                <h2 className="text-lg font-semibold">How do you expect this endpoint to be used?</h2>
-                <p className="text-sm text-muted-foreground">
-                  This helps us size performance requirements.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-              </div>
-            </>
-          )}
-
-          {/* Screen 4: Performance Expectations */}
-          {step === 3 && (
             <>
               <div>
                 <h2 className="text-lg font-semibold">Performance Expectations</h2>

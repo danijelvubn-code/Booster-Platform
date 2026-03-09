@@ -255,12 +255,11 @@ const GranularObservation = () => {
 
       {/* Key-level stat cards */}
       {keyFilter !== "all" && keyData && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {[
             { label: "Tokens (billing month)", value: `${(keyData.totalTokens / 1000).toFixed(0)}k`, icon: Activity },
             { label: "Avg Latency", value: `${keyData.avgLatency}ms`, icon: Clock },
             { label: "Total Requests", value: keyData.totalRequests.toLocaleString(), icon: Zap },
-            { label: "Error Rate", value: `${keyData.errorRate}%`, icon: AlertTriangle },
           ].map((item) => (
             <Card key={item.label}>
               <CardContent className="flex items-center gap-3 p-4">
@@ -279,12 +278,11 @@ const GranularObservation = () => {
 
       {/* Model-level stat cards */}
       {modelFilter !== "all" && keyFilter === "all" && modelData && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {[
             { label: "Tokens (billing month)", value: `${(modelData.totalTokens / 1000).toFixed(0)}k`, icon: Activity },
             { label: "Avg Speed", value: `${Math.round(1000 / modelData.avgLatency * 50)} tok/s`, icon: Clock },
             { label: "Total Requests", value: modelData.totalRequests.toLocaleString(), icon: Zap },
-            { label: "Error Rate", value: `${modelData.errorRate}%`, icon: AlertTriangle },
           ].map((item) => (
             <Card key={item.label}>
               <CardContent className="flex items-center gap-3 p-4">

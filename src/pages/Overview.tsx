@@ -66,13 +66,7 @@ const Overview = () => {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-bold tracking-tight">{tenant.name}</h1>
-            <Badge className="bg-primary/10 text-primary border border-primary/20 gap-1">
-              <Rocket className="h-3 w-3" />
-              {tenant.accountType}
-            </Badge>
-          </div>
+          <h1 className="text-3xl font-bold tracking-tight">{tenant.name}</h1>
         </div>
       </div>
 

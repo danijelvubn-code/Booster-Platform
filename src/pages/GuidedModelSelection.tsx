@@ -551,8 +551,8 @@ const GuidedModelSelection = () => {
             </>
           )}
 
-          {/* Screen 6: Results */}
-          {step === 5 && (
+          {/* Screen 5: Results */}
+          {step === 4 && (
             <>
               <div>
                 <h2 className="text-lg font-semibold">Recommended Models for Your Use Case</h2>

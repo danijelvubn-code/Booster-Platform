@@ -343,7 +343,7 @@ const GranularObservation = () => {
                   <TableHead className="text-right">Cost (€)</TableHead>
                   <TableHead className="text-right">Requests</TableHead>
                   <TableHead className="text-right">Avg Latency</TableHead>
-                  <TableHead className="text-right">Error Rate</TableHead>
+                  
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -359,9 +359,6 @@ const GranularObservation = () => {
                     <TableCell className="text-right text-sm">€{row.usage.reduce((sum: number, d: { cost: number }) => sum + d.cost, 0).toFixed(2)}</TableCell>
                     <TableCell className="text-right text-sm">{row.totalRequests.toLocaleString()}</TableCell>
                     <TableCell className="text-right text-sm">{row.avgLatency}ms</TableCell>
-                    <TableCell className="text-right text-sm">
-                      <span className={row.errorRate === 0 ? "text-success" : "text-destructive"}>{row.errorRate}%</span>
-                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

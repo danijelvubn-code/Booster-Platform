@@ -167,7 +167,6 @@ const Overview = () => {
               <Card className="hover:border-primary/40 transition-colors cursor-pointer h-full border-l-4" style={{ borderLeftColor: `hsl(43 80% 55%)` }}>
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <Badge variant="secondary" className="text-xs">{ep.type}</Badge>
                     {healthBadge(ep.health)}
                   </div>
                   <CardTitle className="text-lg mt-2">{ep.name}</CardTitle>

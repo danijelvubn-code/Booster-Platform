@@ -325,47 +325,6 @@ const GranularObservation = () => {
         </div>
       )}
 
-      {/* Per-key usage breakdown table */}
-      {endpointFilter !== "all" && keyFilter === "all" && keyBreakdownData.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm flex items-center gap-2">
-              <Key className="h-4 w-4 text-primary" />
-              Usage by API Key
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Key Name</TableHead>
-                  <TableHead className="text-right">Tokens (billing month)</TableHead>
-                  <TableHead className="text-right">Cost (€)</TableHead>
-                  <TableHead className="text-right">Requests</TableHead>
-                  <TableHead className="text-right">Avg Latency</TableHead>
-                  
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {keyBreakdownData.map((row) => (
-                  <TableRow key={row.id} className="cursor-pointer hover:bg-muted/50" onClick={() => setKeyFilter(row.id)}>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-sm">{row.name}</span>
-                        <code className="text-[10px] text-muted-foreground">{row.prefix}</code>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right text-sm">{(row.totalTokens / 1000).toFixed(0)}k</TableCell>
-                    <TableCell className="text-right text-sm">€{row.usage.reduce((sum: number, d: { cost: number }) => sum + d.cost, 0).toFixed(2)}</TableCell>
-                    <TableCell className="text-right text-sm">{row.totalRequests.toLocaleString()}</TableCell>
-                    <TableCell className="text-right text-sm">{row.avgLatency}ms</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>

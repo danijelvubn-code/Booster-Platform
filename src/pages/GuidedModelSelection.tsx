@@ -490,16 +490,6 @@ const GuidedModelSelection = () => {
               </div>
 
               <div className="space-y-4">
-
-
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">Is this production-facing?</p>
-                  <div className="grid gap-2">
-                    {AUDIENCE.map((a) => (
-                      <OptionCard key={a} label={a} selected={state.audience === a} onClick={() => update("audience", a)} />
-                    ))}
-                  </div>
-                </div>
               </div>
             </>
           )}

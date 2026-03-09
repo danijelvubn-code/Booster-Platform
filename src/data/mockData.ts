@@ -1,6 +1,6 @@
 // Tenant
 export const tenant = {
-  name: "The Space Dreams",
+  name: "The Space Dreams Pvt Ltd",
   accountType: "Enterprise",
   tokenCredits: 2_450_000,
   tokenCreditsUsed: 1_620_000,

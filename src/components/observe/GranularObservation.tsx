@@ -343,7 +343,7 @@ const GranularObservation = () => {
                   <TableHead className="text-right">Cost (€)</TableHead>
                   <TableHead className="text-right">Requests</TableHead>
                   <TableHead className="text-right">Avg Latency</TableHead>
-                  <TableHead className="text-right">Error Rate</TableHead>
+                  
                 </TableRow>
               </TableHeader>
               <TableBody>

@@ -165,11 +165,8 @@ const Overview = () => {
           {endpoints.map((ep) => (
             <Link key={ep.id} to={`/endpoints/${ep.id}`}>
               <Card className="hover:border-primary/40 transition-colors cursor-pointer h-full border-l-4" style={{ borderLeftColor: `hsl(43 80% 55%)` }}>
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    {healthBadge(ep.health)}
-                  </div>
-                  <CardTitle className="text-lg mt-2">{ep.name}</CardTitle>
+              <CardHeader className="pb-3">
+                  <CardTitle className="text-lg">{ep.name}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <div className="flex items-center gap-1.5 text-sm text-muted-foreground">

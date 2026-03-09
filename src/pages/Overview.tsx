@@ -71,7 +71,7 @@ const Overview = () => {
       </div>
 
       {/* Portfolio Insights */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {[
           { label: "Tokens Processed — Billing Month", value: `${tenant.tokenCreditsUsed.toLocaleString()}`, subValue: `≈ €${(tenant.tokenCreditsUsed / 10).toLocaleString()}`, icon: Euro, href: "/account" },
           { label: "Requests Served — Billing Month", value: "48,320", subValue: undefined, icon: Activity, href: "/observe" },

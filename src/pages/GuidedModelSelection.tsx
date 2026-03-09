@@ -512,8 +512,8 @@ const GuidedModelSelection = () => {
             </>
           )}
 
-          {/* Screen 5: Guardrails & Compliance */}
-          {step === 4 && (
+          {/* Screen 4: Guardrails & Compliance */}
+          {step === 3 && (
             <>
               <div>
                 <h2 className="text-lg font-semibold">Compliance & Safety Requirements</h2>

@@ -1,41 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip as RechartsTooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  Legend,
-} from "recharts";
-import {
-  DollarSign,
-  Clock,
-  Sparkles,
-  ArrowUpRight,
-} from "lucide-react";
-import { endpoints, deployments, tenant } from "@/data/mockData";
-
-// --- Mock data for business KPIs ---
-
-const savingsTrend = Array.from({ length: 6 }, (_, i) => {
-  const month = new Date(2025, 7 + i);
-  const marketCost = 8200 + Math.round(Math.sin(i * 0.9) * 1800 + Math.random() * 1000);
-  const boosterCost = 5100 + Math.round(Math.sin(i * 0.7) * 1200 + Math.random() * 800);
-  return {
-    month: month.toLocaleString("default", { month: "short" }),
-    marketCost,
-    boosterCost,
-    savings: marketCost - boosterCost,
-  };
-});
-
-const totalMarket = savingsTrend.reduce((s, d) => s + d.marketCost, 0);
-const totalBooster = savingsTrend.reduce((s, d) => s + d.boosterCost, 0);
-const totalSavings = totalMarket - totalBooster;
-const savingsPct = Math.round((totalSavings / totalMarket) * 100);
+import { Clock } from "lucide-react";
+import { endpoints, deployments } from "@/data/mockData";
 
 // Latency data per endpoint
 const latencyData = endpoints
@@ -50,38 +15,7 @@ const latencyData = endpoints
 const TenantDashboard = () => {
   return (
     <div className="space-y-8">
-      {/* Section A: Business Value KPIs */}
-      <section className="space-y-4">
-        <div className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-primary" />
-          <h2 className="text-xl font-semibold">Business Value KPIs</h2>
-        </div>
-
-        {/* Savings Realization */}
-        <div className="grid grid-cols-1 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Savings Trend</CardTitle>
-            </CardHeader>
-            <CardContent className="h-56">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={savingsTrend}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis dataKey="month" tick={{ fontSize: 10 }} />
-                  <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `€${v}`} width={52} />
-                  <RechartsTooltip formatter={(v: number) => [`€${v}`, ""]} />
-                  <Legend wrapperStyle={{ fontSize: 11 }} />
-                  <Bar dataKey="marketCost" name="Market Estimate" fill="hsl(var(--muted-foreground))" opacity={0.35} radius={[2, 2, 0, 0]} />
-                  <Bar dataKey="boosterCost" name="Booster Cost" fill="hsl(var(--primary))" radius={[2, 2, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
-
-      </section>
-
-      {/* Section B: Response Times */}
+      {/* Section: Response Times */}
       <section className="space-y-4">
         <div className="flex items-center gap-2">
           <Clock className="h-5 w-5 text-primary" />

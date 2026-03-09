@@ -15,7 +15,7 @@ export const generateMockSessions = (spaceId: string): LogLine[] => {
   const deps = deployments[spaceId] || [];
   if (deps.length === 0) return [];
 
-  const keys = ["sk-***7f2a", "sk-***3e91", "sk-***9b44"];
+  const keys = ["Production", "Default", "Shadow Monitor"];
   const logs: LogLine[] = [];
 
   deps.forEach((dep, di) => {

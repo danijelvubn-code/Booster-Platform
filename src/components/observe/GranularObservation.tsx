@@ -429,20 +429,6 @@ const GranularObservation = () => {
                 </ResponsiveContainer>
               </CardContent>
             </Card>
-            <Card>
-              <CardHeader><CardTitle className="text-sm">Error Rate — Last 24h{activeLabel ? ` · ${activeLabel}` : ""}</CardTitle></CardHeader>
-              <CardContent className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={activeErrorRateData}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                    <XAxis dataKey="hour" tick={{ fontSize: 10 }} />
-                    <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `${v}%`} width={40} domain={[0, 'auto']} />
-                    <Tooltip formatter={(v: number) => [`${v}%`, "Error Rate"]} />
-                    <Bar dataKey="errorRate" radius={[2, 2, 0, 0]} fill="hsl(var(--destructive))" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
           </div>
         </TabsContent>
 

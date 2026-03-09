@@ -411,26 +411,6 @@ const GranularObservation = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="performance" className="space-y-4 mt-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader><CardTitle className="text-sm">Latency Distribution — Last 24h{activeLabel ? ` · ${activeLabel}` : ""}</CardTitle></CardHeader>
-              <CardContent className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={activeLatencyData}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                    <XAxis dataKey="hour" tick={{ fontSize: 10 }} />
-                    <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `${v}ms`} width={48} />
-                    <Tooltip formatter={(v: number) => [`${v}ms`]} />
-                    <Line type="monotone" dataKey="p50" stroke="hsl(var(--success))" strokeWidth={2} dot={false} name="p50" />
-                    <Line type="monotone" dataKey="p95" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} name="p95" />
-                    <Line type="monotone" dataKey="p99" stroke="hsl(var(--destructive))" strokeWidth={2} dot={false} name="p99" />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
 
         <TabsContent value="budget" className="space-y-4 mt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -17,6 +17,8 @@ export const endpoints: Array<{
   budgetUsed: number;
   health: "OK" | "At Risk";
   monthlySpend: number;
+  inputTokens: number;
+  outputTokens: number;
   endpoint: string;
   tokenBudget: number;
   performanceProfile: "best-effort" | "premium" | "enterprise";
@@ -29,6 +31,8 @@ export const endpoints: Array<{
     budgetUsed: 78,
     health: "OK" as const,
     monthlySpend: 14_200,
+    inputTokens: 2_840_000,
+    outputTokens: 1_060_000,
     endpoint: "https://api.booster.ai/v1/endpoints/claims-processing",
     tokenBudget: 5_000_000,
     performanceProfile: "premium",
@@ -41,6 +45,8 @@ export const endpoints: Array<{
     budgetUsed: 62,
     health: "OK" as const,
     monthlySpend: 9_800,
+    inputTokens: 1_520_000,
+    outputTokens: 340_000,
     endpoint: "https://api.booster.ai/v1/endpoints/contract-analysis",
     tokenBudget: 3_000_000,
     performanceProfile: "enterprise",
@@ -53,6 +59,8 @@ export const endpoints: Array<{
     budgetUsed: 45,
     health: "OK" as const,
     monthlySpend: 4_200,
+    inputTokens: 420_000,
+    outputTokens: 255_000,
     endpoint: "https://api.booster.ai/v1/endpoints/coding-copilot",
     tokenBudget: 1_500_000,
     performanceProfile: "best-effort",
@@ -65,6 +73,8 @@ export const endpoints: Array<{
     budgetUsed: 88,
     health: "At Risk" as const,
     monthlySpend: 3_000,
+    inputTokens: 580_000,
+    outputTokens: 124_000,
     endpoint: "https://api.booster.ai/v1/endpoints/customer-support",
     tokenBudget: 800_000,
     performanceProfile: "best-effort",
@@ -77,6 +87,8 @@ export const endpoints: Array<{
     budgetUsed: 0,
     health: "OK" as const,
     monthlySpend: 0,
+    inputTokens: 0,
+    outputTokens: 0,
     endpoint: "https://api.booster.ai/v1/endpoints/getting-started",
     tokenBudget: 500_000,
     performanceProfile: "best-effort",

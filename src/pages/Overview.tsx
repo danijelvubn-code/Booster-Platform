@@ -180,8 +180,9 @@ const Overview = () => {
                     <Shield className="h-3.5 w-3.5" />
                     {ep.defaultDeployment}
                   </div>
-                  <div className="text-sm">
-                    <span className="text-muted-foreground">{ep.monthlySpend.toLocaleString()} tokens/mo</span>
+                  <div className="text-sm text-muted-foreground space-y-0.5">
+                    <div>↗ {ep.inputTokens.toLocaleString()} input</div>
+                    <div>↙ {ep.outputTokens.toLocaleString()} output</div>
                   </div>
                 </CardContent>
               </Card>

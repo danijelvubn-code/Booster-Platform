@@ -212,13 +212,6 @@ const GranularObservation = () => {
           </SelectContent>
         </Select>
 
-        <Select value={modelFilter} onValueChange={setModelFilter} disabled={endpointFilter === "all"}>
-          <SelectTrigger className="w-52"><SelectValue placeholder={endpointFilter === "all" ? "Select endpoint first" : "Model"} /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Models</SelectItem>
-            {availableModels.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
-          </SelectContent>
-        </Select>
 
         {(activeTab === "usage" || activeTab === "logs") && (
           <div className="flex items-center gap-2">

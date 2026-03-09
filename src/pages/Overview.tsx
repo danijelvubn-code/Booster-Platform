@@ -74,9 +74,6 @@ const Overview = () => {
             </Badge>
           </div>
         </div>
-        <Link to="/account" className={`px-4 py-2 rounded-lg border text-sm font-semibold cursor-pointer hover:opacity-80 transition-opacity ${budgetHeatColor(budgetPct)}`}>
-          Credit usage: {budgetPct}%
-        </Link>
       </div>
 
       {/* Portfolio Insights */}

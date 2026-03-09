@@ -58,44 +58,8 @@ const TenantDashboard = () => {
         </div>
 
         {/* Savings Realization */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <Card className="lg:col-span-1">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <DollarSign className="h-4 w-4 text-success" />
-                Savings Realization
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-xs text-muted-foreground">
-                Is this platform paying for itself?
-              </p>
-              <div className="space-y-1">
-                <p className="text-3xl font-bold text-success">
-                  €{(totalSavings / 100).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                </p>
-                <p className="text-xs text-muted-foreground">Total saved this period</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <Badge variant="outline" className="border-success/30 text-success font-mono">
-                  <ArrowUpRight className="h-3 w-3 mr-1" />
-                  {savingsPct}% cost reduction
-                </Badge>
-              </div>
-              <div className="pt-2 space-y-1">
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>Market estimate</span>
-                  <span className="font-mono">€{(totalMarket / 100).toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>Booster actual</span>
-                  <span className="font-mono">€{(totalBooster / 100).toLocaleString()}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="lg:col-span-2">
+        <div className="grid grid-cols-1 gap-4">
+          <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Savings Trend</CardTitle>
             </CardHeader>

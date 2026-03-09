@@ -174,7 +174,7 @@ const GranularObservation = () => {
       <div className="flex items-center gap-2 flex-wrap">
         <Layers className="h-4 w-4 text-muted-foreground" />
         <span className="text-xs text-muted-foreground">Metric Level:</span>
-        {["Tenant / Account", "Inference Endpoint", "Key / API", "Model"].map((level) => (
+        {["Tenant / Account", "Inference Endpoint", "Key / API"].map((level) => (
           <Badge
             key={level}
             variant={level === hierarchyLevel ? "default" : "outline"}

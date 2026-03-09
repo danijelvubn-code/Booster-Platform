@@ -477,42 +477,8 @@ const GuidedModelSelection = () => {
           )}
 
 
-          {/* Screen 3: Performance Expectations */}
+          {/* Screen 3: Guardrails & Compliance */}
           {step === 2 && (
-            <>
-              <div>
-                <h2 className="text-lg font-semibold">Performance Expectations</h2>
-                <p className="text-sm text-muted-foreground">
-                  Performance constraints filter out incompatible models.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">Maximum acceptable P95 latency</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {LATENCY.map((l) => (
-                      <OptionCard key={l} label={l} selected={state.maxLatency === l} onClick={() => update("maxLatency", l)} />
-                    ))}
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">Is low TTFT critical?</p>
-                  <div className="grid gap-2">
-                    {TTFT.map((t) => (
-                      <OptionCard key={t.label} label={t.label} description={t.description} selected={state.ttftCritical === t.label} onClick={() => update("ttftCritical", t.label)} />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* Screen 4: Guardrails & Compliance */}
-          {step === 3 && (
             <>
               <div>
                 <h2 className="text-lg font-semibold">Compliance & Safety Requirements</h2>

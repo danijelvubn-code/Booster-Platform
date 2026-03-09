@@ -373,7 +373,7 @@ const GranularObservation = () => {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="usage">Usage</TabsTrigger>
-          <TabsTrigger value="performance">Performance</TabsTrigger>
+          
           <TabsTrigger value="budget">Budget</TabsTrigger>
           <TabsTrigger value="logs">Logs</TabsTrigger>
         </TabsList>

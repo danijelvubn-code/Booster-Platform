@@ -79,7 +79,6 @@ const defaultState: WizardState = {
 const stepsMeta = [
   { title: "Use Case", icon: Target },
   { title: "Objective", icon: Sparkles },
-  { title: "Cost", icon: DollarSign },
   { title: "Results", icon: Check },
 ];
 
@@ -476,38 +475,8 @@ const GuidedModelSelection = () => {
           )}
 
 
-          {/* Screen 3: Cost Sensitivity */}
+          {/* Screen 3: Results */}
           {step === 2 && (
-            <>
-              <div>
-                <h2 className="text-lg font-semibold">Budget Sensitivity</h2>
-                <p className="text-sm text-muted-foreground">How sensitive is this workload to cost?</p>
-              </div>
-
-              <div className="space-y-4">
-                <div className="grid gap-2">
-                  {COST_SENS.map((cs) => (
-                    <OptionCard key={cs.label} label={cs.label} description={cs.description} selected={state.costSensitivity === cs.label} onClick={() => update("costSensitivity", cs.label)} />
-                  ))}
-                </div>
-
-                <Separator />
-
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">Monthly budget range <span className="text-muted-foreground font-normal">(optional)</span></p>
-                  <Input
-                    type="text"
-                    placeholder="e.g. $500 – $2,000"
-                    value={state.monthlyBudget}
-                    onChange={(e) => update("monthlyBudget", e.target.value)}
-                  />
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* Screen 4: Results */}
-          {step === 3 && (
             <>
               <div>
                 <h2 className="text-lg font-semibold">Recommended Models for Your Use Case</h2>

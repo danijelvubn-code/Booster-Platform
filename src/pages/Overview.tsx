@@ -85,7 +85,7 @@ const Overview = () => {
           { label: "Tokens Processed — Billing Month", value: `${tenant.tokenCreditsUsed.toLocaleString()}`, subValue: `≈ €${(tenant.tokenCreditsUsed / 10).toLocaleString()}`, icon: Euro, href: "/account" },
           { label: "Requests Served — Billing Month", value: "48,320", subValue: undefined, icon: Activity, href: "/observe" },
           
-          { label: "Active Recommendations", value: String(recommendations.filter(r => r.status === "pending").length), subValue: undefined, icon: Lightbulb, href: "/recommendations" },
+          
         ].map((item) => (
           <Link key={item.label} to={item.href}>
             <Card className="hover:border-primary/30 transition-colors cursor-pointer h-full">

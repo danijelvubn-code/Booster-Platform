@@ -83,12 +83,6 @@ const Account = () => {
         <div className="flex items-start justify-between flex-wrap gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">{account.tenantName}</h1>
-            <p className="text-muted-foreground mt-1 flex items-center gap-2">
-              {account.planName} • {account.planType}
-              <Badge variant="outline" className="border-success/30 text-success bg-success/10 ml-1">
-                {account.status}
-              </Badge>
-            </p>
           </div>
         </div>
 

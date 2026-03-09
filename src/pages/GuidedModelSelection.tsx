@@ -490,16 +490,6 @@ const GuidedModelSelection = () => {
               </div>
 
               <div className="space-y-4">
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">Estimated Monthly Volume</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {VOLUMES.map((v) => (
-                      <OptionCard key={v} label={v} selected={state.monthlyVolume === v} onClick={() => update("monthlyVolume", v)} />
-                    ))}
-                  </div>
-                </div>
-
-                <Separator />
 
                 <div className="space-y-2">
                   <p className="text-sm font-medium">Traffic Pattern</p>

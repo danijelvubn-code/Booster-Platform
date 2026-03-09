@@ -186,13 +186,6 @@ const Overview = () => {
                       {ep.budgetUsed}% of budget
                     </span>
                   </div>
-                  {/* Budget bar */}
-                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all ${ep.budgetUsed >= 85 ? "bg-destructive" : ep.budgetUsed >= 60 ? "bg-warning" : "bg-success"}`}
-                      style={{ width: `${ep.budgetUsed}%` }}
-                    />
-                  </div>
                 </CardContent>
               </Card>
             </Link>

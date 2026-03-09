@@ -415,13 +415,7 @@ const GranularObservation = () => {
 
         <TabsContent value="logs" className="mt-4">
           {endpointFilter !== "all" ? (
-            <SessionLogsList sessions={
-              (() => {
-                const allSessions = generateMockSessions(endpointFilter);
-                if (modelFilter === "all") return allSessions;
-                return allSessions.filter((s) => s.modelName === modelFilter);
-              })()
-            } />
+            <SessionLogsList sessions={generateMockSessions(endpointFilter)} />
           ) : (
             <Card>
               <CardContent className="p-6">

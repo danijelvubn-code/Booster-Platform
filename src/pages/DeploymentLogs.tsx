@@ -17,9 +17,7 @@ const DeploymentLogs = () => {
 
   const [modelFilter, setModelFilter] = useState<string>("all");
 
-  const filteredSessions = modelFilter === "all"
-    ? allSessions
-    : allSessions.filter((s) => s.deploymentId === modelFilter);
+  const filteredSessions = allSessions;
 
   return (
     <div className="container py-8 space-y-6">

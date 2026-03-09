@@ -27,7 +27,7 @@ const DeploymentLogs = () => {
 
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Session Logs</h1>
+          <h1 className="text-2xl font-bold">Request Logs</h1>
           {ep && (
             <p className="text-sm text-muted-foreground mt-1">
               {ep.name}

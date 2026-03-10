@@ -98,7 +98,7 @@ const EndpointDetail = () => {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Model</TableHead>
-                <TableHead>Mode</TableHead>
+                
                 <TableHead>Budget</TableHead>
                 
                 
@@ -111,7 +111,7 @@ const EndpointDetail = () => {
                 <TableRow key={dep.id}>
                   <TableCell className="font-medium">{dep.name}</TableCell>
                   <TableCell>{dep.model} <span className="text-muted-foreground text-xs">{dep.version}</span></TableCell>
-                  <TableCell>{modeBadge(dep.mode)}</TableCell>
+                  
                   <TableCell>
                     <span className={dep.budgetUsed >= 85 ? "text-destructive" : dep.budgetUsed >= 60 ? "text-warning" : "text-success"}>
                       {dep.budgetUsed}%

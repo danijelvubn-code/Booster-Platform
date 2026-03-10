@@ -101,7 +101,7 @@ const EndpointDetail = () => {
                 <TableHead>Mode</TableHead>
                 <TableHead>Budget</TableHead>
                 
-                <TableHead>Location</TableHead>
+                
                 <TableHead>Security</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -116,9 +116,6 @@ const EndpointDetail = () => {
                     <span className={dep.budgetUsed >= 85 ? "text-destructive" : dep.budgetUsed >= 60 ? "text-warning" : "text-success"}>
                       {dep.budgetUsed}%
                     </span>
-                  </TableCell>
-                  <TableCell className="flex items-center gap-1 text-sm">
-                    <Globe className="h-3.5 w-3.5 text-muted-foreground" /> {dep.region}
                   </TableCell>
                   <TableCell>
                     {dep.confidentialCompute && (

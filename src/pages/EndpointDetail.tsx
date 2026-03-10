@@ -152,21 +152,6 @@ const EndpointDetail = () => {
                             </DropdownMenuItem>
                           </>
                         )}
-                        {dep.mode !== "Inactive" && (
-                          <>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              className="text-destructive focus:text-destructive"
-                              onClick={() => {
-                                dep.mode = "Inactive";
-                                forceUpdate((n) => n + 1);
-                                toast({ title: "Deactivated", description: `${dep.name} has been set to Inactive.` });
-                              }}
-                            >
-                              <XCircle className="h-4 w-4 mr-2" /> Deactivate
-                            </DropdownMenuItem>
-                          </>
-                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

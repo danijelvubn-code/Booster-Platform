@@ -117,13 +117,6 @@ const EndpointDetail = () => {
                       {dep.budgetUsed}%
                     </span>
                   </TableCell>
-                  <TableCell>
-                    {dep.confidentialCompute && (
-                      <Badge variant="outline" className="border-primary/30 text-primary text-xs">
-                        <Lock className="h-3 w-3 mr-1" /> CC
-                      </Badge>
-                    )}
-                  </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

@@ -117,11 +117,6 @@ const EndpointDetail = () => {
                       {dep.budgetUsed}%
                     </span>
                   </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={dep.slaStatus === "OK" ? "border-success/30 text-success" : "border-warning/30 text-warning"}>
-                      {dep.slaStatus}
-                    </Badge>
-                  </TableCell>
                   <TableCell className="flex items-center gap-1 text-sm">
                     <Globe className="h-3.5 w-3.5 text-muted-foreground" /> {dep.region}
                   </TableCell>

@@ -434,14 +434,6 @@ const CreateEndpoint = () => {
                     </Card>
                     <Card className="bg-muted/50">
                       <CardContent className="p-4 space-y-2">
-                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Infrastructure</p>
-                        <div className="flex items-center gap-1 text-sm">
-                          <Globe className="h-3.5 w-3.5 text-muted-foreground" /> {config.region}
-                        </div>
-                      </CardContent>
-                    </Card>
-                    <Card className="bg-muted/50">
-                      <CardContent className="p-4 space-y-2">
                         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Budget</p>
                         <p className="text-sm">{parseInt(config.monthlyBudget).toLocaleString()} tokens/mo</p>
                         <p className="text-xs text-muted-foreground">Alert at {config.alertThreshold}%</p>

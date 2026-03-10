@@ -117,9 +117,6 @@ const EndpointDetail = () => {
                       {dep.budgetUsed}%
                     </span>
                   </TableCell>
-                  <TableCell className="flex items-center gap-1 text-sm">
-                    <Globe className="h-3.5 w-3.5 text-muted-foreground" /> {dep.region}
-                  </TableCell>
                   <TableCell>
                     {dep.confidentialCompute && (
                       <Badge variant="outline" className="border-primary/30 text-primary text-xs">

@@ -152,6 +152,13 @@ const EndpointDetail = () => {
                             </DropdownMenuItem>
                           </>
                         )}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive"
+                          onClick={() => toast({ title: "Disassociated", description: `${dep.name} has been disassociated from this endpoint.` })}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" /> Disassociate
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

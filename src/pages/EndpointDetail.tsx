@@ -140,11 +140,6 @@ const EndpointDetail = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        {dep.mode !== "Inactive" && (
-                          <DropdownMenuItem onClick={() => navigate(`/playground?deployment=${dep.id}&space=${endpointId}`)}>
-                            <Play className="h-4 w-4 mr-2" /> Playground
-                          </DropdownMenuItem>
-                        )}
                         {dep.mode === "Inactive" && !isImpersonating && (
                           <>
                             <DropdownMenuItem onClick={() => { setPromoteTarget(dep.id); setConfirmed(false); }}>

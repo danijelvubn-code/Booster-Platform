@@ -98,7 +98,7 @@ const EndpointDetail = () => {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Model</TableHead>
-                <TableHead>Mode</TableHead>
+                
                 <TableHead>Budget</TableHead>
                 
                 

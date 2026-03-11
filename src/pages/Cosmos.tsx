@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Zap, Leaf, BarChart3, ArrowRight, SlidersHorizontal, Server, Cloud, ExternalLink, FileDown, Play, X, Rocket, GitCompareArrows, Sparkles, ChevronDown, AlertTriangle, Ban } from "lucide-react";
+import { Search, Zap, Leaf, BarChart3, ArrowRight, SlidersHorizontal, Server, Cloud, ExternalLink, FileDown, Play, X, Rocket, Sparkles, ChevronDown, AlertTriangle, Ban } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";

@@ -91,7 +91,7 @@ const ModelSearchSelect = ({ value, onChange }: { value: string; onChange: (id: 
 
 type WizardMode = "simple" | "expert";
 const simpleSteps = ["Basic Setup", "Review & Deploy"];
-const expertSteps = ["Basic Setup", "Safety & Guardrails", "Budget & Usage Controls", "Review & Deploy"];
+const expertSteps = ["Basic Setup", "Guardrails", "Budget & Usage Controls", "Review & Deploy"];
 
 /* Simple mode defaults */
 const SIMPLE_DEFAULTS = {

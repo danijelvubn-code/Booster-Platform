@@ -230,29 +230,23 @@ const Cosmos = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 pt-1 justify-end">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className={`h-8 w-8 shrink-0 ${model.status === "Deprecated" ? "opacity-30 cursor-not-allowed" : model.status === "Sunsetting" ? "text-warning" : ""}`}
-                          disabled={model.status === "Deprecated"}
-                          onClick={(e) => { e.stopPropagation(); e.preventDefault(); if (model.status !== "Deprecated") navigate(`/endpoints/new?model=${model.id}`); }}
-                        >
-                          {model.status === "Deprecated" ? <Ban className="h-4 w-4" /> : <Rocket className="h-4 w-4" />}
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        {model.status === "Deprecated"
-                          ? "This model is deprecated and can no longer be deployed"
-                          : model.status === "Sunsetting"
-                          ? "This model is sunsetting — consider alternatives for new deployments"
-                          : model.status === "Beta"
-                          ? "Deploy Inference Endpoint (Beta — no SLAs, testing phase)"
-                          : "Deploy Inference Endpoint"}
-                      </TooltipContent>
-                    </Tooltip>
+                  <div className="flex items-center justify-end pt-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className={`text-xs gap-1.5 ${model.status === "Deprecated" ? "opacity-30 cursor-not-allowed" : model.status === "Sunsetting" ? "border-warning/30 text-warning hover:text-warning" : "hover:border-primary/40 hover:text-primary"}`}
+                      disabled={model.status === "Deprecated"}
+                      onClick={(e) => { e.stopPropagation(); e.preventDefault(); if (model.status !== "Deprecated") navigate(`/endpoints/new?model=${model.id}`); }}
+                    >
+                      {model.status === "Deprecated" ? <Ban className="h-3.5 w-3.5" /> : <Rocket className="h-3.5 w-3.5" />}
+                      {model.status === "Deprecated"
+                        ? "Deprecated"
+                        : model.status === "Sunsetting"
+                        ? "Create Endpoint (Sunsetting)"
+                        : model.status === "Beta"
+                        ? "Create Endpoint (Beta)"
+                        : "Create Inference Endpoint"}
+                    </Button>
                   </div>
                 </CardContent>
               </Card>

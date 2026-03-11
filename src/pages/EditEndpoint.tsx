@@ -112,7 +112,7 @@ const EditEndpoint = () => {
 
           {/* Safety & Guardrails */}
           <Card>
-            <CardHeader><CardTitle>Safety & Guardrails</CardTitle></CardHeader>
+            <CardHeader><CardTitle>Guardrails</CardTitle></CardHeader>
             <CardContent>
               <GuardrailsStep state={guardrails} onChange={setGuardrails} />
             </CardContent>

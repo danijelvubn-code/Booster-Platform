@@ -37,6 +37,7 @@ const account = {
   performanceProfile: "Premium" as const,
   rpmLimit: 500,
   tpmLimit: 250_000,
+  costPerMillionTokens: 3.5,
 };
 
 const usageByEndpoint = [

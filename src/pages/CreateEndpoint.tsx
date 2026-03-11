@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, ArrowRight, Check, Globe, Lock, Info, Rocket, Search, X, Zap, Shield, ShieldOff, Coins, Settings2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import GuardrailsStep, { defaultGuardrailsState, GuardrailsReviewSection, countEnabledGuardrails, type GuardrailsState } from "@/components/GuardrailsStep";
 import PerformanceProfileStep, { getProfileSpecs, type PerformanceProfile } from "@/components/PerformanceProfileStep";
 import CostTransparencyPanel from "@/components/CostTransparencyPanel";

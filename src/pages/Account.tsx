@@ -53,6 +53,11 @@ const fmt = (n: number) => {
   return n.toLocaleString();
 };
 
+const fmtEur = (tokens: number) => {
+  const cost = (tokens / 1_000_000) * account.costPerMillionTokens;
+  return `€${cost.toFixed(2)}`;
+};
+
 const tokensPct = Math.round((account.tokensUsed / account.totalTokens) * 100);
 
 const barColor = (pct: number) => {

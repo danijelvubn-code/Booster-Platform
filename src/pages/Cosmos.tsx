@@ -34,13 +34,9 @@ const Cosmos = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const endpointParam = params.get("space") || "";
-  const compareParam = params.get("compare") || "";
   const hostingParam = params.get("hosting") || "";
   const [search, setSearch] = useState("");
   const [activeUseCase, setActiveUseCase] = useState<string | null>(null);
-  const [compareIds, setCompareIds] = useState<string[]>(() => 
-    compareParam ? compareParam.split(",").filter(Boolean) : []
-  );
   const [selectedVersions, setSelectedVersions] = useState<Record<string, string>>({});
   const [filters, setFilters] = useState<ModelFilterState>(() => ({
     ...defaultFilters,

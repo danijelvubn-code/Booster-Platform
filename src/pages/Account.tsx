@@ -134,14 +134,17 @@ const Account = () => {
             <div>
               <p className="text-xs text-muted-foreground">Total Allocated</p>
               <p className="text-xl font-bold">{fmt(account.totalTokens)} tokens</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{fmtEur(account.totalTokens)}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Used</p>
               <p className="text-xl font-bold">{fmt(account.tokensUsed)} tokens</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{fmtEur(account.tokensUsed)}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Remaining</p>
               <p className="text-xl font-bold">{fmt(account.totalTokens - account.tokensUsed)} tokens</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{fmtEur(account.totalTokens - account.tokensUsed)}</p>
             </div>
           </div>
 

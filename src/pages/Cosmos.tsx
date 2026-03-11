@@ -316,25 +316,6 @@ const Cosmos = () => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 shrink-0"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setCompareIds((prev) =>
-                              prev.includes(model.id) ? prev.filter((id) => id !== model.id) : [...prev, model.id]
-                            );
-                          }}
-                        >
-                          <GitCompareArrows className={`h-4 w-4 ${compareIds.includes(model.id) ? "text-primary" : ""}`} />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>{compareIds.includes(model.id) ? "Remove from compare" : "Add to compare"}</TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
                           className={`h-8 w-8 shrink-0 ${model.status === "Deprecated" ? "opacity-30 cursor-not-allowed" : model.status === "Sunsetting" ? "text-warning" : ""}`}
                           disabled={model.status === "Deprecated"}
                           onClick={(e) => { e.stopPropagation(); e.preventDefault(); if (model.status !== "Deprecated") navigate(`/endpoints/new?model=${model.id}`); }}

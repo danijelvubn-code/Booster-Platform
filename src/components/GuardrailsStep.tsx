@@ -272,13 +272,6 @@ export const GuardrailsReviewSection = ({ state }: { state: GuardrailsState }) =
           )}
         </div>
       ))}
-      <Separator />
-      <div className="flex justify-between text-sm">
-        <span className="text-muted-foreground">Advanced Debugging</span>
-        <Badge variant={state.advancedDebugging ? "secondary" : "outline"} className="text-xs">
-          {state.advancedDebugging ? "Enabled" : "Off"}
-        </Badge>
-      </div>
     </div>
   );
 };

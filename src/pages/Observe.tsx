@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
-import { BarChart3, ShieldCheck, Layers, Lock } from "lucide-react";
+import { BarChart3, Layers } from "lucide-react";
 import TenantDashboard from "@/components/observe/TenantDashboard";
-import AdminDashboard from "@/components/observe/AdminDashboard";
 import GranularObservation from "@/components/observe/GranularObservation";
 import { Card, CardContent } from "@/components/ui/card";
 

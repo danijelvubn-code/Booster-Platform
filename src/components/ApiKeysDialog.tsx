@@ -24,7 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Key, Plus, Copy, MoreHorizontal, Trash2, Check, X } from "lucide-react";
+import { Key, Plus, Copy, MoreHorizontal, Trash2, Check, X, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface ApiKey {

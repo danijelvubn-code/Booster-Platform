@@ -29,7 +29,6 @@ export interface GuardrailsState {
   privacy: GuardrailConfig;
   secrets: GuardrailConfig;
   privacyEntities: PrivacyEntity[];
-  advancedDebugging: boolean;
 }
 
 export const defaultGuardrailsState: GuardrailsState = {

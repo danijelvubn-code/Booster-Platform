@@ -144,7 +144,7 @@ const Cosmos = () => {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Model Cosmos</h1>
-          <p className="text-muted-foreground mt-1">Browse, compare, and deploy AI models</p>
+          <p className="text-muted-foreground mt-1">Browse and deploy AI models</p>
         </div>
         <div className="flex items-center gap-2">
           <Link to="/cosmos/guided">
@@ -153,9 +153,6 @@ const Cosmos = () => {
               Find Model for My Use Case
             </Button>
           </Link>
-          {compareIds.length >= 1 && (
-            <Badge className="bg-primary text-primary-foreground">{compareIds.length} selected for comparison</Badge>
-          )}
           <Button
             variant={showFilters ? "default" : "outline"}
             size="sm"

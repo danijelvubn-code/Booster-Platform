@@ -144,7 +144,7 @@ const GuardrailsStep = ({ state, onChange }: GuardrailsStepProps) => {
   return (
     <div className="space-y-1">
       <div className="mb-4">
-        <h3 className="text-base font-semibold">Safety & Guardrails</h3>
+        <h3 className="text-base font-semibold">Guardrails</h3>
         <p className="text-sm text-muted-foreground mt-1">
           Configure safety, content filtering, adversarial prompt protection, and privacy controls for this endpoint.
         </p>

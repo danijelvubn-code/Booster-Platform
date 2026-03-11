@@ -183,10 +183,12 @@ const Account = () => {
             <div>
               <p className="text-xs text-muted-foreground">Usage This Cycle</p>
               <p className="text-lg font-bold">{fmt(account.cycleUsage)} tokens</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{fmtEur(account.cycleUsage)}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Estimated Remaining</p>
               <p className="text-lg font-bold">{fmt(account.cycleEstRemaining)} tokens</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{fmtEur(account.cycleEstRemaining)}</p>
             </div>
           </div>
           <Button variant="outline" size="sm" className="gap-1.5">

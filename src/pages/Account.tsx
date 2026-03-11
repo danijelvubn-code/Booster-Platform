@@ -193,7 +193,7 @@ const Account = () => {
           </div>
           <Button variant="outline" size="sm" className="gap-1.5">
             <Download className="h-4 w-4" />
-            Download CSV
+            Download Usage Details
           </Button>
         </CardContent>
       </Card>

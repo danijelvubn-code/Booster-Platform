@@ -214,40 +214,6 @@ const Cosmos = () => {
         <Input placeholder="Search models..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
       </div>
 
-      {/* Comparison View */}
-      {compareIds.length >= 1 && (
-        <Card className="border-primary/30">
-          <CardHeader>
-            <CardTitle className="text-sm">Comparison Canvas</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {compareModels.map((m) => (
-                <div key={m.id} className="space-y-2 p-3 bg-muted rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <p className="font-semibold">{m.name}</p>
-                    <Link to={`/cosmos/${m.id}`} className="text-primary hover:text-primary/80">
-                      <ExternalLink className="h-3.5 w-3.5" />
-                    </Link>
-                  </div>
-                  <p className="text-xs text-muted-foreground">{m.provider}</p>
-                  <div className="text-sm space-y-1">
-                    <p>Input: <strong>€{m.inputCostPer1M}/1M</strong> · Output: <strong>€{m.outputCostPer1M}/1M</strong></p>
-                    <p>Speed: <strong>{m.tokensPerSecond} tok/s</strong></p>
-                    <p>Sustainability: <strong>{m.sustainability}</strong></p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="flex gap-2 mt-4">
-              {compareIds.length > 0 && (
-                <Button size="sm" variant="ghost" onClick={() => setCompareIds([])}>Clear All</Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Main content with optional filter sidebar */}
       <div className="flex gap-6">
         {showFilters && (

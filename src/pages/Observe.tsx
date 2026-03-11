@@ -28,11 +28,6 @@ const Observe = () => {
             <BarChart3 className="h-4 w-4" />
             Business Value
           </TabsTrigger>
-          <TabsTrigger value="admin" className="gap-1.5" disabled={!isAdmin}>
-            <ShieldCheck className="h-4 w-4" />
-            Platform Health
-            {!isAdmin && <Lock className="h-3 w-3 ml-1 opacity-50" />}
-          </TabsTrigger>
           <TabsTrigger value="granular" className="gap-1.5">
             <Layers className="h-4 w-4" />
             Granular Metrics
@@ -41,19 +36,6 @@ const Observe = () => {
 
         <TabsContent value="tenant" className="mt-6">
           <TenantDashboard />
-        </TabsContent>
-
-        <TabsContent value="admin" className="mt-6">
-          {isAdmin ? (
-            <AdminDashboard />
-          ) : (
-            <Card>
-              <CardContent className="p-8 text-center">
-                <Lock className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
-                <p className="text-muted-foreground">Admin access required to view platform health metrics.</p>
-              </CardContent>
-            </Card>
-          )}
         </TabsContent>
 
         <TabsContent value="granular" className="mt-6">

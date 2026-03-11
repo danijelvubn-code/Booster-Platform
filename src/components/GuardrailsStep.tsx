@@ -229,34 +229,6 @@ const GuardrailsStep = ({ state, onChange }: GuardrailsStepProps) => {
         </div>
       </GuardrailRow>
 
-      <Separator className="my-4" />
-
-      <div className="mb-3">
-        <h4 className="text-sm font-semibold">Observability & Debugging</h4>
-      </div>
-      <div className="rounded-md border border-border p-4 space-y-3">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Eye className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium">Advanced Debugging</span>
-          </div>
-          <Switch
-            checked={state.advancedDebugging}
-            onCheckedChange={(v) => update("advancedDebugging", v)}
-          />
-        </div>
-        <p className="text-xs text-muted-foreground">
-          When enabled, all prompts and model responses will be visible on the Booster platform for debugging and inspection purposes.
-        </p>
-        {state.advancedDebugging && (
-          <div className="rounded-md border border-yellow-500/30 bg-yellow-500/5 p-2.5 flex items-start gap-2">
-            <ShieldAlert className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mt-0.5 shrink-0" />
-            <p className="text-xs text-yellow-700 dark:text-yellow-300">
-              By enabling this, you consent to Booster storing and displaying full prompt and response content for this endpoint. This data is used solely for debugging and is never shared with third parties or used for training.
-            </p>
-          </div>
-        )}
-      </div>
 
       <div className="rounded-md border border-border bg-muted/50 p-3 flex items-start gap-2 mt-4">
         <Info className="h-4 w-4 text-primary mt-0.5 shrink-0" />

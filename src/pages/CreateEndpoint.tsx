@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, ArrowRight, Check, Globe, Lock, Info, Rocket, Search, X, Zap, Shield, ShieldOff, Coins, Settings2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import GuardrailsStep, { defaultGuardrailsState, GuardrailsReviewSection, countEnabledGuardrails, type GuardrailsState } from "@/components/GuardrailsStep";
 import PerformanceProfileStep, { getProfileSpecs, type PerformanceProfile } from "@/components/PerformanceProfileStep";
 import CostTransparencyPanel from "@/components/CostTransparencyPanel";
@@ -372,7 +373,17 @@ const CreateEndpoint = () => {
                       </div>
                       {selectedModel && selectedModel.availableVersions && selectedModel.availableVersions.length > 1 && (
                         <div className="space-y-2">
-                          <Label>Model Version</Label>
+                          <div className="flex items-center gap-1.5">
+                            <Label>Booster Variant</Label>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-xs text-xs">
+                                This is the serving profile of the model optimised and hosted by Booster.
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
                           <Select value={config.modelVersion || selectedModel.version} onValueChange={(v) => updateConfig("modelVersion", v)}>
                             <SelectTrigger><SelectValue /></SelectTrigger>
                             <SelectContent>

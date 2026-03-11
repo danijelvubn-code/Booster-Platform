@@ -37,6 +37,7 @@ const account = {
   performanceProfile: "Premium" as const,
   rpmLimit: 500,
   tpmLimit: 250_000,
+  costPerMillionTokens: 3.5,
 };
 
 const usageByEndpoint = [
@@ -50,6 +51,11 @@ const fmt = (n: number) => {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
   return n.toLocaleString();
+};
+
+const fmtEur = (tokens: number) => {
+  const cost = (tokens / 1_000_000) * account.costPerMillionTokens;
+  return `€${cost.toFixed(2)}`;
 };
 
 const tokensPct = Math.round((account.tokensUsed / account.totalTokens) * 100);
@@ -128,14 +134,17 @@ const Account = () => {
             <div>
               <p className="text-xs text-muted-foreground">Total Allocated</p>
               <p className="text-xl font-bold">{fmt(account.totalTokens)} tokens</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{fmtEur(account.totalTokens)}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Used</p>
               <p className="text-xl font-bold">{fmt(account.tokensUsed)} tokens</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{fmtEur(account.tokensUsed)}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Remaining</p>
               <p className="text-xl font-bold">{fmt(account.totalTokens - account.tokensUsed)} tokens</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{fmtEur(account.totalTokens - account.tokensUsed)}</p>
             </div>
           </div>
 
@@ -174,10 +183,12 @@ const Account = () => {
             <div>
               <p className="text-xs text-muted-foreground">Usage This Cycle</p>
               <p className="text-lg font-bold">{fmt(account.cycleUsage)} tokens</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{fmtEur(account.cycleUsage)}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Estimated Remaining</p>
               <p className="text-lg font-bold">{fmt(account.cycleEstRemaining)} tokens</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{fmtEur(account.cycleEstRemaining)}</p>
             </div>
           </div>
           <Button variant="outline" size="sm" className="gap-1.5">

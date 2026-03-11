@@ -57,7 +57,6 @@ const Cosmos = () => {
     filters
   );
 
-  const compareModels = models.filter((m) => compareIds.includes(m.id));
   const hasActiveFilters = isFiltersActive(filters);
 
   const generateComparisonReport = (modelsToCompare: typeof models) => {

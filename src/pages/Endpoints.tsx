@@ -62,7 +62,7 @@ const Endpoints = () => {
           <p className="text-muted-foreground">Manage your isolated inference endpoints and their deployments.</p>
         </div>
         <Button asChild>
-          <Link to="/endpoints/new"><Plus className="h-4 w-4 mr-1" /> Deploy Inference Endpoint</Link>
+          <Link to="/endpoints/new"><Plus className="h-4 w-4 mr-1" /> Create Inference Endpoint</Link>
         </Button>
       </div>
 

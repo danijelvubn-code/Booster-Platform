@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Zap, Leaf, BarChart3, ArrowRight, SlidersHorizontal, Server, Cloud, ExternalLink, FileDown, Play, X, Rocket, GitCompareArrows, Sparkles, ChevronDown, AlertTriangle, Ban } from "lucide-react";
+import { Search, Zap, Leaf, BarChart3, ArrowRight, SlidersHorizontal, Server, Cloud, ExternalLink, FileDown, Play, X, Rocket, Sparkles, ChevronDown, AlertTriangle, Ban } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -34,13 +34,9 @@ const Cosmos = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const endpointParam = params.get("space") || "";
-  const compareParam = params.get("compare") || "";
   const hostingParam = params.get("hosting") || "";
   const [search, setSearch] = useState("");
   const [activeUseCase, setActiveUseCase] = useState<string | null>(null);
-  const [compareIds, setCompareIds] = useState<string[]>(() => 
-    compareParam ? compareParam.split(",").filter(Boolean) : []
-  );
   const [selectedVersions, setSelectedVersions] = useState<Record<string, string>>({});
   const [filters, setFilters] = useState<ModelFilterState>(() => ({
     ...defaultFilters,
@@ -61,95 +57,14 @@ const Cosmos = () => {
     filters
   );
 
-  const compareModels = models.filter((m) => compareIds.includes(m.id));
   const hasActiveFilters = isFiltersActive(filters);
-
-  const generateComparisonReport = (modelsToCompare: typeof models) => {
-    const date = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
-    const separator = "=".repeat(70);
-    const thinSep = "-".repeat(70);
-
-    let report = `${separator}\n`;
-    report += `  MODEL COMPARISON REPORT\n`;
-    report += `  Generated: ${date}\n`;
-    report += `  Booster Datacenter — Confidential\n`;
-    report += `${separator}\n\n`;
-
-    report += `EXECUTIVE SUMMARY\n${thinSep}\n`;
-    report += `This report compares ${modelsToCompare.length} AI model(s) across key dimensions\n`;
-    report += `including cost, performance, capabilities, and sustainability to support\n`;
-    report += `informed procurement and deployment decisions.\n\n`;
-
-    report += `MODELS COMPARED\n${thinSep}\n`;
-    modelsToCompare.forEach((m, i) => {
-      report += `  ${i + 1}. ${m.name} (${m.provider}) — v${m.version}\n`;
-    });
-    report += `\n`;
-
-    report += `COST ANALYSIS\n${thinSep}\n`;
-    report += `${"Model".padEnd(25)} ${"Input (€/1M)".padEnd(15)} ${"Output (€/1M)".padEnd(15)}\n`;
-    modelsToCompare.forEach((m) => {
-      report += `${m.name.padEnd(25)} €${String(m.inputCostPer1M).padEnd(13)} €${String(m.outputCostPer1M).padEnd(13)}\n`;
-    });
-    report += `\n`;
-
-    report += `PERFORMANCE METRICS\n${thinSep}\n`;
-    report += `${"Model".padEnd(25)} ${"Speed (tok/s)".padEnd(15)} ${"Context Length".padEnd(15)} ${"Sustainability".padEnd(15)}\n`;
-    modelsToCompare.forEach((m) => {
-      report += `${m.name.padEnd(25)} ${String(m.tokensPerSecond).padEnd(15)} ${(m.contextLength / 1000).toFixed(0)}k${" ".repeat(12)} ${m.sustainability.padEnd(15)}\n`;
-    });
-    report += `\n`;
-
-    report += `CAPABILITY SCORES\n${thinSep}\n`;
-    modelsToCompare.forEach((m) => {
-      report += `\n  ${m.name} (${m.provider})\n`;
-      m.capabilities.forEach((cap) => {
-        report += `    ${cap.name.padEnd(20)} ${cap.score}/100\n`;
-        cap.subs.forEach((sub) => {
-          report += `      └ ${sub.name.padEnd(18)} ${sub.score}/100\n`;
-        });
-      });
-    });
-    report += `\n`;
-
-    report += `BENCHMARK RESULTS\n${thinSep}\n`;
-    const allBenchmarks = [...new Set(modelsToCompare.flatMap((m) => m.benchmarks.map((b) => b.name)))];
-    report += `${"Benchmark".padEnd(20)} ${modelsToCompare.map((m) => m.name.padEnd(20)).join("")}\n`;
-    allBenchmarks.forEach((bench) => {
-      let line = bench.padEnd(20);
-      modelsToCompare.forEach((m) => {
-        const b = m.benchmarks.find((bm) => bm.name === bench);
-        line += (b ? `${b.score}/${b.maxScore}` : "N/A").padEnd(20);
-      });
-      report += `${line}\n`;
-    });
-    report += `\n`;
-
-    report += `RECOMMENDATION NOTES\n${thinSep}\n`;
-    report += `• Review capability scores relative to your specific use-case requirements.\n`;
-    report += `• Consider sustainability ratings for ESG compliance reporting.\n`;
-    report += `• Cost projections should be validated against actual usage volumes.\n`;
-    report += `• This report is generated for internal review and approval purposes.\n\n`;
-
-    report += `${separator}\n`;
-    report += `  End of Report — Booster Datacenter\n`;
-    report += `${separator}\n`;
-
-    const blob = new Blob([report], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `model-comparison-report-${new Date().toISOString().split("T")[0]}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
 
   return (
     <div className="container py-8 space-y-6">
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Model Cosmos</h1>
-          <p className="text-muted-foreground mt-1">Browse, compare, and deploy AI models</p>
+          <p className="text-muted-foreground mt-1">Browse and deploy AI models</p>
         </div>
         <div className="flex items-center gap-2">
           <Link to="/cosmos/guided">
@@ -158,9 +73,6 @@ const Cosmos = () => {
               Find Model for My Use Case
             </Button>
           </Link>
-          {compareIds.length >= 1 && (
-            <Badge className="bg-primary text-primary-foreground">{compareIds.length} selected for comparison</Badge>
-          )}
           <Button
             variant={showFilters ? "default" : "outline"}
             size="sm"
@@ -221,40 +133,6 @@ const Cosmos = () => {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input placeholder="Search models..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
       </div>
-
-      {/* Comparison View */}
-      {compareIds.length >= 1 && (
-        <Card className="border-primary/30">
-          <CardHeader>
-            <CardTitle className="text-sm">Comparison Canvas</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {compareModels.map((m) => (
-                <div key={m.id} className="space-y-2 p-3 bg-muted rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <p className="font-semibold">{m.name}</p>
-                    <Link to={`/cosmos/${m.id}`} className="text-primary hover:text-primary/80">
-                      <ExternalLink className="h-3.5 w-3.5" />
-                    </Link>
-                  </div>
-                  <p className="text-xs text-muted-foreground">{m.provider}</p>
-                  <div className="text-sm space-y-1">
-                    <p>Input: <strong>€{m.inputCostPer1M}/1M</strong> · Output: <strong>€{m.outputCostPer1M}/1M</strong></p>
-                    <p>Speed: <strong>{m.tokensPerSecond} tok/s</strong></p>
-                    <p>Sustainability: <strong>{m.sustainability}</strong></p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="flex gap-2 mt-4">
-              {compareIds.length > 0 && (
-                <Button size="sm" variant="ghost" onClick={() => setCompareIds([])}>Clear All</Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Main content with optional filter sidebar */}
       <div className="flex gap-6">
@@ -353,25 +231,6 @@ const Cosmos = () => {
                   </div>
 
                   <div className="flex items-center gap-2 pt-1 justify-end">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 shrink-0"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setCompareIds((prev) =>
-                              prev.includes(model.id) ? prev.filter((id) => id !== model.id) : [...prev, model.id]
-                            );
-                          }}
-                        >
-                          <GitCompareArrows className={`h-4 w-4 ${compareIds.includes(model.id) ? "text-primary" : ""}`} />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>{compareIds.includes(model.id) ? "Remove from compare" : "Add to compare"}</TooltipContent>
-                    </Tooltip>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button

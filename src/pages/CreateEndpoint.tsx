@@ -372,7 +372,17 @@ const CreateEndpoint = () => {
                       </div>
                       {selectedModel && selectedModel.availableVersions && selectedModel.availableVersions.length > 1 && (
                         <div className="space-y-2">
-                          <Label>Model Version</Label>
+                          <div className="flex items-center gap-1.5">
+                            <Label>Booster Variant</Label>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-xs text-xs">
+                                This is the serving profile of the model optimised and hosted by Booster.
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
                           <Select value={config.modelVersion || selectedModel.version} onValueChange={(v) => updateConfig("modelVersion", v)}>
                             <SelectTrigger><SelectValue /></SelectTrigger>
                             <SelectContent>

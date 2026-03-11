@@ -241,17 +241,6 @@ const Account = () => {
               />
             </div>
             <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="hard-cap">Hard Cap</Label>
-                <p className="text-xs text-muted-foreground">Block all requests once the token limit is reached</p>
-              </div>
-              <Switch
-                id="hard-cap"
-                checked={hardCap}
-                onCheckedChange={setHardCap}
-              />
-            </div>
-            <div className="flex items-center justify-between">
               <Label htmlFor="email-notif">Email Notifications</Label>
               <Switch
                 id="email-notif"

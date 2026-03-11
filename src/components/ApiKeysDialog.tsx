@@ -129,7 +129,10 @@ export function ApiKeysDialog({ open, onOpenChange, spaceName }: ApiKeysDialogPr
             <Key className="h-5 w-5 text-primary" /> API Keys
           </DialogTitle>
           <DialogDescription>
-            Manage API keys for <span className="font-semibold text-foreground">{spaceName}</span>. Keys are scoped to the space and apply to all models within it.
+            Manage API keys for <span className="font-semibold text-foreground">{spaceName}</span>. Keys are scoped to the space and apply to all models within it.{" "}
+            <a href="https://docs.booster.cloud/api-keys" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">
+              <ExternalLink className="h-3 w-3" /> Learn how to use API keys
+            </a>
           </DialogDescription>
         </DialogHeader>
 

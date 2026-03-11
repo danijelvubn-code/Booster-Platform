@@ -187,37 +187,6 @@ const Account = () => {
         </CardContent>
       </Card>
 
-      {/* ─── 4. Usage Breakdown ────────────────────────────────── */}
-      <Card>
-        <CardHeader className="flex-row items-center justify-between">
-          <CardTitle className="text-lg">Usage by Inference Endpoint</CardTitle>
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/observe" className="gap-1">
-              View detailed analytics <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Inference Endpoint</TableHead>
-                <TableHead className="text-right">Tokens Used</TableHead>
-                <TableHead className="text-right">% of Total</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {usageByEndpoint.map((row) => (
-                <TableRow key={row.endpoint}>
-                  <TableCell className="font-medium">{row.endpoint}</TableCell>
-                  <TableCell className="text-right">{fmt(row.tokens)}</TableCell>
-                  <TableCell className="text-right">{row.pct}%</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
 
       {/* ─── 5. Budget Alerts ──────────────────────────────────── */}
       <Card>

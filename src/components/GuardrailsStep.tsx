@@ -48,7 +48,6 @@ export const defaultGuardrailsState: GuardrailsState = {
     { id: "credit_card", label: "CREDIT CARD", checked: false },
     { id: "ip_address", label: "IP ADDRESS", checked: false },
   ],
-  advancedDebugging: false,
 };
 
 interface GuardrailsStepProps {

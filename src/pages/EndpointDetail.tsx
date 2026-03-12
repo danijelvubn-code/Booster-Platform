@@ -80,11 +80,27 @@ const EndpointDetail = () => {
           <Button variant="outline" onClick={() => setShowApiKeys(true)}>
             <Key className="h-4 w-4 mr-1" /> API Keys
           </Button>
-          <Button asChild>
-            <Link to={`/deploy?space=${endpointId}`}>
+          {deps.some((d) => d.mode === "Default" || d.mode === "Shared") ? (
+            <Button
+              variant="default"
+              onClick={() =>
+                toast({
+                  title: "Cannot add model",
+                  description:
+                    "You must deactivate all active models before adding a new one to this inference endpoint.",
+                  variant: "destructive",
+                })
+              }
+            >
               <Plus className="h-4 w-4 mr-1" /> Add Model
-            </Link>
-          </Button>
+            </Button>
+          ) : (
+            <Button asChild>
+              <Link to={`/deploy?space=${endpointId}`}>
+                <Plus className="h-4 w-4 mr-1" /> Add Model
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
 

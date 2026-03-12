@@ -112,6 +112,7 @@ const DeployWizard = () => {
               onClick={() => {
                 setSelectedModelId(m.id);
                 setSelectedModelVersion(modelVersions[m.id] || m.version);
+                setProvisioningType("proxied");
                 updateConfig("name", `${m.name.toLowerCase().replace(/\s+/g, "-")}-v1`);
               }}
             >

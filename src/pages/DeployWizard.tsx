@@ -10,9 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import UseCaseSelect from "@/components/UseCaseSelect";
-import { ArrowLeft, Check, Globe2, Server, Play, Info, Lock } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import PlaygroundPanel from "@/components/PlaygroundPanel";
+import { ArrowLeft, Check, Globe2, Server, Info, Lock } from "lucide-react";
 
 type DeploymentType = "platform" | "external" | "opensource" | null;
 type ProvisioningType = "dedicated" | "proxied" | null;

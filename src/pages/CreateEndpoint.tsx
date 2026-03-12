@@ -220,7 +220,7 @@ const CreateEndpoint = () => {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Deploy Inference Endpoint</h1>
+          <h1 className="text-2xl font-bold">Create Inference Endpoint</h1>
           <p className="text-muted-foreground text-sm mt-1">Configure and deploy a model inference endpoint with safety and budget controls.</p>
         </div>
         <div className="flex items-center gap-1 rounded-lg border border-border p-1 bg-muted/50">

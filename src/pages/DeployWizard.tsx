@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import UseCaseSelect from "@/components/UseCaseSelect";
-import { ArrowLeft, Check, Globe2, Server, Info, Lock } from "lucide-react";
+import { ArrowLeft, Check, Info, Lock } from "lucide-react";
 
 type DeploymentType = "platform" | "external" | "opensource" | null;
 type ProvisioningType = "dedicated" | "proxied" | null;
@@ -30,7 +30,7 @@ const DeployWizard = () => {
   const model = models.find((m) => m.id === modelId);
 
   const [deploymentType, setDeploymentType] = useState<DeploymentType>(model ? (model.hosting === "Booster Powered" ? "opensource" : "external") : null);
-  const [provisioningType, setProvisioningType] = useState<ProvisioningType>(model ? (model.hosting === "Booster Powered" ? null : "proxied") : null);
+  const [provisioningType, setProvisioningType] = useState<ProvisioningType>(model ? "proxied" : null);
   const [selectedModelId, setSelectedModelId] = useState(modelId || "");
   const [selectedModelVersion, setSelectedModelVersion] = useState(model?.version || "");
   const [modelVersions, setModelVersions] = useState<Record<string, string>>({});
@@ -112,6 +112,7 @@ const DeployWizard = () => {
               onClick={() => {
                 setSelectedModelId(m.id);
                 setSelectedModelVersion(modelVersions[m.id] || m.version);
+                setProvisioningType("proxied");
                 updateConfig("name", `${m.name.toLowerCase().replace(/\s+/g, "-")}-v1`);
               }}
             >
@@ -157,71 +158,6 @@ const DeployWizard = () => {
     );
   }
 
-  // Open Source: choose hosting mode
-  if (selectedModel && provisioningType === null) {
-    return (
-      <div className="container py-8 max-w-3xl space-y-6">
-        <Button variant="ghost" size="sm" className="-ml-3" onClick={() => { setSelectedModelId(""); }}>
-          <ArrowLeft className="h-4 w-4 mr-1" /> Change Model
-        </Button>
-
-        <div>
-          <h1 className="text-2xl font-bold">How should {selectedModel.name} be hosted?</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            {selectedModel.provider} • v{selectedModelVersion || selectedModel.version}
-            <Badge variant="outline" className="ml-2 text-xs">Booster Powered</Badge>
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card
-            className="cursor-pointer hover:border-primary/40 transition-colors group"
-            onClick={() => setProvisioningType("proxied")}
-          >
-            <CardContent className="p-6 space-y-3">
-              <div className="h-11 w-11 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                <Globe2 className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg">Platform Managed</h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  The platform hosts and manages this model for you on a shared instance. No infrastructure to manage — ready to use instantly.
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                <Badge variant="secondary" className="text-xs">Managed</Badge>
-                <Badge variant="secondary" className="text-xs">Shared instance</Badge>
-                <Badge variant="secondary" className="text-xs">Instant availability</Badge>
-                <Badge variant="secondary" className="text-xs">No infra overhead</Badge>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card
-            className="cursor-pointer hover:border-primary/40 transition-colors group"
-            onClick={() => setProvisioningType("dedicated")}
-          >
-            <CardContent className="p-6 space-y-3">
-              <div className="h-11 w-11 rounded-lg bg-muted flex items-center justify-center group-hover:bg-muted/80 transition-colors">
-                <Server className="h-5 w-5 text-foreground" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg">Dedicated Instance</h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Provision an exclusive compute instance. Full control with isolated resources.
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                <Badge variant="secondary" className="text-xs">Exclusive</Badge>
-                <Badge variant="secondary" className="text-xs">Full control</Badge>
-                <Badge variant="secondary" className="text-xs">Isolated compute</Badge>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
 
   // Single deployment screen (no advanced toggle)
   const content = (

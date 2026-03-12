@@ -10,9 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import UseCaseSelect from "@/components/UseCaseSelect";
-import { ArrowLeft, Check, Globe2, Server, Play, Info, Lock } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import PlaygroundPanel from "@/components/PlaygroundPanel";
+import { ArrowLeft, Check, Globe2, Server, Info, Lock } from "lucide-react";
 
 type DeploymentType = "platform" | "external" | "opensource" | null;
 type ProvisioningType = "dedicated" | "proxied" | null;
@@ -37,8 +35,6 @@ const DeployWizard = () => {
   const [selectedModelVersion, setSelectedModelVersion] = useState(model?.version || "");
   const [modelVersions, setModelVersions] = useState<Record<string, string>>({});
   const selectedModel = selectedModelId ? models.find((m) => m.id === selectedModelId) : undefined;
-  const [tryModelId, setTryModelId] = useState<string | null>(null);
-  const tryModel = tryModelId ? models.find((m) => m.id === tryModelId) : null;
 
   const [config, setConfig] = useState({
     endpoint: endpointParam,
@@ -130,17 +126,6 @@ const DeployWizard = () => {
                       <p>€{m.inputCostPer1M}/1M in</p>
                       <p>€{m.outputCostPer1M}/1M out</p>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-muted-foreground hover:text-primary"
-                      asChild
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Link to={`/playground?model=${m.id}`}>
-                        <Play className="h-3.5 w-3.5 mr-1" /> Try
-                      </Link>
-                    </Button>
                   </div>
                 </div>
                 {m.availableVersions && m.availableVersions.length > 1 && (
@@ -353,29 +338,7 @@ const DeployWizard = () => {
     </div>
   );
 
-  // Wrap with playground dialog
-  return (
-    <>
-      {content}
-
-      {/* Platform Model Try Playground Dialog */}
-      <Dialog open={!!tryModelId} onOpenChange={(open) => !open && setTryModelId(null)}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Try Model — {tryModel?.name}</DialogTitle>
-            <DialogDescription>{tryModel?.provider} • v{tryModel?.version}</DialogDescription>
-          </DialogHeader>
-          <PlaygroundPanel
-            modelName={tryModel?.name || ""}
-            modelVersion={tryModel?.version}
-            provider={tryModel?.provider}
-            costPer1MTokens={tryModel?.inputCostPer1M || 3}
-            showCreditNotice
-          />
-        </DialogContent>
-      </Dialog>
-    </>
-  );
+  return content;
 };
 
 export default DeployWizard;

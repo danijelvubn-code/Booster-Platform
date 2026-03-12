@@ -130,17 +130,6 @@ const DeployWizard = () => {
                       <p>€{m.inputCostPer1M}/1M in</p>
                       <p>€{m.outputCostPer1M}/1M out</p>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-muted-foreground hover:text-primary"
-                      asChild
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Link to={`/playground?model=${m.id}`}>
-                        <Play className="h-3.5 w-3.5 mr-1" /> Try
-                      </Link>
-                    </Button>
                   </div>
                 </div>
                 {m.availableVersions && m.availableVersions.length > 1 && (

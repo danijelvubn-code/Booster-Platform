@@ -338,29 +338,7 @@ const DeployWizard = () => {
     </div>
   );
 
-  // Wrap with playground dialog
-  return (
-    <>
-      {content}
-
-      {/* Platform Model Try Playground Dialog */}
-      <Dialog open={!!tryModelId} onOpenChange={(open) => !open && setTryModelId(null)}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Try Model — {tryModel?.name}</DialogTitle>
-            <DialogDescription>{tryModel?.provider} • v{tryModel?.version}</DialogDescription>
-          </DialogHeader>
-          <PlaygroundPanel
-            modelName={tryModel?.name || ""}
-            modelVersion={tryModel?.version}
-            provider={tryModel?.provider}
-            costPer1MTokens={tryModel?.inputCostPer1M || 3}
-            showCreditNotice
-          />
-        </DialogContent>
-      </Dialog>
-    </>
-  );
+  return content;
 };
 
 export default DeployWizard;

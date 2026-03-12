@@ -30,7 +30,7 @@ const DeployWizard = () => {
   const model = models.find((m) => m.id === modelId);
 
   const [deploymentType, setDeploymentType] = useState<DeploymentType>(model ? (model.hosting === "Booster Powered" ? "opensource" : "external") : null);
-  const [provisioningType, setProvisioningType] = useState<ProvisioningType>(model ? (model.hosting === "Booster Powered" ? null : "proxied") : null);
+  const [provisioningType, setProvisioningType] = useState<ProvisioningType>(model ? "proxied" : null);
   const [selectedModelId, setSelectedModelId] = useState(modelId || "");
   const [selectedModelVersion, setSelectedModelVersion] = useState(model?.version || "");
   const [modelVersions, setModelVersions] = useState<Record<string, string>>({});

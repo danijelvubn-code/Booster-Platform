@@ -130,7 +130,7 @@ const DeployWizard = () => {
                 </div>
                 {m.availableVersions && m.availableVersions.length > 1 && (
                   <div className="flex items-center gap-2 pt-1" onClick={(e) => e.stopPropagation()}>
-                    <Label className="text-xs text-muted-foreground shrink-0">Version</Label>
+                    <Label className="text-xs text-muted-foreground shrink-0">Booster Variant</Label>
                     <Select value={modelVersions[m.id] || m.version} onValueChange={(v) => { setModelVersions((prev) => ({ ...prev, [m.id]: v })); if (selectedModelId === m.id) setSelectedModelVersion(v); }}>
                       <SelectTrigger className="h-7 text-xs w-40">
                         <SelectValue />

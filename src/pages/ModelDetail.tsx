@@ -67,7 +67,7 @@ const ModelDetail = () => {
           <p className="text-sm max-w-2xl">{model.description}</p>
         </div>
         <Button asChild>
-          <Link to={`/deploy?model=${model.id}${new URLSearchParams(window.location.search).get("space") ? `&space=${new URLSearchParams(window.location.search).get("space")}` : ""}`}>
+          <Link to={`/endpoints/new?model=${model.id}`}>
             Add to Endpoint <ArrowRight className="h-3.5 w-3.5 ml-1" />
           </Link>
         </Button>

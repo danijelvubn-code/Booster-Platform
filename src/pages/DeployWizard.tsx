@@ -35,8 +35,6 @@ const DeployWizard = () => {
   const [selectedModelVersion, setSelectedModelVersion] = useState(model?.version || "");
   const [modelVersions, setModelVersions] = useState<Record<string, string>>({});
   const selectedModel = selectedModelId ? models.find((m) => m.id === selectedModelId) : undefined;
-  const [tryModelId, setTryModelId] = useState<string | null>(null);
-  const tryModel = tryModelId ? models.find((m) => m.id === tryModelId) : null;
 
   const [config, setConfig] = useState({
     endpoint: endpointParam,

@@ -73,6 +73,9 @@ const Recommendations = () => {
                     {!isIgnored && (
                       <div className="flex gap-2 pt-2 flex-wrap">
                         <Button size="sm" onClick={() => navigate(`/deploy?model=${rec.recommendedModelId}`)}>Add to Endpoint</Button>
+                        <Button size="sm" variant="outline" onClick={() => navigate(`/cosmos/${rec.recommendedModelId}`)}>
+                          <Sparkles className="h-3.5 w-3.5 mr-1" /> Analyse further
+                        </Button>
                         <Button
                           size="sm"
                           variant="ghost"

@@ -105,7 +105,6 @@ const Endpoints = () => {
               <CardContent className="space-y-3">
                 <p className="text-sm font-mono text-muted-foreground truncate">{ep.endpoint}</p>
                 <div className="flex items-center gap-1.5 text-sm">
-                  <Shield className="h-3.5 w-3.5 text-primary" />
                   <span>{ep.defaultDeployment}</span>
                 </div>
                 <div className="space-y-1.5">

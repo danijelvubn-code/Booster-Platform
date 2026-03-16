@@ -123,11 +123,6 @@ const Endpoints = () => {
                     />
                   </div>
                 </div>
-                <div className="flex items-center justify-end">
-                  <Badge variant="outline" className={ep.health === "OK" ? "border-success/30 text-success" : "border-warning/30 text-warning"}>
-                    SLA: {ep.health}
-                  </Badge>
-                </div>
               </CardContent>
             </Link>
           </Card>

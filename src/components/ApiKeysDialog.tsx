@@ -237,9 +237,6 @@ export function ApiKeysDialog({ open, onOpenChange, spaceName }: ApiKeysDialogPr
                               <DropdownMenuItem onClick={() => handleToggleStatus(k.id)}>
                                 <Key className="h-4 w-4 mr-2" /> Disable
                               </DropdownMenuItem>
-                              <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => handleDelete(k.id)}>
-                                <Trash2 className="h-4 w-4 mr-2" /> Delete
-                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>

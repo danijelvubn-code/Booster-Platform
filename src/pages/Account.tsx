@@ -58,11 +58,10 @@ const Account = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {[
-            { label: "Plan Start", value: account.planStart, icon: Calendar },
-            { label: "Plan End", value: account.planEnd, icon: Calendar },
-            { label: "Days Remaining", value: `${account.daysRemaining} days`, icon: Shield },
+            { label: "Plan", value: "Pay Per Use", icon: Zap },
+            { label: "Account Start", value: account.planStart, icon: Calendar },
           ].map((item) => (
             <Card key={item.label}>
               <CardContent className="flex items-center gap-3 p-4">

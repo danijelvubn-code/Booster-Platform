@@ -583,11 +583,6 @@ const GuidedModelSelection = () => {
 
                         {/* Actions */}
                         <div className="flex gap-2 pt-1">
-                          <Link to={`/cosmos?compare=${m.id}`}>
-                            <Button variant="outline" size="sm">
-                              <GitCompareArrows className="h-3.5 w-3.5 mr-1" /> Compare
-                            </Button>
-                          </Link>
                           <Link to={`/cosmos/${m.id}`}>
                             <Button variant="outline" size="sm">
                               <ExternalLink className="h-3.5 w-3.5 mr-1" /> View Details

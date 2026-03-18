@@ -270,9 +270,6 @@ export function ApiKeysDialog({ open, onOpenChange, spaceName }: ApiKeysDialogPr
                             <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" onClick={() => handleToggleStatus(k.id)}>
                               Enable
                             </Button>
-                            <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-destructive" onClick={() => handleDelete(k.id)}>
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>

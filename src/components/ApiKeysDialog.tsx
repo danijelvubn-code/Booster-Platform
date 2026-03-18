@@ -237,9 +237,6 @@ export function ApiKeysDialog({ open, onOpenChange, spaceName }: ApiKeysDialogPr
                               <DropdownMenuItem onClick={() => handleToggleStatus(k.id)}>
                                 <Key className="h-4 w-4 mr-2" /> Disable
                               </DropdownMenuItem>
-                              <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => handleDelete(k.id)}>
-                                <Trash2 className="h-4 w-4 mr-2" /> Delete
-                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
@@ -272,9 +269,6 @@ export function ApiKeysDialog({ open, onOpenChange, spaceName }: ApiKeysDialogPr
                           <div className="flex items-center gap-1">
                             <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" onClick={() => handleToggleStatus(k.id)}>
                               Enable
-                            </Button>
-                            <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-destructive" onClick={() => handleDelete(k.id)}>
-                              <Trash2 className="h-3.5 w-3.5" />
                             </Button>
                           </div>
                         </TableCell>

@@ -24,7 +24,7 @@ const account = {
   billingCycleEnd: "Jan 31",
   cycleUsage: 1_120_000,
   costPerMillionTokens: 3.5,
-  alertTokenThreshold: 2_000_000,
+  alertTokenThreshold: 570_000_000,
 };
 
 // ── Helpers ────────────────────────────────────────────────────

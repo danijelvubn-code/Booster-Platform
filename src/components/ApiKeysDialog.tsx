@@ -222,9 +222,6 @@ export function ApiKeysDialog({ open, onOpenChange, spaceName }: ApiKeysDialogPr
                             <Button size="sm" variant="ghost" className="h-6 w-6 p-0" onClick={() => handleCopy(k.id, k.prefix)}>
                               {copiedId === k.id ? <Check className="h-3 w-3 text-success" /> : <Copy className="h-3 w-3" />}
                             </Button>
-                            <Button size="sm" variant="ghost" className="h-6 w-6 p-0" onClick={() => handleCopy(k.id, k.prefix)}>
-                              {copiedId === k.id ? <Check className="h-3 w-3 text-success" /> : <Copy className="h-3 w-3" />}
-                            </Button>
                           </div>
                         </TableCell>
                         <TableCell className="text-xs text-muted-foreground">{k.createdAt}</TableCell>

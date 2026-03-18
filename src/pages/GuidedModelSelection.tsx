@@ -552,8 +552,8 @@ const GuidedModelSelection = () => {
                             <p className="text-sm font-semibold">~{Math.round(1000 / m.tokensPerSecond * 100)}ms</p>
                           </div>
                           <div className="bg-muted/50 rounded-md p-2">
-                            <p className="text-[10px] text-muted-foreground">Cost per 1K tokens</p>
-                            <p className="text-sm font-semibold">€{(parseFloat(avgCost) / 1000).toFixed(4)}</p>
+                            <p className="text-[10px] text-muted-foreground">Cost per 1M tokens</p>
+                            <p className="text-sm font-semibold">€{parseFloat(avgCost).toFixed(2)}</p>
                           </div>
                           <div className="bg-muted/50 rounded-md p-2">
                             <p className="text-[10px] text-muted-foreground">Quality Score</p>

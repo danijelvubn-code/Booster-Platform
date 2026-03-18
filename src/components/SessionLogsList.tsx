@@ -1,6 +1,7 @@
 import { deployments } from "@/data/mockData";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
+import { Clock, Timer, Key } from "lucide-react";
 
 interface LogLine {
   id: string;
@@ -61,11 +62,26 @@ export function SessionLogsList({ sessions }: SessionLogsListProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Request Timestamp</TableHead>
-              <TableHead className="text-right">Processing Time</TableHead>
+              <TableHead>
+                <span className="inline-flex items-center gap-1.5">
+                  <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                  Request Timestamp
+                </span>
+              </TableHead>
+              <TableHead className="text-right">
+                <span className="inline-flex items-center gap-1.5 justify-end w-full">
+                  <Timer className="h-3.5 w-3.5 text-muted-foreground" />
+                  Processing Time
+                </span>
+              </TableHead>
               <TableHead className="text-right">Input Tokens</TableHead>
               <TableHead className="text-right">Output Tokens</TableHead>
-              <TableHead>Key Used</TableHead>
+              <TableHead>
+                <span className="inline-flex items-center gap-1.5">
+                  <Key className="h-3.5 w-3.5 text-muted-foreground" />
+                  Key Used
+                </span>
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

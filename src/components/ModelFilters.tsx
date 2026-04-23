@@ -3,7 +3,7 @@ import { models } from "@/data/mockData";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import { Label } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import {
   Collapsible,
@@ -347,6 +347,8 @@ const ModelFilters = ({ filters, onChange }: ModelFiltersProps) => {
           <FilterSection title="Min Capability Score">
             <div className="space-y-3 pt-1">
               <Slider
+                size="dense"
+                showStepMarks
                 value={[filters.minCapScore]}
                 onValueChange={([v]) =>
                   onChange({ ...filters, minCapScore: v })
@@ -371,6 +373,7 @@ const ModelFilters = ({ filters, onChange }: ModelFiltersProps) => {
           <FilterSection title="Cost per 1M Tokens">
             <div className="space-y-3 pt-1">
               <Slider
+                size="dense"
                 value={[filters.costRange[0], filters.costRange[1]]}
                 onValueChange={([min, max]) =>
                   onChange({
@@ -395,6 +398,7 @@ const ModelFilters = ({ filters, onChange }: ModelFiltersProps) => {
           <FilterSection title="Output Cost per 1M Tokens" defaultOpen={false}>
             <div className="space-y-3 pt-1">
               <Slider
+                size="dense"
                 value={[filters.outputCostRange[0], filters.outputCostRange[1]]}
                 onValueChange={([min, max]) =>
                   onChange({

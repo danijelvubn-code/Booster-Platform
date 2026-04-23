@@ -4,7 +4,7 @@ import { deployments, endpoints } from "@/data/mockData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { Label } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
@@ -152,7 +152,14 @@ const Playground = () => {
                   <Label>Temperature</Label>
                   <span className="text-xs text-muted-foreground font-mono">{temperature[0]}</span>
                 </div>
-                <Slider value={temperature} onValueChange={setTemperature} min={0} max={2} step={0.1} />
+                <Slider
+                  size="dense"
+                  value={temperature}
+                  onValueChange={setTemperature}
+                  min={0}
+                  max={2}
+                  step={0.1}
+                />
               </div>
 
               <div className="space-y-2">
@@ -160,7 +167,14 @@ const Playground = () => {
                   <Label>Max Tokens</Label>
                   <span className="text-xs text-muted-foreground font-mono">{maxTokens[0]}</span>
                 </div>
-                <Slider value={maxTokens} onValueChange={setMaxTokens} min={64} max={4096} step={64} />
+                <Slider
+                  size="dense"
+                  value={maxTokens}
+                  onValueChange={setMaxTokens}
+                  min={64}
+                  max={4096}
+                  step={64}
+                />
               </div>
             </CardContent>
           </Card>

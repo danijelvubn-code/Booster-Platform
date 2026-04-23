@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Label } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
@@ -90,7 +90,7 @@ const DeployWizard = () => {
   if (!selectedModel) {
     const allModels = models;
     return (
-      <div className="container py-8 max-w-3xl space-y-6">
+      <div className="container space-y-6 py-8">
         <Button variant="ghost" size="sm" className="-ml-3" onClick={() => {
           const epId = params.get("space");
           if (epId) navigate(`/endpoints/${epId}`);
@@ -161,7 +161,7 @@ const DeployWizard = () => {
 
   // Single deployment screen (no advanced toggle)
   const content = (
-    <div className="container py-8 max-w-3xl space-y-6">
+    <div className="container space-y-6 py-8">
       <Button variant="ghost" size="sm" className="-ml-3" onClick={() => {
         if (deploymentType === "opensource" && provisioningType) {
           setProvisioningType(null);

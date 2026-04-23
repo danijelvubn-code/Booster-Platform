@@ -22,13 +22,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ApiKeysDialog } from "@/components/ApiKeysDialog";
 
 const modeBadge = (mode: string) => {
-  const styles: Record<string, string> = {
-    Default: "bg-primary/10 text-primary border-primary/30",
-    Shadow: "bg-info/10 text-info border-info/30",
-    Inactive: "bg-muted text-muted-foreground border-border opacity-60",
-    Shared: "bg-info/10 text-info border-info/30",
-  };
-  return <Badge variant="outline" className={styles[mode] || ""}>{mode}</Badge>;
+  if (mode === "Default") return <Badge>{mode}</Badge>;
+  if (mode === "Shadow" || mode === "Shared") return <Badge variant="info">{mode}</Badge>;
+  if (mode === "Inactive") return <Badge variant="outline" className="opacity-60">{mode}</Badge>;
+  return <Badge variant="outline">{mode}</Badge>;
 };
 
 const EndpointDetail = () => {
@@ -164,7 +161,7 @@ const EndpointDetail = () => {
                               onClick={() => toast({ title: "Restricted", description: "Production default switching is disabled during impersonation.", variant: "destructive" })}
                             >
                               <ArrowUpCircle className="h-4 w-4 mr-2" /> Promote to Default
-                              <Badge variant="outline" className="ml-2 text-[9px] border-destructive/30 text-destructive">Restricted</Badge>
+                              <Badge variant="destructive" className="ml-2 text-[9px]">Restricted</Badge>
                             </DropdownMenuItem>
                           </>
                         )}

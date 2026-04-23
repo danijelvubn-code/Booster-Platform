@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/table";
 import { ArrowLeft, ArrowRight, BarChart3, Zap, Leaf, Euro, Globe, ChevronDown, ChevronUp, MessageSquare } from "lucide-react";
 import { useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getModelProviderLogoSrc, getProviderInitials } from "@/lib/model-provider-logos";
 
 const scoreColor = (score: number) => {
   if (score >= 90) return "text-success";
@@ -50,23 +52,35 @@ const ModelDetail = () => {
     );
   }
 
+  const providerLogoSrc = getModelProviderLogoSrc(model.provider, model.name);
+
   return (
-    <div className="container py-8 space-y-6 max-w-4xl">
+    <div className="container space-y-6 py-8">
       <Button asChild variant="ghost" size="sm" className="-ml-3">
         <Link to="/cosmos"><ArrowLeft className="h-4 w-4 mr-1" /> Model Cosmos</Link>
       </Button>
 
       {/* Header */}
-      <div className="flex items-start justify-between">
-        <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold">{model.name}</h1>
-            <Badge variant="secondary">{model.category}</Badge>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 items-start gap-3">
+          <div className="bg-muted/50 relative h-14 w-14 shrink-0 overflow-hidden rounded-md">
+            <Avatar className="h-full w-full rounded-md">
+              {providerLogoSrc ? (
+                <AvatarImage src={providerLogoSrc} alt="" className="h-full w-full object-contain" />
+              ) : null}
+              <AvatarFallback className="rounded-md text-label">{getProviderInitials(model.provider)}</AvatarFallback>
+            </Avatar>
           </div>
-          <p className="text-sm text-muted-foreground">{model.provider} • v{model.version}</p>
-          <p className="text-sm max-w-2xl">{model.description}</p>
+          <div className="min-w-0 space-y-2">
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-2xl font-bold">{model.name}</h1>
+              <Badge variant="secondary">{model.category}</Badge>
+            </div>
+            <p className="text-sm text-muted-foreground">{model.provider} • v{model.version}</p>
+            <p className="text-sm max-w-2xl">{model.description}</p>
+          </div>
         </div>
-        <Button asChild>
+        <Button asChild className="shrink-0">
           <Link to={`/endpoints/new?model=${model.id}`}>
             Add to Endpoint <ArrowRight className="h-3.5 w-3.5 ml-1" />
           </Link>
@@ -125,7 +139,7 @@ const ModelDetail = () => {
             <div className="p-2 rounded-lg bg-success/10"><Leaf className="h-4 w-4 text-success" /></div>
             <div>
               <p className="text-xs text-muted-foreground">Sustainability</p>
-              <p className="font-semibold text-sm">{model.sustainability}</p>
+              <Badge variant="success" className="text-xs mt-0.5">{model.sustainability}</Badge>
             </div>
           </CardContent>
         </Card>

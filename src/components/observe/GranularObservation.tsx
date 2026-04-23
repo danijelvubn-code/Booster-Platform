@@ -331,7 +331,7 @@ const GranularObservation = () => {
                     <XAxis dataKey="date" tick={{ fontSize: 10 }} />
                     <YAxis tick={{ fontSize: 10 }} />
                     <Tooltip />
-                    <Line type="monotone" dataKey="tokens" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
+                    <Line type="monotone" dataKey="tokens" stroke="oklch(var(--primary))" strokeWidth={2} dot={false} />
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -345,7 +345,7 @@ const GranularObservation = () => {
                     <XAxis dataKey="date" tick={{ fontSize: 10 }} />
                     <YAxis tick={{ fontSize: 10 }} />
                     <Tooltip />
-                    <Bar dataKey="cost" fill="hsl(var(--primary))" radius={[2, 2, 0, 0]} />
+                    <Bar dataKey="cost" fill="oklch(var(--primary))" radius={[2, 2, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>

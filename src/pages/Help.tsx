@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Zap, Box, Layers, Shield, Sparkles } from "lucide-react";
 
 const Help = () => (
-  <div className="container py-8 space-y-6 max-w-3xl">
+  <div className="container space-y-6 py-8">
     <h1 className="text-3xl font-bold tracking-tight">Help</h1>
     <p className="text-muted-foreground">Learn how Booster works and get the most out of the platform.</p>
 

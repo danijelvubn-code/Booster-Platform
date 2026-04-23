@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Label } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -211,7 +211,7 @@ export function ApiKeysDialog({ open, onOpenChange, spaceName }: ApiKeysDialogPr
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <span className="font-medium text-sm">{k.name}</span>
-                            <Badge variant="outline" className="text-[10px] border-success/30 text-success">active</Badge>
+                            <Badge variant="success" className="text-[10px]">active</Badge>
                           </div>
                         </TableCell>
                         <TableCell>

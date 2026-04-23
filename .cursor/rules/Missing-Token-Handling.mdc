@@ -1,0 +1,16 @@
+---
+alwaysApply: true
+---
+
+If a required value does not exist:
+
+stop immediately
+do not guess or approximate
+list what is missing in this format:
+Missing:
+- category:
+- usage:
+- reason existing tokens are insufficient:
+- proposed token name:
+
+Wait for values before continuing.

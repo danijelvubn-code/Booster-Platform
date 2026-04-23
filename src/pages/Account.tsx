@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { Label } from "@/components/ui/input";
 import { Input } from "@/components/ui/input";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
@@ -49,12 +50,15 @@ const Account = () => {
   const nearExpiry = account.daysRemaining <= 14;
 
   return (
-    <div className="container py-8 space-y-8 max-w-4xl">
+    <div className="container space-y-8 py-8">
       {/* ─── 1. Account Overview ─────────────────────────────── */}
       <section className="space-y-4">
         <div className="flex items-start justify-between flex-wrap gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">{account.tenantName}</h1>
+            <div className="mt-2">
+              <Badge variant="success" className="text-xs">{account.status}</Badge>
+            </div>
           </div>
         </div>
 
@@ -78,9 +82,9 @@ const Account = () => {
         </div>
 
         {nearExpiry && (
-          <div className="flex items-center gap-2 rounded-lg border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-warning font-medium">
-            <AlertTriangle className="h-4 w-4 shrink-0" />
-            Your beta access expires soon.
+          <div className="flex items-center gap-2 rounded-lg border border-warning/20 bg-warning/10 px-4 py-3 text-sm">
+            <Badge variant="warning" className="text-xs">Expiring Soon</Badge>
+            <span className="text-warning font-medium">Your beta access expires soon.</span>
           </div>
         )}
       </section>
@@ -131,9 +135,9 @@ const Account = () => {
           </div>
 
           {alertTriggered && (
-            <div className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2.5 text-sm text-destructive font-medium">
-              <AlertTriangle className="h-4 w-4 shrink-0" />
-              You have crossed your usage alert threshold of {fmt(alertTokens)} tokens.
+            <div className="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-2.5 text-sm">
+              <Badge variant="destructive" className="text-xs">Threshold Reached</Badge>
+              <span className="text-destructive font-medium">You have crossed your usage alert threshold of {fmt(alertTokens)} tokens.</span>
             </div>
           )}
 

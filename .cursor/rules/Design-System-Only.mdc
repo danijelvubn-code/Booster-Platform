@@ -1,0 +1,28 @@
+---
+description: 
+alwaysApply: true
+---
+
+# Design system only (no arbitrary styling)
+
+Use **only** existing design tokens and Tailwind utilities defined in this project (`src/index.css` + `tailwind.config.ts`).
+
+Do not:
+
+- use arbitrary values (e.g. `p-[...]`, `text-[...]`, `bg-[#...]`)
+- use raw colors, `px`, `rem`, or inline styles
+- invent new class names or tokens
+
+Examples:
+
+```tsx
+// ❌ BAD
+<div className="px-[10px] text-[#111]">
+  ...
+</div>
+
+// ✅ GOOD
+<div className="px-3 text-foreground">
+  ...
+</div>
+```

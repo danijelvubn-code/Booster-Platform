@@ -1,103 +1,200 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff, Lock, Mail, Zap } from "lucide-react";
+
+import { AuthFlowCardShell } from "@/components/AuthFlowCardShell";
 import { useAuth } from "@/contexts/AuthContext";
+import { clearPendingLogin, setPendingLogin } from "@/lib/pending-login";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Zap, ArrowRight } from "lucide-react";
-import boosterRocket from "@/assets/booster-rocket.png";
+import { InputControl, InputLeadIcon, InputRoot, InputSegment, Label } from "@/components/ui/input";
+
+const welcomeLogoLinkClass =
+  "inline-flex items-center gap-2 rounded-md outline-none ring-offset-background transition-colors ease-standard focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
+const VALID_LOGIN_EMAIL = "user@booster.com";
+const VALID_LOGIN_PASSWORD = "Booster123#";
+const EMAIL_FORMAT_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const Login = () => {
-  const { login } = useAuth();
-  const [email, setEmail] = useState("bob@openrangeai.com");
-  const [password, setPassword] = useState("");
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("user@booster.com");
+  const [password, setPassword] = useState("Booster123#");
+  const [showPassword, setShowPassword] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const canSubmit = email.trim().length > 0 && password.length > 0;
+
+  useEffect(() => {
+    clearPendingLogin();
+  }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/overview", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    login(email, password);
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!EMAIL_FORMAT_REGEX.test(normalizedEmail)) {
+      setEmailError("Invalid email format.");
+      setAuthError(null);
+      return;
+    }
+
+    setEmailError(null);
+
+    if (normalizedEmail !== VALID_LOGIN_EMAIL || password !== VALID_LOGIN_PASSWORD) {
+      setAuthError("The email or password you entered doesn't match our records. Please double-check and try again.");
+      return;
+    }
+
+    setAuthError(null);
+    setPendingLogin(normalizedEmail, password);
+    navigate("/verify-email", { state: { email: normalizedEmail } });
   };
 
   return (
-    <div className="min-h-screen flex bg-booster-navy">
-      {/* Left — Visual Panel */}
-      <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden">
+    <div className="relative flex min-h-screen w-full flex-1 flex-col" data-testid="page-login">
+      <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
         <img
-          alt="Booster rocket launch"
-          className="absolute inset-0 w-full h-full object-cover"
-          src="/lovable-uploads/datacenter-login-bg.png" />
+          alt=""
+          className="h-full w-full object-cover"
+          src="/lovable-uploads/datacenter-login-bg.png"
+        />
+        <div className="absolute inset-0 backdrop-blur-sm bg-overlay-scrim" />
+      </div>
 
-        {/* Gradient overlay for branding readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-booster-navy/80 via-transparent to-transparent" />
-        {/* Branding overlay */}
-        <div className="relative z-10 flex flex-col items-center w-full h-full">
-          <div className="flex-1 flex items-center justify-center text-center">
-            <div className="flex flex-col items-center justify-center gap-2">
-              <div className="flex items-center justify-center gap-3">
-                <Zap className="h-[168px] w-[168px] text-primary fill-primary" />
-                <span className="text-9xl font-bold text-white tracking-tight">booster</span>
+      <div className="relative z-10 flex min-h-0 flex-1 flex-col items-center lg:flex-row lg:items-stretch">
+        <div className="relative hidden min-h-0 flex-1 flex-col items-center justify-center px-6 py-12 lg:flex lg:w-[55%]">
+          <Link to="/" className={welcomeLogoLinkClass}>
+            <div className="flex items-center justify-center gap-3">
+              <Zap className="h-icon-40 w-icon-40 fill-primary text-primary" aria-hidden="true" />
+              <span className="text-display font-semibold tracking-tight text-primary-foreground">booster</span>
+            </div>
+          </Link>
+        </div>
+
+        <AuthFlowCardShell
+          onSubmit={handleSubmit}
+          beforeCard={
+            <div className="mb-6 flex justify-center lg:hidden">
+              <Link to="/" className={welcomeLogoLinkClass}>
+                <Zap className="h-icon-28 w-icon-28 fill-primary text-primary" aria-hidden="true" />
+                <span className="text-h2 font-bold text-primary-foreground">booster</span>
+              </Link>
+            </div>
+          }
+          header={
+            <Link to="/" className={welcomeLogoLinkClass} aria-label="Back to welcome">
+              <Zap className="h-icon-16 w-icon-16 fill-primary text-primary" aria-hidden="true" />
+              <span className="text-caption-strong uppercase tracking-widest text-foreground">booster</span>
+            </Link>
+          }
+          bodyClassName="space-y-6"
+          showFooter={false}
+          body={
+            <>
+              <div className="space-y-2 text-center">
+                <h1 className="text-h1 text-foreground">Welcome!</h1>
+                <p className="text-body text-muted-foreground/75">Log in to continue</p>
               </div>
-              <span className="text-sm font-semibold tracking-widest uppercase px-4 py-1.5 rounded-full bg-primary/20 text-primary border border-primary/30">Beta Version</span>
-            </div>
-          </div>
-          <div className="pb-12 text-center">
-            <p className="text-white/60 text-4xl max-w-2xl leading-relaxed">
-              Enterprise AI Model Management.<br />
-              Deploy, route, and optimize at scale.
-            </p>
-          </div>
-        </div>
+
+              <div className="space-y-6">
+                {authError ? (
+                  <Alert variant="destructive" density="compact">
+                    <AlertDescription className="text-body-sm text-foreground/75">{authError}</AlertDescription>
+                  </Alert>
+                ) : null}
+
+                <div className="space-y-1">
+                  <Label htmlFor="email" className="text-label text-foreground">
+                    Email
+                  </Label>
+                  <InputRoot invalid={!!emailError}>
+                    <InputSegment>
+                      <InputLeadIcon>
+                        <Mail aria-hidden="true" />
+                      </InputLeadIcon>
+                      <InputControl
+                        id="email"
+                        type="email"
+                        autoComplete="email"
+                        placeholder="you@domain.com"
+                        value={email}
+                        aria-invalid={emailError ? "true" : undefined}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          if (emailError) setEmailError(null);
+                          if (authError) setAuthError(null);
+                        }}
+                      />
+                    </InputSegment>
+                  </InputRoot>
+                  {emailError ? <p className="text-caption text-destructive">{emailError}</p> : null}
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="password" className="text-label text-foreground">
+                    Password
+                  </Label>
+                  <InputRoot>
+                    <InputSegment>
+                      <InputLeadIcon>
+                        <Lock aria-hidden="true" />
+                      </InputLeadIcon>
+                      <InputControl
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        autoComplete="current-password"
+                        placeholder="Enter password..."
+                        value={password}
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                          if (authError) setAuthError(null);
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        className="-mr-1 shrink-0"
+                        onClick={() => setShowPassword((v) => !v)}
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-icon-16 w-icon-16" aria-hidden="true" />
+                        ) : (
+                          <Eye className="h-icon-16 w-icon-16" aria-hidden="true" />
+                        )}
+                      </Button>
+                    </InputSegment>
+                  </InputRoot>
+                </div>
+
+                <Button type="submit" size="lg" className="w-full" disabled={!canSubmit}>
+                  Log In
+                </Button>
+
+                <div className="flex items-center justify-center">
+                  <button
+                    type="button"
+                    onClick={() => navigate("/reset-password")}
+                    className="text-body-sm text-info transition-colors ease-standard hover:text-info/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  >
+                    Reset Password
+                  </button>
+                </div>
+              </div>
+            </>
+          }
+        />
       </div>
-
-      {/* Right — Login Form */}
-      <div className="flex-1 flex items-center justify-center p-8 relative">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,hsl(var(--primary)/0.04),transparent_60%)]" />
-
-        <div className="w-full max-w-sm relative z-10">
-          <div className="flex items-center gap-2 mb-10 lg:hidden">
-            <Zap className="h-7 w-7 text-primary fill-primary" />
-            <span className="text-2xl font-bold text-white">booster</span>
-          </div>
-
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-white mb-2">Welcome back</h1>
-            <p className="text-white/50">Sign in to your Booster account</p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-white/70 text-sm">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@company.com"
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/30 h-12 focus:border-primary focus:ring-primary/20" />
-
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-white/70 text-sm">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/30 h-12 focus:border-primary focus:ring-primary/20" />
-
-            </div>
-            <div className="flex justify-end">
-              <button type="button" className="text-xs text-white/40 hover:text-primary transition-colors">
-                Forgot password?
-              </button>
-            </div>
-            <Button type="submit" className="w-full h-12 text-base font-semibold gap-2 group" size="lg">
-              Sign In
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </Button>
-          </form>
-        </div>
-      </div>
-    </div>);
+    </div>
+  );
 
 };
 

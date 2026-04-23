@@ -81,7 +81,7 @@ const AdminConsole = () => {
   };
 
   return (
-    <div className="container py-8 space-y-6 max-w-5xl">
+    <div className="container space-y-6 py-8">
       <div className="flex items-center gap-3">
         <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
           <UserCog className="h-5 w-5 text-primary" />
@@ -159,12 +159,7 @@ const AdminConsole = () => {
                         <TableCell className="text-right">{t.endpoints}</TableCell>
                         <TableCell className="text-right">{fmt(t.tokensUsed)}</TableCell>
                         <TableCell className="text-right">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="gap-1.5 text-warning border-warning/30 hover:bg-warning/10 hover:text-warning"
-                            onClick={() => setConfirmTenant(t)}
-                          >
+                          <Button size="sm" variant="warning" className="gap-1.5" onClick={() => setConfirmTenant(t)}>
                             <Shield className="h-3.5 w-3.5" />
                             Impersonate
                           </Button>
@@ -233,7 +228,7 @@ const AdminConsole = () => {
                 <TableBody>
                   {mockTokenPools.map((pool) => {
                     const pct = Math.round((pool.usedTokens / pool.totalTokens) * 100);
-                    const color = pct > 85 ? "text-destructive" : pct > 60 ? "text-warning" : "text-green-500";
+                    const color = pct > 85 ? "text-destructive" : pct > 60 ? "text-warning" : "text-success";
                     return (
                       <TableRow key={pool.id}>
                         <TableCell>
@@ -244,7 +239,7 @@ const AdminConsole = () => {
                         <TableCell className="text-right font-mono text-sm">{fmt(pool.usedTokens)}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <Progress value={pct} className="h-2 flex-1" />
+                            <Progress value={pct} className="flex-1" />
                             <span className={`text-xs font-semibold ${color} w-10 text-right`}>{pct}%</span>
                           </div>
                         </TableCell>
@@ -307,7 +302,7 @@ const AdminConsole = () => {
                         <TableCell className="text-right font-mono text-sm">{fmt(u.tokensUsed)}</TableCell>
                         <TableCell className="text-right font-mono text-sm">€{u.cost.toLocaleString()}</TableCell>
                         <TableCell className="text-right">
-                          <div className={`inline-flex items-center gap-1 text-xs font-semibold ${u.trend >= 0 ? "text-destructive" : "text-green-500"}`}>
+                          <div className={`inline-flex items-center gap-1 text-xs font-semibold ${u.trend >= 0 ? "text-destructive" : "text-success"}`}>
                             {u.trend >= 0 ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
                             {u.trend >= 0 ? "+" : ""}{u.trend}%
                           </div>
@@ -362,10 +357,7 @@ const AdminConsole = () => {
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmTenant(null)}>Cancel</Button>
-            <Button
-              className="bg-warning text-warning-foreground hover:bg-warning/90"
-              onClick={handleImpersonate}
-            >
+            <Button variant="warning" onClick={handleImpersonate}>
               <Shield className="h-4 w-4 mr-1" />
               Start Impersonation
             </Button>

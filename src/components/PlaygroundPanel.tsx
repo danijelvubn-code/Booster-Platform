@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { Label } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { Play, Copy, RotateCcw, Clock, Zap, Euro, Loader2, Info } from "lucide-react";
@@ -117,14 +117,28 @@ const PlaygroundPanel = ({
                   <Label>Temperature</Label>
                   <span className="text-xs text-muted-foreground font-mono">{temperature[0]}</span>
                 </div>
-                <Slider value={temperature} onValueChange={setTemperature} min={0} max={2} step={0.1} />
+                <Slider
+                  size="dense"
+                  value={temperature}
+                  onValueChange={setTemperature}
+                  min={0}
+                  max={2}
+                  step={0.1}
+                />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label>Max Tokens</Label>
                   <span className="text-xs text-muted-foreground font-mono">{maxTokens[0]}</span>
                 </div>
-                <Slider value={maxTokens} onValueChange={setMaxTokens} min={64} max={4096} step={64} />
+                <Slider
+                  size="dense"
+                  value={maxTokens}
+                  onValueChange={setMaxTokens}
+                  min={64}
+                  max={4096}
+                  step={64}
+                />
               </div>
             </CardContent>
           </Card>

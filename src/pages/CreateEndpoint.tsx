@@ -3,10 +3,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { endpoints, deployments, models } from "@/data/mockData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Input, Label } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, ArrowRight, Check, Globe, Lock, Info, Rocket, Search, X, Zap, Shield, ShieldOff, Coins, Settings2 } from "lucide-react";
@@ -164,6 +162,7 @@ const CreateEndpoint = () => {
       outputTokens: 0,
       endpoint: endpointUrl,
       tokenBudget: parseInt(config.monthlyBudget) || 1_000_000,
+      monthlyBudgetEur: Math.max(0, Math.round((parseInt(config.monthlyBudget) || 1_000_000) / 1000)),
       performanceProfile: config.performanceProfile,
     });
     if (selectedModel) {
@@ -213,7 +212,7 @@ const CreateEndpoint = () => {
   };
 
   return (
-    <div className="container py-8 max-w-5xl space-y-6">
+    <div className="container space-y-6 py-8">
       <Button variant="ghost" size="sm" className="-ml-3" onClick={() => navigate("/endpoints")}>
         <ArrowLeft className="h-4 w-4 mr-1" /> Inference Endpoints
       </Button>

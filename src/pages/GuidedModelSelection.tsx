@@ -355,7 +355,7 @@ const GuidedModelSelection = () => {
   const progress = ((step + 1) / stepsMeta.length) * 100;
 
   return (
-    <div className="container py-8 max-w-3xl space-y-6">
+    <div className="container space-y-6 py-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <Button variant="ghost" size="sm" className="-ml-3" onClick={() => navigate("/cosmos")}>
@@ -377,7 +377,7 @@ const GuidedModelSelection = () => {
           <span>Step {step + 1} of {stepsMeta.length}: {stepsMeta[step].title}</span>
           <span>{Math.round(progress)}%</span>
         </div>
-        <Progress value={progress} className="h-1.5" />
+        <Progress value={progress} size="dense" />
         <div className="flex gap-1">
           {stepsMeta.map((s, i) => {
             const Icon = s.icon;
@@ -564,13 +564,8 @@ const GuidedModelSelection = () => {
                               <Badge key={tag} variant="outline" className="text-[10px]">{tag}</Badge>
                             ))}
                             <Badge
-                              variant="outline"
-                              className={cn(
-                                "text-[10px]",
-                                m.hosting === "Booster Powered"
-                                  ? "border-yellow-500/30 text-yellow-600 dark:text-yellow-400"
-                                  : "border-info/30 text-info"
-                              )}
+                              variant={m.hosting === "Booster Powered" ? "warning" : "info"}
+                              className="text-[10px]"
                             >
                               {m.hosting}
                             </Badge>

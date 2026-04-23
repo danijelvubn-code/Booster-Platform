@@ -15,10 +15,17 @@ const typeIcon: Record<string, typeof Euro> = {
 };
 
 const typeColor: Record<string, string> = {
-  "Cost Optimization": "bg-success/10 text-success",
-  "Performance Upgrade": "bg-primary/10 text-primary",
-  Sustainability: "bg-info/10 text-info",
-  "Stability Improvement": "bg-warning/10 text-warning",
+  "Cost Optimization": "bg-success/10 text-success border border-success/20",
+  "Performance Upgrade": "bg-primary/10 text-primary border border-primary/20",
+  Sustainability: "bg-info/10 text-info border border-info/20",
+  "Stability Improvement": "bg-warning/10 text-warning border border-warning/20",
+};
+
+const typeVariant: Record<string, "success" | "default" | "info" | "warning"> = {
+  "Cost Optimization": "success",
+  "Performance Upgrade": "default",
+  Sustainability: "info",
+  "Stability Improvement": "warning",
 };
 
 const Recommendations = () => {
@@ -53,6 +60,9 @@ const Recommendations = () => {
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h3 className="font-semibold">{rec.title}</h3>
+                      <Badge variant={typeVariant[rec.type] || "secondary"} className="text-xs">
+                        {rec.type}
+                      </Badge>
                       <Badge variant="secondary" className="text-xs">{rec.endpoint}</Badge>
                       {isIgnored && <Badge variant="outline" className="text-xs opacity-60">Ignored</Badge>}
                     </div>

@@ -126,7 +126,7 @@ const AdminDashboard = () => {
                   <XAxis dataKey="month" tick={{ fontSize: 10 }} />
                   <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `${v}%`} width={36} />
                   <RechartsTooltip formatter={(v: number) => [`${v}%`, "Margin"]} />
-                  <Line type="monotone" dataKey="margin" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="margin" stroke="oklch(var(--primary))" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </CardContent>
@@ -160,7 +160,7 @@ const AdminDashboard = () => {
               {marginByTenant.map((t) => (
                 <div key={t.tenant} className="flex items-center gap-3">
                   <span className="text-sm w-36 truncate">{t.tenant}</span>
-                  <Badge variant="outline" className={`text-[10px] ${t.isMoneyMaker ? "border-success/30 text-success" : "border-destructive/30 text-destructive"}`}>
+                  <Badge variant={t.isMoneyMaker ? "success" : "destructive"} className="text-[10px]">
                     {t.isMoneyMaker ? "Money Maker" : "Loss Leader"}
                   </Badge>
                   <span className={`text-sm font-mono ml-auto ${t.margin >= 0 ? "text-success" : "text-destructive"}`}>
@@ -214,7 +214,7 @@ const AdminDashboard = () => {
                 </div>
               )}
               {!burnAlert && (
-                <Badge variant="outline" className="border-success/30 text-success text-xs">
+                <Badge variant="success" className="text-xs">
                   Within normal range
                 </Badge>
               )}
@@ -233,8 +233,8 @@ const AdminDashboard = () => {
                   <YAxis tick={{ fontSize: 10 }} width={36} />
                   <RechartsTooltip />
                   <Legend wrapperStyle={{ fontSize: 11 }} />
-                  <Line type="monotone" dataKey="current" name="Current" stroke="hsl(var(--warning))" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="baseline" name="7d Avg" stroke="hsl(var(--muted-foreground))" strokeWidth={1.5} strokeDasharray="4 3" dot={false} />
+                  <Line type="monotone" dataKey="current" name="Current" stroke="oklch(var(--warning))" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="baseline" name="7d Avg" stroke="oklch(var(--muted-foreground))" strokeWidth={1.5} strokeDasharray="4 3" dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </CardContent>
@@ -287,7 +287,7 @@ const AdminDashboard = () => {
                   <XAxis dataKey="month" tick={{ fontSize: 10 }} />
                   <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => fmt(v)} width={40} />
                   <RechartsTooltip formatter={(v: number) => [fmt(v), "Tok/€"]} />
-                  <Line type="monotone" dataKey="tokensPerDollar" name="Tok/€" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="tokensPerDollar" name="Tok/€" stroke="oklch(var(--primary))" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </CardContent>

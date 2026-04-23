@@ -1,7 +1,12 @@
 import { useToast } from "@/hooks/use-toast";
 import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast";
 
-export function Toaster() {
+/**
+ * Root host for Radix toasts: wraps `ToastProvider`, maps the `useToast` queue to `Toast` roots,
+ * and renders `ToastViewport` for positioning. Mount once in the app shell (see `App.tsx`).
+ * Trigger notifications with `toast()` from `@/hooks/use-toast`.
+ */
+function Toaster() {
   const { toasts } = useToast();
 
   return (
@@ -22,3 +27,7 @@ export function Toaster() {
     </ToastProvider>
   );
 }
+
+Toaster.displayName = "Toaster";
+
+export { Toaster };

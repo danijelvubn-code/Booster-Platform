@@ -5,24 +5,36 @@ import { MetricCell, MetricsRow } from "@/components/metrics";
 import { cn } from "@/lib/utils";
 import {
   formatContextLength,
+  formatEurPerTokenFromPer1M,
   getCodingScore,
   getMathScore,
+  getModelCatalogBadge,
   getModelSubline,
   getReasoningScore,
   getOverallModelScore,
+  modelHasVisionCapability,
   overallScoreTextClass,
   type ModelRecord,
 } from "@/lib/model-metrics";
 import { getModelProviderLogoSrc, getProviderInitials } from "@/lib/model-provider-logos";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Cpu, Zap } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Cpu, Eye, Zap } from "lucide-react";
+
+export type ModelCosmosCardVariant = "full" | "basic" | "catalog";
 
 type ModelCosmosCardProps = {
   model: ModelRecord;
   className?: string;
+  /**
+   * `full`: avatar, scores, sustainability, metrics (phase 2).
+   * `basic`: name, provider, description only (phase 1).
+   * `catalog`: card layout with avatar, model name, modalities, endpoint, and per-token in/out in metric cells.
+   */
+  variant?: ModelCosmosCardVariant;
 };
 
-export function ModelCosmosCard({ model, className }: ModelCosmosCardProps) {
+function ModelCosmosCardFull({ model, className }: { model: ModelRecord; className?: string }) {
   const coding = getCodingScore(model);
   const reasoning = getReasoningScore(model);
   const math = getMathScore(model);
@@ -105,3 +117,119 @@ export function ModelCosmosCard({ model, className }: ModelCosmosCardProps) {
     </Card>
   );
 }
+
+function ModelCosmosCardCatalog({ model, className }: { model: ModelRecord; className?: string }) {
+  const providerLogoSrc = getModelProviderLogoSrc(model.provider, model.name);
+  const isDeprecated = model.status === "Deprecated";
+  const showVision = modelHasVisionCapability(model);
+  const catalogBadge = getModelCatalogBadge(model);
+  const inEur = formatEurPerTokenFromPer1M(model.inputCostPer1M);
+  const outEur = formatEurPerTokenFromPer1M(model.outputCostPer1M);
+
+  return (
+    <Card
+      className={cn(
+        "hover:border-primary/40 hover:shadow-md flex h-full min-h-0 flex-col gap-4 p-4 transition duration-200 ease-standard",
+        isDeprecated && "opacity-50",
+        className,
+      )}
+    >
+      <div className="flex min-w-0 flex-1 items-start gap-3">
+        <div className="bg-muted/50 relative h-14 w-14 shrink-0 overflow-hidden rounded-md">
+          <Avatar className="h-full w-full rounded-md">
+            {providerLogoSrc ? (
+              <AvatarImage src={providerLogoSrc} alt="" className="h-full w-full object-contain" />
+            ) : null}
+            <AvatarFallback className="rounded-md text-label">{getProviderInitials(model.provider)}</AvatarFallback>
+          </Avatar>
+        </div>
+        <p className="min-w-0 flex-1 truncate text-lg font-semibold leading-tight text-foreground">{model.name}</p>
+      </div>
+
+      <div className="flex gap-3">
+        <div className="w-14 shrink-0" aria-hidden />
+        <div className="grid min-w-0 flex-1 grid-cols-2 gap-2">
+          <div className="flex min-h-0 min-w-0 flex-1 flex-row flex-wrap items-center justify-start gap-2">
+            <span className="shrink-0 text-caption text-muted-foreground">Modalities</span>
+            <div className="flex flex-wrap items-center justify-start gap-1">
+              <span
+                className="bg-secondary-foreground/4 flex h-icon-24 w-icon-24 shrink-0 items-center justify-center rounded-md border border-border text-caption font-bold text-foreground"
+                title="Text"
+              >
+                T
+              </span>
+              {showVision ? (
+                <span
+                  className="bg-secondary-foreground/4 flex h-icon-24 w-icon-24 shrink-0 items-center justify-center rounded-sm border border-border"
+                  title="Vision"
+                >
+                  <Eye className="h-icon-16 w-icon-16 text-muted-foreground" aria-hidden />
+                </span>
+              ) : null}
+            </div>
+          </div>
+          <div className="flex min-h-0 min-w-0 flex-1 flex-row flex-wrap items-center justify-start gap-2">
+            <span className="shrink-0 text-caption text-muted-foreground">Endpoint</span>
+            <Badge variant="outline" size="20" className="shrink-0 font-normal">
+              {catalogBadge}
+            </Badge>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex gap-3">
+        <div className="w-14 shrink-0" aria-hidden />
+        <MetricsRow className="grid-cols-2">
+          <MetricCell
+            className="[&>span]:font-mono [&>span]:tabular-nums"
+            label={`in: €${inEur}`}
+          />
+          <MetricCell
+            className="[&>span]:font-mono [&>span]:tabular-nums"
+            label={`out: €${outEur}`}
+          />
+        </MetricsRow>
+      </div>
+    </Card>
+  );
+}
+
+function ModelCosmosCardBasic({ model, className }: { model: ModelRecord; className?: string }) {
+  return (
+    <Card
+      className={cn(
+        "hover:border-primary/40 hover:shadow-md flex h-model-cosmos-card-basic min-h-model-cosmos-card-basic flex-col gap-3 overflow-hidden p-4 transition duration-200 ease-standard",
+        className,
+      )}
+    >
+      <div className="flex min-w-0 shrink-0 items-start justify-between gap-3">
+        <p className="min-w-0 flex-1 truncate text-lg font-semibold leading-tight text-foreground/75">
+          {model.name}
+        </p>
+        <p className="max-w-40 shrink-0 truncate text-right text-body-sm text-muted-foreground">
+          {model.provider}
+        </p>
+      </div>
+      <p className="min-h-0 flex-1 line-clamp-3 text-body-sm text-muted-foreground">
+        {model.description}
+      </p>
+    </Card>
+  );
+}
+
+export function ModelCosmosCard({ model, className, variant = "full" }: ModelCosmosCardProps) {
+  if (variant === "basic") {
+    return <ModelCosmosCardBasic model={model} className={className} />;
+  }
+  if (variant === "catalog") {
+    return <ModelCosmosCardCatalog model={model} className={className} />;
+  }
+  return <ModelCosmosCardFull model={model} className={className} />;
+}
+
+/** Phase 1 catalog card: title row + description only. */
+export { ModelCosmosCardBasic };
+/** Phase 2: full metrics, avatar, and benchmark row. */
+export { ModelCosmosCardFull };
+/** Catalog tile: avatar, name, modalities vs endpoint, pricing in metric cells. */
+export { ModelCosmosCardCatalog };

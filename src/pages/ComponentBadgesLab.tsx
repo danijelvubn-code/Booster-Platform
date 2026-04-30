@@ -26,6 +26,7 @@ const variants = [
   "info",
   "destructive",
   "outline",
+  "muted",
 ] as const;
 const badgeSizes = ["20", "24", "28"] as const;
 const badgeAppearances = ["pill", "ghost"] as const;

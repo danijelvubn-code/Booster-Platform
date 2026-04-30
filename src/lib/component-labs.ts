@@ -55,9 +55,12 @@ export const COMPONENT_LAB_LINKS = [
  * Add new entries here and register matching routes under `/dev/components/sections/…`.
  */
 export const SECTION_LAB_LINKS = [
+  { label: "App header", path: "/dev/components/sections/app-header" },
   { label: "Energy score", path: "/dev/components/sections/energy-score" },
+  { label: "Endpoint card", path: "/dev/components/sections/endpoint-card" },
   { label: "Metrics", path: "/dev/components/sections/metrics" },
   { label: "Model card", path: "/dev/components/sections/model-card" },
+  { label: "Stepper", path: "/dev/components/sections/stepper" },
   { label: "Shadows", path: "/dev/components/sections/shadows" },
 ] as const;
 

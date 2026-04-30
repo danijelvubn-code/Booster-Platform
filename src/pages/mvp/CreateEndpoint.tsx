@@ -1,5 +1,7 @@
 import { useState, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { ArrowLeft, ArrowRight, Check, Info, Lock, Rocket, Search, X } from "lucide-react";
+
 import { endpoints, deployments, models } from "@/data/mockData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,23 +9,19 @@ import { Input, Label } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ArrowRight, Check, Lock, Info, Rocket, Search, X } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useToast } from "@/hooks/use-toast";
 import { defaultGuardrailsState, countEnabledGuardrails, type GuardrailsState } from "@/components/GuardrailsStep";
 import { type PerformanceProfile } from "@/components/PerformanceProfileStep";
 
-/* ── Model Search Select ── */
 const ModelSearchSelect = ({ value, onChange }: { value: string; onChange: (id: string) => void }) => {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    return models.filter(
-      (m) => m.name.toLowerCase().includes(q) || m.provider.toLowerCase().includes(q)
-    );
+    return models.filter((m) => m.name.toLowerCase().includes(q) || m.provider.toLowerCase().includes(q));
   }, [search]);
 
   const selected = models.find((m) => m.id === value);
@@ -40,7 +38,10 @@ const ModelSearchSelect = ({ value, onChange }: { value: string; onChange: (id: 
               <span
                 role="button"
                 className="rounded-full p-0.5 hover:bg-muted"
-                onClick={(e) => { e.stopPropagation(); onChange(""); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onChange("");
+                }}
               >
                 <X className="h-3.5 w-3.5 text-muted-foreground" />
               </span>
@@ -64,10 +65,16 @@ const ModelSearchSelect = ({ value, onChange }: { value: string; onChange: (id: 
             filtered.map((m) => (
               <button
                 key={m.id}
-                onClick={() => { onChange(m.id); setOpen(false); setSearch(""); }}
+                onClick={() => {
+                  onChange(m.id);
+                  setOpen(false);
+                  setSearch("");
+                }}
                 className={`flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-sm hover:bg-accent ${value === m.id ? "bg-accent" : ""}`}
               >
-                <span>{m.name} <span className="text-muted-foreground">— {m.provider}</span></span>
+                <span>
+                  {m.name} <span className="text-muted-foreground">— {m.provider}</span>
+                </span>
                 {value === m.id && <Check className="h-3.5 w-3.5 text-primary" />}
               </button>
             ))
@@ -86,13 +93,16 @@ const ModelSearchSelect = ({ value, onChange }: { value: string; onChange: (id: 
 };
 
 const STEPS = ["Basic Setup", "Review & Deploy"] as const;
-
 const HOSTING_PROVIDERS = ["Openchip", "Scaleway", "Booster EU"] as const;
-
 const USE_CASE_PLACEHOLDER =
   "Describe your use case in a few sentences, e.g., 'We need to process insurance claims documents and extract key information like policy numbers, dates, and damage amounts for automated underwriting.'";
 
-const CreateEndpoint = () => {
+/**
+ * MVP create-endpoint wizard. Mirrors `pages/CreateEndpoint.tsx` but stays inside the MVP track:
+ * back button uses browser history; success navigates to `/mvp/overview`.
+ * Edit independently from the post-MVP version.
+ */
+const MvpCreateEndpoint = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
@@ -127,7 +137,9 @@ const CreateEndpoint = () => {
 
   const handleCreate = () => {
     const newEndpointId = `sp-${Date.now()}`;
-    const endpointUrl = `https://api.booster.ai/v1/endpoints/${config.targetSpace.toLowerCase()}/${config.name.toLowerCase().replace(/\s+/g, "-")}`;
+    const endpointUrl = `https://api.booster.ai/v1/endpoints/${config.targetSpace.toLowerCase()}/${config.name
+      .toLowerCase()
+      .replace(/\s+/g, "-")}`;
     endpoints.push({
       id: newEndpointId,
       name: config.name,
@@ -144,20 +156,29 @@ const CreateEndpoint = () => {
       performanceProfile: config.performanceProfile,
     });
     if (selectedModel) {
-      const regionLabel = config.region === "scaleway-fr" ? "EU-West" : config.region === "scaleway-nl" ? "EU-West" : config.region === "scaleway-pl" ? "EU-Central" : "EU-South";
-      deployments[newEndpointId] = [{
-        id: `dep-${Date.now()}`,
-        name: `${selectedModel.name.toLowerCase().replace(/\s+/g, "-")}-${config.name.toLowerCase().replace(/\s+/g, "-")}`,
-        model: selectedModel.name,
-        version: config.modelVersion || selectedModel.version,
-        mode: "Shared",
-        budgetUsed: 0,
-        slaStatus: "OK",
-        region: regionLabel,
-        confidentialCompute: config.confidentialCompute,
-        latencyP50: 0,
-        costPer1MTokens: selectedModel.inputCostPer1M,
-      }];
+      const regionLabel =
+        config.region === "scaleway-fr"
+          ? "EU-West"
+          : config.region === "scaleway-nl"
+            ? "EU-West"
+            : config.region === "scaleway-pl"
+              ? "EU-Central"
+              : "EU-South";
+      deployments[newEndpointId] = [
+        {
+          id: `dep-${Date.now()}`,
+          name: `${selectedModel.name.toLowerCase().replace(/\s+/g, "-")}-${config.name.toLowerCase().replace(/\s+/g, "-")}`,
+          model: selectedModel.name,
+          version: config.modelVersion || selectedModel.version,
+          mode: "Shared",
+          budgetUsed: 0,
+          slaStatus: "OK",
+          region: regionLabel,
+          confidentialCompute: config.confidentialCompute,
+          latencyP50: 0,
+          costPer1MTokens: selectedModel.inputCostPer1M,
+        },
+      ];
     } else {
       deployments[newEndpointId] = [];
     }
@@ -165,13 +186,13 @@ const CreateEndpoint = () => {
       title: "Inference Endpoint Deployed",
       description: `"${config.name}" has been deployed successfully.`,
     });
-    navigate(`/endpoints/${newEndpointId}`);
+    navigate("/mvp/overview");
   };
 
   const estimatedCost = () => {
     if (!selectedModel) return "—";
     const budget = parseInt(config.monthlyBudget) || 0;
-    const avg = ((selectedModel.inputCostPer1M + selectedModel.outputCostPer1M) / 2) / 1000;
+    const avg = (selectedModel.inputCostPer1M + selectedModel.outputCostPer1M) / 2 / 1000;
     return `~$${((budget / 1000) * avg).toFixed(0)}`;
   };
 
@@ -184,8 +205,8 @@ const CreateEndpoint = () => {
 
   return (
     <div className="container space-y-6 py-8">
-      <Button variant="ghost" size="sm" className="-ml-3" onClick={() => navigate("/endpoints")}>
-        <ArrowLeft className="mr-1 h-4 w-4" /> Inference Endpoints
+      <Button variant="ghost" size="sm" className="-ml-3" onClick={() => navigate(-1)}>
+        <ArrowLeft className="mr-1 h-4 w-4" /> Back
       </Button>
 
       <div>
@@ -195,13 +216,14 @@ const CreateEndpoint = () => {
         </p>
       </div>
 
-      {/* Two-step stepper */}
       <div className="flex items-center gap-2">
         {STEPS.map((s, i) => (
           <div key={s} className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => { if (i < step) setStep(i); }}
+              onClick={() => {
+                if (i < step) setStep(i);
+              }}
               className={`flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-medium transition-colors ${
                 i === step
                   ? "bg-primary text-primary-foreground"
@@ -213,9 +235,7 @@ const CreateEndpoint = () => {
               {i < step && <Check className="h-3.5 w-3.5" />}
               <span className="whitespace-nowrap">{s}</span>
             </button>
-            {i < STEPS.length - 1 && (
-              <div className={`h-px w-6 ${i < step ? "bg-primary" : "bg-border"}`} />
-            )}
+            {i < STEPS.length - 1 && <div className={`h-px w-6 ${i < step ? "bg-primary" : "bg-border"}`} />}
           </div>
         ))}
       </div>
@@ -317,12 +337,15 @@ const CreateEndpoint = () => {
           {isReviewStep && (
             <div className="space-y-4">
               <p className="text-body-sm text-muted-foreground">
-                Review your configuration before deploying. Default budget and performance settings apply; you can change them in the product later.
+                Review your configuration before deploying. Default budget and performance settings apply; you can change
+                them in the product later.
               </p>
               <div className="grid gap-4 md:grid-cols-2">
                 <Card className="bg-muted/50">
                   <CardContent className="space-y-2 p-4">
-                    <p className="text-caption font-semibold uppercase tracking-wider text-muted-foreground">Inference endpoint</p>
+                    <p className="text-caption font-semibold uppercase tracking-wider text-muted-foreground">
+                      Inference endpoint
+                    </p>
                     <p className="font-semibold">{config.name || "—"}</p>
                     <Badge variant="secondary">{config.targetSpace}</Badge>
                     <p className="text-body-sm text-muted-foreground">
@@ -340,7 +363,9 @@ const CreateEndpoint = () => {
                     <p className="text-body-sm">{parseInt(config.monthlyBudget, 10).toLocaleString()} tokens/mo</p>
                     <p className="text-xs text-muted-foreground">Alert at {config.alertThreshold}%</p>
                     <p className="text-xs text-muted-foreground">Hard stop: {config.hardCap ? "Yes" : "No"}</p>
-                    {selectedModel && <p className="text-sm font-medium text-primary">Est. cost: {estimatedCost()}/mo</p>}
+                    {selectedModel && (
+                      <p className="text-sm font-medium text-primary">Est. cost: {estimatedCost()}/mo</p>
+                    )}
                     <p className="text-xs text-muted-foreground">
                       Guardrails: {enabledGuardrailCount === 0 ? "None enabled" : `${enabledGuardrailCount} enabled`}
                     </p>
@@ -350,8 +375,8 @@ const CreateEndpoint = () => {
               <div className="mt-2 flex items-start gap-2 rounded-md border border-border bg-muted/50 p-3">
                 <Lock className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                 <p className="text-xs text-muted-foreground">
-                  Your input data and model responses are never used to train our models and will not be shared with other
-                  users or third parties.
+                  Your input data and model responses are never used to train our models and will not be shared with
+                  other users or third parties.
                 </p>
               </div>
             </div>
@@ -377,4 +402,4 @@ const CreateEndpoint = () => {
   );
 };
 
-export default CreateEndpoint;
+export default MvpCreateEndpoint;

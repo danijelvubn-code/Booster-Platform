@@ -40,6 +40,17 @@ const designSystemWidthKeys = [
   "component-labs-audit",
 ] as const;
 
+/** Matches `theme.extend.maxWidth` so `max-w-modal-sm` merges with `max-w-[520px]`, etc. */
+const designSystemMaxWidthKeys = [
+  "modal-sm",
+  "modal-md",
+  "modal-lg",
+  "modal-auth",
+  "component-labs",
+  "component-labs-row",
+  "page-intro",
+] as const;
+
 const twMerge = extendTailwindMerge({
   extend: {
     classGroups: {
@@ -63,6 +74,7 @@ const twMerge = extendTailwindMerge({
       ],
       h: [{ h: [...designSystemHeightKeys] }],
       w: [{ w: [...designSystemWidthKeys] }],
+      "max-w": [{ "max-w": [...designSystemMaxWidthKeys] }],
     },
   },
 });

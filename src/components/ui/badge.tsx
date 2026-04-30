@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(
-  "inline-flex select-none items-center justify-center gap-1 rounded-full border px-2 transition-colors ease-standard",
+  "inline-flex select-none items-center justify-center gap-1 rounded-md border px-2 transition-colors ease-standard",
   {
     variants: {
       variant: {
@@ -15,15 +15,17 @@ const badgeVariants = cva(
         warning: "",
         info: "",
         outline: "",
+        /** Light gray surface and muted label (e.g. neutral tags, metadata). */
+        muted: "",
       },
       appearance: {
         pill: "",
         ghost: "",
       },
       size: {
-        "20": "h-5 text-caption-strong [&>svg]:h-icon-16 [&>svg]:w-icon-16",
-        "24": "h-6 text-caption-strong [&>svg]:h-icon-16 [&>svg]:w-icon-16",
-        "28": "h-icon-28 text-body-sm-strong [&>svg]:h-icon-20 [&>svg]:w-icon-20",
+        "20": "h-5 text-caption [&>svg]:h-icon-16 [&>svg]:w-icon-16",
+        "24": "h-6 text-caption [&>svg]:h-icon-16 [&>svg]:w-icon-16",
+        "28": "h-icon-28 text-body-sm [&>svg]:h-icon-20 [&>svg]:w-icon-20",
       },
     },
     compoundVariants: [
@@ -60,7 +62,13 @@ const badgeVariants = cva(
       {
         appearance: "pill",
         variant: "outline",
-        className: "border-border bg-transparent text-foreground hover:border-foreground/30",
+        className: "border-border bg-transparent text-muted-foreground hover:border-foreground/30",
+      },
+      {
+        appearance: "pill",
+        variant: "muted",
+        className:
+          "border-transparent bg-muted text-muted-foreground hover:bg-muted/80",
       },
       {
         appearance: "ghost",
@@ -98,7 +106,13 @@ const badgeVariants = cva(
       {
         appearance: "ghost",
         variant: "outline",
-        className: "border-border bg-transparent text-foreground hover:border-foreground/30",
+        className: "border-border bg-transparent text-muted-foreground hover:border-foreground/30",
+      },
+      {
+        appearance: "ghost",
+        variant: "muted",
+        className:
+          "border-border bg-muted/50 text-muted-foreground hover:border-border hover:bg-muted",
       },
     ],
     defaultVariants: {

@@ -15,27 +15,27 @@ const scenarios: Array<{
   {
     state: "setup-password",
     title: "Setup Password",
-    description: "User completes initial password setup",
+    description: "User completes initial password setup (MVP)",
     icon: Zap,
   },
   {
     state: "link-expired",
     title: "Link Expired",
-    description: "User encounters an expired invitation link",
+    description: "User encounters an expired invitation link (MVP)",
     icon: AlertCircle,
   },
   {
     state: "invitation-used",
     title: "Invitation Already Used",
-    description: "User tries to use a previously claimed invitation",
+    description: "User tries to use a previously claimed invitation (MVP)",
     icon: CheckCircle2,
   },
 ];
 
 /**
- * First-time tester: pick a GetStarted `state` scenario (pre-auth control panel flow).
+ * MVP-only first-time scenario picker. Does not import `pages/FirstTimeUser.tsx` — edit independently.
  */
-const FirstTimeUser = () => {
+const MvpFirstTimeUser = () => {
   const navigate = useNavigate();
 
   return (
@@ -43,16 +43,14 @@ const FirstTimeUser = () => {
       <div className="mx-auto w-full max-w-component-labs">
         <div className="mb-8">
           <Link
-            to="/flows/post-mvp"
+            to="/flows/mvp"
             className="inline-flex items-center gap-1 text-body-sm text-muted-foreground transition-colors ease-standard hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md"
           >
             <ChevronLeft className="h-icon-16 w-icon-16 shrink-0" aria-hidden />
-            Back to Post MVP
+            Back to MVP
           </Link>
-          <h1 className="mt-6 text-h1 text-foreground">Post MVP · First-time flows</h1>
-          <p className="mt-2 text-body-sm text-muted-foreground">
-            Select a status scenario to test the full product experience
-          </p>
+          <h1 className="mt-6 text-h1 text-foreground">MVP · First-time flows</h1>
+          <p className="mt-2 text-body-sm text-muted-foreground">Select a status scenario to test the MVP experience</p>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -60,7 +58,7 @@ const FirstTimeUser = () => {
             <button
               key={state}
               type="button"
-              onClick={() => navigate(`/get-started?state=${state}`)}
+              onClick={() => navigate(`/mvp/get-started?state=${state}`)}
               className={cn(
                 "text-left transition-colors ease-standard",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-lg",
@@ -88,4 +86,4 @@ const FirstTimeUser = () => {
   );
 };
 
-export default FirstTimeUser;
+export default MvpFirstTimeUser;

@@ -43,15 +43,47 @@ export function getModelModalityLabel(model: ModelRecord): string {
   return "LLM";
 }
 
+/** Small badge on catalog-style model tiles (e.g. Chat vs Code). */
+export function getModelCatalogBadge(model: ModelRecord): string {
+  if (model.category === "Code") return "Code";
+  return "Chat";
+}
+
+/** Whether to show a vision / multimodal affordance (e.g. beside text modality). */
+export function modelHasVisionCapability(model: ModelRecord): boolean {
+  return model.strengths.some((s) => {
+    const l = s.toLowerCase();
+    return l.includes("multimodal") || l.includes("vision") || l.includes("image");
+  });
+}
+
 export function getModelSubline(model: ModelRecord): string {
   const param = getParamSizeLabel(model.name) ?? "—";
   return `${param} · ${getModelModalityLabel(model)}`;
+}
+
+/** Per-token price in EUR when `inputCostPer1M` is EUR per 1M tokens. */
+export function formatEurPerTokenFromPer1M(eurPer1M: number): string {
+  const per = eurPer1M / 1_000_000;
+  return per.toFixed(8);
+}
+
+/** EUR per 1M tokens for hero metrics (short, two decimals; e.g. `0.89`, `1.20`). */
+export function formatEurPer1MForDisplay(eurPer1M: number): string {
+  return eurPer1M.toFixed(2);
 }
 
 export function formatContextLength(ctx: number): string {
   if (ctx >= 1_000_000) return `${(ctx / 1_000_000).toFixed(0)}M ctx`;
   if (ctx >= 1_000) return `${Math.round(ctx / 1_000)}k ctx`;
   return `${ctx} ctx`;
+}
+
+/** Compact window label for tables and metric tiles (e.g. `128K`, `1M`). */
+export function formatContextWindowShort(ctx: number): string {
+  if (ctx >= 1_000_000) return `${(ctx / 1_000_000).toFixed(0)}M`;
+  if (ctx >= 1_000) return `${Math.round(ctx / 1_000)}K`;
+  return `${ctx}`;
 }
 
 /** Energy / efficiency letter → text class (same hues as EnergyScorePill icon). */
@@ -63,19 +95,14 @@ const ENERGY_GRADE_FOREGROUND_CLASS: Record<string, string> = {
   E: "text-destructive",
 };
 
-/** E (50–59) through A (90–100); 10-point bands on the 50–100 range. */
-const BENCHMARK_SCORE_TO_ENERGY_LETTER: readonly string[] = ["E", "D", "C", "B", "A"];
-
 /**
- * Aggregated benchmark % on model cards: same colors as energy efficiency tiers.
- * No score → muted; below 50% → E (destructive); 50–100% → E…A by decade.
+ * Capability / aggregate score numerals on cards and detail views: ≥90 → green; otherwise primary text.
+ * No score (≤0) → muted foreground.
  */
 export function overallScoreTextClass(score: number): string {
   if (score <= 0) return "text-muted-foreground";
-  if (score < 50) return ENERGY_GRADE_FOREGROUND_CLASS.E;
-  const idx = Math.min(BENCHMARK_SCORE_TO_ENERGY_LETTER.length - 1, Math.floor((score - 50) / 10));
-  const letter = BENCHMARK_SCORE_TO_ENERGY_LETTER[idx]!;
-  return ENERGY_GRADE_FOREGROUND_CLASS[letter] ?? ENERGY_GRADE_FOREGROUND_CLASS.E;
+  if (score >= 90) return "text-success";
+  return "text-foreground";
 }
 
 /** Energy grades A–E: icon well uses alpha 7 (0.07); B/C use fixed hex (product exception). */

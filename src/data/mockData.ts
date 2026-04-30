@@ -161,7 +161,7 @@ export const models = [
       { name: "HellaSwag", score: 89.4, maxScore: 100, category: "Language" },
       { name: "TruthfulQA", score: 68.9, maxScore: 100, category: "Safety" },
     ],
-    popularity: "18.1k", inputCostPer1M: 2, outputCostPer1M: 6, contextLength: 128000, addedDate: "2024-11-05", tokensPerSecond: 105, sustainability: "A", category: "General", hosting: "Booster Powered" as const, avgResponseTokens: 540, availableVersions: ["2024-11", "2024-07", "2024-02"], status: "Active" as const,
+    popularity: "18.1k", inputCostPer1M: 0.89, outputCostPer1M: 1.2, contextLength: 128000, addedDate: "2024-11-05", tokensPerSecond: 105, sustainability: "A", category: "General", hosting: "Booster Powered" as const, avgResponseTokens: 540, availableVersions: ["2024-11", "2024-07", "2024-02"], status: "Active" as const,
   },
   {
     id: "m-5", name: "Codestral", provider: "Mistral AI", version: "2024-05",

@@ -4,7 +4,7 @@ import { models } from "@/data/mockData";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, SlidersHorizontal, Sparkles, Plus, ChevronDown, ArrowDownUp } from "lucide-react";
+import { Search, SlidersHorizontal, Plus, ChevronDown, ArrowDownUp } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ModelCosmosCard } from "@/components/ModelCosmosCard";
 import {
@@ -127,7 +127,8 @@ const useCaseFilters = [
   { label: "Structured Data Extraction", subtitle: "Parsing & formatting", keywords: ["RAG", "Grounding", "Tool Use"] },
 ];
 
-const Cosmos = () => {
+/** MVP Model Cosmos — fork of `pages/Cosmos.tsx`; internal links stay under `/mvp/...`. */
+const MvpCosmos = () => {
   const [params] = useSearchParams();
   const hostingParam = params.get("hosting") || "";
   const [search, setSearch] = useState("");
@@ -193,7 +194,7 @@ const Cosmos = () => {
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2 sm:pb-0.5">
-          <Link to="/endpoints/new">
+          <Link to="/mvp/endpoints/new">
             <Button>
               <Plus className="h-icon-16 w-icon-16" aria-hidden />
               Create Endpoint
@@ -299,12 +300,6 @@ const Cosmos = () => {
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Link to="/cosmos/guided" className="shrink-0">
-            <Button variant="outline">
-              <Sparkles className="h-icon-16 w-icon-16" aria-hidden />
-              Find Model for My Use Case
-            </Button>
-          </Link>
         </div>
       </div>
 
@@ -333,12 +328,16 @@ const Cosmos = () => {
               )}
             </div>
           )}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {paginatedModels.map((model) => (
-              <Link key={model.id} to={`/cosmos/${model.id}`} className="block h-full min-w-0">
-                <ModelCosmosCard model={model} variant="catalog" />
-              </Link>
-            ))}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {paginatedModels.map((model) => {
+              // Alternative 2 route is explicit and consistent for every card.
+              const detailPath = `/mvp/cosmos/${model.id}/alt2`;
+              return (
+                <Link key={model.id} to={detailPath} className="block h-full min-w-0">
+                  <ModelCosmosCard model={model} variant="basic" />
+                </Link>
+              );
+            })}
           </div>
           {filtered.length > COSMOS_PAGE_SIZE && (
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
@@ -384,4 +383,4 @@ const Cosmos = () => {
   );
 };
 
-export default Cosmos;
+export default MvpCosmos;

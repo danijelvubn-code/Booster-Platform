@@ -1,12 +1,15 @@
+import type { AppTrack } from "@/contexts/AuthContext";
+
 const STORAGE_KEY = "booster.pendingLogin";
 
 export type PendingLogin = {
   email: string;
   password: string;
+  track?: AppTrack;
 };
 
-export function setPendingLogin(email: string, password: string): void {
-  const payload: PendingLogin = { email, password };
+export function setPendingLogin(email: string, password: string, track: AppTrack = "post-mvp"): void {
+  const payload: PendingLogin = { email, password, track };
   sessionStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
 }
 

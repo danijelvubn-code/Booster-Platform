@@ -53,15 +53,23 @@ const tableCaptionVariants = cva("mt-4 text-muted-foreground", {
 
 export type TableProps = React.HTMLAttributes<HTMLTableElement> & {
   size?: TableSize;
+  /**
+   * Override the default container `overflow-auto` wrapper. Set to e.g.
+   * `overflow-visible` so a sticky `<thead>` can pin to a higher
+   * scroll ancestor (modal body, sheet, page main). Default: `overflow-auto`.
+   */
+  containerClassName?: string;
 };
 
-const Table = React.forwardRef<HTMLTableElement, TableProps>(({ className, size = "md", ...props }, ref) => (
-  <TableSizeContext.Provider value={size}>
-    <div className="relative w-full overflow-auto">
-      <table ref={ref} className={cn("w-full caption-bottom text-body-sm", className)} {...props} />
-    </div>
-  </TableSizeContext.Provider>
-));
+const Table = React.forwardRef<HTMLTableElement, TableProps>(
+  ({ className, size = "md", containerClassName, ...props }, ref) => (
+    <TableSizeContext.Provider value={size}>
+      <div className={cn("relative w-full overflow-auto", containerClassName)}>
+        <table ref={ref} className={cn("w-full caption-bottom text-body-sm", className)} {...props} />
+      </div>
+    </TableSizeContext.Provider>
+  ),
+);
 Table.displayName = "Table";
 
 const TableHeader = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(

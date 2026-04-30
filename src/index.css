@@ -85,6 +85,14 @@
     --layout-component-labs-score-surface: 1 0 0;
     /* Page hero / intro description column (e.g. Cosmos subtitle). */
     --layout-page-intro-max: 600px;
+    /* MVP shell: page container max width (overrides Tailwind container 2xl: 1400px on MVP only). */
+    --layout-mvp-container-max: 1200px;
+    /* Review cards: fixed label column width (Step 3 alt2 endpoint flow). */
+    --layout-endpoint-review-label-width: 136px;
+    /* MVP deploy inference flow: tinted model header strip + wizard step pills row height. */
+    --layout-endpoint-deploy-strip-height: 60px;
+    /* MVP deploy inference flow: left column (model summary card) width at lg+. */
+    --layout-endpoint-deploy-sidebar-width: 278px;
 
     --overlay-scrim: rgb(0 0 0 / 0.8);
 
@@ -132,6 +140,7 @@
     --space-24: 1.5rem; /* 24px */
     --space-32: 2rem; /* 32px */
     --space-40: 2.5rem; /* 40px */
+    --space-80: 5rem; /* 80px */
 
     /* Motion tokens. */
     --motion-duration-200: 200ms;
@@ -163,6 +172,7 @@
     --modal-size-md: 32rem; /* 512px */
     --modal-size-lg: 40rem; /* 640px */
     --modal-size-auth: 35rem; /* 560px — auth / get-started form column */
+    --modal-size-benchmark-details: 64.25rem; /* 1028px — wide benchmark methodology sheet */
     --chart-height-sm: 15rem; /* 240px */
     --chart-height-md: 18.75rem; /* 300px */
     /* Control Panel — illustrated cards (First Time User, Login; object-contain preserves aspect ratio). */
@@ -170,6 +180,10 @@
     /* Scroll area: native scrollbar track thickness (vertical width / horizontal height). */
     --scroll-area-scrollbar-thickness: 0.625rem; /* 10px */
     --components-dropdown-max-height: 520px;
+    /* Model Cosmos — basic catalog card (fixed tile height). */
+    --model-cosmos-card-basic-height: 112px;
+    /* MVP model detail — benchmark tile description (two-line body-sm block). */
+    --layout-benchmark-tile-description-min-height: 63px;
 
     --focus-ring: var(--ring);
     --focus-ring-offset: var(--background);
@@ -275,6 +289,14 @@
     --layout-component-labs-score-surface: 1 0 0;
     /* Page hero / intro description column (e.g. Cosmos subtitle). */
     --layout-page-intro-max: 600px;
+    /* MVP shell: page container max width (overrides Tailwind container 2xl: 1400px on MVP only). */
+    --layout-mvp-container-max: 1200px;
+    /* Review cards: fixed label column width (Step 3 alt2 endpoint flow). */
+    --layout-endpoint-review-label-width: 136px;
+    /* MVP deploy inference flow: tinted model header strip + wizard step pills row height. */
+    --layout-endpoint-deploy-strip-height: 60px;
+    /* MVP deploy inference flow: left column (model summary card) width at lg+. */
+    --layout-endpoint-deploy-sidebar-width: 278px;
 
     --overlay-scrim: rgb(0 0 0 / 0.8);
 
@@ -319,6 +341,7 @@
     --space-24: 1.5rem; /* 24px */
     --space-32: 2rem; /* 32px */
     --space-40: 2.5rem; /* 40px */
+    --space-80: 5rem; /* 80px */
 
     /* Motion tokens. */
     --motion-duration-200: 200ms;
@@ -350,7 +373,10 @@
     --modal-size-md: 32rem; /* 512px */
     --modal-size-lg: 40rem; /* 640px */
     --modal-size-auth: 35rem; /* 560px — auth / get-started form column */
+    --modal-size-benchmark-details: 64.25rem; /* 1028px — wide benchmark methodology sheet */
     --components-dropdown-max-height: 520px;
+    --model-cosmos-card-basic-height: 112px;
+    --layout-benchmark-tile-description-min-height: 63px;
 
     --disabled-opacity-strong: 0.5;
     --disabled-opacity-soft: 0.75;
@@ -505,6 +531,15 @@
 
   .rdp-multiple_month .calendar-caption-end .calendar-nav-prev {
     display: none;
+  }
+
+  /**
+   * MVP shell narrows the Tailwind `container` from its global 2xl: 1400px to
+   * --layout-mvp-container-max (1200px). Scoped to .mvp-shell so post-MVP and
+   * Component Labs surfaces keep their own widths.
+   */
+  .mvp-shell .container {
+    max-width: var(--layout-mvp-container-max);
   }
 }
 

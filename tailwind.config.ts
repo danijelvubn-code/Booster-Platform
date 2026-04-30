@@ -102,6 +102,7 @@ export default {
         6: "var(--space-24)",
         8: "var(--space-32)",
         10: "var(--space-40)",
+        20: "var(--space-80)",
       },
       borderRadius: {
         sm: "var(--radius-sm)",
@@ -116,6 +117,7 @@ export default {
       },
       width: {
         "modal-auth": "var(--modal-size-auth)",
+        "modal-benchmark-details": "var(--modal-size-benchmark-details)",
         "icon-16": "var(--icon-size-16)",
         "icon-20": "var(--icon-size-20)",
         "icon-24": "var(--icon-size-24)",
@@ -132,6 +134,7 @@ export default {
         "component-labs-audit": "var(--layout-component-labs-audit-panel)",
       },
       height: {
+        "endpoint-deploy-strip": "var(--layout-endpoint-deploy-strip-height)",
         "icon-16": "var(--icon-size-16)",
         "icon-20": "var(--icon-size-20)",
         "icon-24": "var(--icon-size-24)",
@@ -149,12 +152,14 @@ export default {
         "control-md": "var(--control-height-md)",
         "control-lg": "var(--control-height-lg)",
         "components-dropdown": "var(--components-dropdown-max-height)",
+        "model-cosmos-card-basic": "var(--model-cosmos-card-basic-height)",
       },
       maxWidth: {
         "modal-sm": "var(--modal-size-sm)",
         "modal-md": "var(--modal-size-md)",
         "modal-lg": "var(--modal-size-lg)",
         "modal-auth": "var(--modal-size-auth)",
+        "modal-benchmark-details": "var(--modal-size-benchmark-details)",
         "component-labs": "var(--layout-component-labs-max)",
         "component-labs-row": "var(--layout-component-labs-row-max)",
         "page-intro": "var(--layout-page-intro-max)",
@@ -162,6 +167,15 @@ export default {
       maxHeight: {
         "components-dropdown": "var(--components-dropdown-max-height)",
         "component-labs-sidebar-mobile": "var(--layout-component-labs-sidebar-mobile-max)",
+      },
+      minHeight: {
+        "benchmark-tile-description": "var(--layout-benchmark-tile-description-min-height)",
+        "endpoint-deploy-strip": "var(--layout-endpoint-deploy-strip-height)",
+      },
+      gridTemplateColumns: {
+        "endpoint-review-label": "var(--layout-endpoint-review-label-width) minmax(0, 1fr)",
+        "endpoint-deploy-wizard":
+          "var(--layout-endpoint-deploy-sidebar-width) minmax(0, 1fr)",
       },
       transitionDuration: {
         200: "var(--motion-duration-200)",

@@ -38,9 +38,9 @@ const buttonVariants = cva(
         warning: "bg-warning text-warning-foreground hover:bg-warning/90",
         // Semantic informational actions/feedback.
         info: "bg-info text-info-foreground hover:bg-info/90",
-        // Neutral actions and filters.
-        // Keep outline buttons unfilled (especially in dark mode): border + text only.
-        outline: "border border-input bg-transparent text-foreground hover:bg-primary/4 hover:text-foreground hover:border-ring",
+        // Neutral actions and filters — card surface reads as opaque white vs page background (light).
+        outline:
+          "border border-input bg-card text-foreground hover:bg-primary/4 hover:text-foreground hover:border-ring",
         // Supporting actions.
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         // Low-emphasis/toolbar actions — no fill; hover darkens text via .ghost-hover-text (foreground mix). Pair with text-info-hover-dim when using text-info.

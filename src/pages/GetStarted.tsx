@@ -67,6 +67,10 @@ const GetStarted = () => {
   const confirmHasError = confirm.length > 0 && (confirmTooLong || confirmPrefixMismatch);
   const passwordsMatch = password.length > 0 && password === confirm;
   const canSubmit = rules.allMet && passwordsMatch;
+  const isMvpFlow = location.pathname.startsWith("/mvp/");
+  const loginHref = isMvpFlow ? "/mvp/login" : "/login";
+  const welcomeHref = isMvpFlow ? "/flows/mvp" : "/flows/post-mvp";
+
   const stateParam = new URLSearchParams(location.search).get("state");
   const firstTimeState: FirstTimeState =
     stateParam === "link-expired" || stateParam === "invitation-used" ? stateParam : "setup-password";
@@ -87,7 +91,7 @@ const GetStarted = () => {
           title: "Invitation already used",
           description: "This account has already been activated.",
           cta: "Go to Login",
-          onClick: () => navigate("/login"),
+          onClick: () => navigate(loginHref),
           testId: "button-go-to-login-from-invitation-used",
         };
 
@@ -100,7 +104,7 @@ const GetStarted = () => {
 
   const handleSuccessSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate("/login");
+    navigate(loginHref);
   };
 
   return (
@@ -118,7 +122,7 @@ const GetStarted = () => {
       <div className="relative z-10 flex min-h-0 flex-1 flex-col items-center lg:flex-row lg:items-stretch">
         {/* Left — hero branding; logo links to welcome */}
         <div className="relative hidden min-h-0 flex-1 flex-col items-center justify-center px-6 py-12 lg:flex lg:w-[55%]">
-          <Link to="/" className={welcomeLogoLinkClass}>
+          <Link to={welcomeHref} className={welcomeLogoLinkClass}>
             <div className="flex flex-col items-center justify-center gap-2 text-center">
               <div className="flex items-center justify-center gap-3">
                 <Zap className="h-icon-40 w-icon-40 fill-primary text-primary" aria-hidden="true" />
@@ -136,14 +140,14 @@ const GetStarted = () => {
           onSubmit={isStatusScreen ? undefined : showSuccessStep ? handleSuccessSubmit : handleSubmit}
           beforeCard={
             <div className="mb-6 flex justify-center lg:hidden">
-              <Link to="/" className={welcomeLogoLinkClass}>
+              <Link to={welcomeHref} className={welcomeLogoLinkClass}>
                 <Zap className="h-icon-28 w-icon-28 fill-primary text-primary" aria-hidden="true" />
                 <span className="text-h2 font-bold text-primary-foreground">booster</span>
               </Link>
             </div>
           }
           header={
-            <Link to="/" className={welcomeLogoLinkClass} aria-label="Back to welcome">
+            <Link to={welcomeHref} className={welcomeLogoLinkClass} aria-label="Back to welcome">
               <Zap className="h-icon-16 w-icon-16 fill-primary text-primary" aria-hidden="true" />
               <span className="text-h3 font-semibold text-foreground">booster</span>
             </Link>

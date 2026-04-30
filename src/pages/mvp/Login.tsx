@@ -4,7 +4,7 @@ import { Eye, EyeOff, Lock, Mail, Zap } from "lucide-react";
 
 import { AuthFlowCardShell } from "@/components/AuthFlowCardShell";
 import { useAuth } from "@/contexts/AuthContext";
-import { clearPendingLogin, setPendingLogin } from "@/lib/pending-login";
+import { clearPendingLogin } from "@/lib/pending-login";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { InputControl, InputLeadIcon, InputRoot, InputSegment, Label } from "@/components/ui/input";
@@ -15,8 +15,12 @@ const VALID_LOGIN_EMAIL = "user@booster.com";
 const VALID_LOGIN_PASSWORD = "Booster123#";
 const EMAIL_FORMAT_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const Login = () => {
-  const { isAuthenticated } = useAuth();
+/**
+ * MVP login screen — forked from `pages/Login.tsx`. Edit this file freely for the lean product;
+ * the full app keeps using `Login.tsx` until you merge or align them.
+ */
+const LoginMvp = () => {
+  const { isAuthenticated, login } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("user@booster.com");
   const [password, setPassword] = useState("Booster123#");
@@ -31,7 +35,7 @@ const Login = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/overview", { replace: true });
+      navigate("/mvp/overview", { replace: true });
     }
   }, [isAuthenticated, navigate]);
 
@@ -53,12 +57,12 @@ const Login = () => {
     }
 
     setAuthError(null);
-    setPendingLogin(normalizedEmail, password, "post-mvp");
-    navigate("/verify-email", { state: { email: normalizedEmail, returnLoginPath: "/login" } });
+    login(normalizedEmail, password, "mvp");
+    navigate("/mvp/overview", { replace: true });
   };
 
   return (
-    <div className="relative flex min-h-screen w-full flex-1 flex-col" data-testid="page-login">
+    <div className="relative flex min-h-screen w-full flex-1 flex-col" data-testid="page-login-mvp">
       <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
         <img
           alt=""
@@ -111,7 +115,7 @@ const Login = () => {
                 ) : null}
 
                 <div className="space-y-1">
-                  <Label htmlFor="email" className="text-label text-foreground">
+                  <Label htmlFor="email-mvp" className="text-label text-foreground">
                     Email
                   </Label>
                   <InputRoot invalid={!!emailError}>
@@ -120,7 +124,7 @@ const Login = () => {
                         <Mail aria-hidden="true" />
                       </InputLeadIcon>
                       <InputControl
-                        id="email"
+                        id="email-mvp"
                         type="email"
                         autoComplete="email"
                         placeholder="you@domain.com"
@@ -138,7 +142,7 @@ const Login = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <Label htmlFor="password" className="text-label text-foreground">
+                  <Label htmlFor="password-mvp" className="text-label text-foreground">
                     Password
                   </Label>
                   <InputRoot>
@@ -147,7 +151,7 @@ const Login = () => {
                         <Lock aria-hidden="true" />
                       </InputLeadIcon>
                       <InputControl
-                        id="password"
+                        id="password-mvp"
                         type={showPassword ? "text" : "password"}
                         autoComplete="current-password"
                         placeholder="Enter password..."
@@ -195,7 +199,6 @@ const Login = () => {
       </div>
     </div>
   );
-
 };
 
-export default Login;
+export default LoginMvp;

@@ -15,6 +15,8 @@ const welcomeLogoLinkClass =
 
 type LocationState = {
   email?: string;
+  /** Where "Log in" / redirects go when resuming the same product track (MVP vs post-MVP). */
+  returnLoginPath?: string;
 };
 
 const VerifyEmail = () => {
@@ -27,16 +29,21 @@ const VerifyEmail = () => {
 
   const emailFromState = state?.email?.trim();
   const displayEmail = emailFromState || getPendingLogin()?.email || "";
+  const returnLoginPath = state?.returnLoginPath ?? "/login";
+  const welcomeHubPath = returnLoginPath.startsWith("/mvp/") ? "/flows/mvp" : "/flows/post-mvp";
+
+  const isMvpFlow = returnLoginPath.startsWith("/mvp/");
+  const overviewPath = isMvpFlow ? "/mvp/overview" : "/overview";
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/overview", { replace: true });
+      navigate(overviewPath, { replace: true });
       return;
     }
     if (!getPendingLogin()) {
-      navigate("/login", { replace: true });
+      navigate(returnLoginPath, { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, overviewPath, returnLoginPath]);
 
   const canVerify = code.length === 6;
 
@@ -46,13 +53,13 @@ const VerifyEmail = () => {
 
     const creds = getPendingLogin();
     if (!creds) {
-      navigate("/login", { replace: true });
+      navigate(returnLoginPath, { replace: true });
       return;
     }
 
-    login(creds.email, creds.password);
+    login(creds.email, creds.password, creds.track ?? (isMvpFlow ? "mvp" : "post-mvp"));
     clearPendingLogin();
-    navigate("/overview", { replace: true });
+    navigate(overviewPath, { replace: true });
   };
 
   const handleResend = () => {
@@ -71,7 +78,7 @@ const VerifyEmail = () => {
 
       <div className="relative z-10 flex min-h-0 flex-1 flex-col items-center lg:flex-row lg:items-stretch">
         <div className="relative hidden min-h-0 flex-1 flex-col items-center justify-center px-6 py-12 lg:flex lg:w-[55%]">
-          <Link to="/" className={welcomeLogoLinkClass}>
+          <Link to={welcomeHubPath} className={welcomeLogoLinkClass}>
             <div className="flex items-center justify-center gap-3">
               <Zap className="h-icon-40 w-icon-40 fill-primary text-primary" aria-hidden="true" />
               <span className="text-display font-semibold tracking-tight text-primary-foreground">booster</span>
@@ -83,7 +90,7 @@ const VerifyEmail = () => {
           onSubmit={handleSubmit}
           beforeCard={
             <div className="mb-6 flex justify-center lg:hidden">
-              <Link to="/" className={welcomeLogoLinkClass}>
+              <Link to={welcomeHubPath} className={welcomeLogoLinkClass}>
                 <Zap className="h-icon-28 w-icon-28 fill-primary text-primary" aria-hidden="true" />
                 <span className="text-h2 font-bold text-primary-foreground">booster</span>
               </Link>
@@ -91,7 +98,7 @@ const VerifyEmail = () => {
           }
           header={
             <div className="relative flex w-full items-center justify-center">
-              <Link to="/login" className="absolute left-0">
+              <Link to={returnLoginPath} className="absolute left-0">
                 <Button
                   type="button"
                   variant="ghost"
@@ -102,7 +109,7 @@ const VerifyEmail = () => {
                   Log in
                 </Button>
               </Link>
-              <Link to="/" className={welcomeLogoLinkClass} aria-label="Back to welcome">
+              <Link to={welcomeHubPath} className={welcomeLogoLinkClass} aria-label="Back to welcome">
                 <Zap className="h-icon-16 w-icon-16 fill-primary text-primary" aria-hidden="true" />
                 <span className="text-caption-strong uppercase tracking-widest text-foreground">booster</span>
               </Link>

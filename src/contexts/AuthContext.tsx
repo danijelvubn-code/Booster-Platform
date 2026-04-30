@@ -15,13 +15,23 @@ interface ImpersonationLog {
   admin: string;
 }
 
+/**
+ * Which post-login app shell the user lands in. Set by the screen that calls `login()`.
+ * - `"mvp"` → leaner MVP routes (`/mvp/overview`, …)
+ * - `"post-mvp"` (default) → current full product routes (`/overview`, …)
+ */
+export type AppTrack = "mvp" | "post-mvp";
+
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isImpersonating: boolean;
   impersonatedTenant: string | null;
   impersonationLogs: ImpersonationLog[];
-  login: (email: string, password: string) => void;
+  track: AppTrack;
+  /** Switch between MVP and post-MVP shells while staying signed in. */
+  setAppTrack: (next: AppTrack) => void;
+  login: (email: string, password: string, track?: AppTrack) => void;
   logout: () => void;
   dismissOnboarding: () => void;
   startImpersonation: (tenant: string, ownerName: string, ownerEmail: string) => void;
@@ -37,9 +47,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [impersonatedTenant, setImpersonatedTenant] = useState<string | null>(null);
   const [originalUser, setOriginalUser] = useState<User | null>(null);
   const [impersonationLogs, setImpersonationLogs] = useState<ImpersonationLog[]>([]);
+  const [track, setTrack] = useState<AppTrack>("post-mvp");
 
-  const login = (email: string, _password: string) => {
-    // Admin users get isAdmin flag (mock: admin@booster.ai is admin)
+  const setAppTrack = (next: AppTrack) => {
+    setTrack(next);
+  };
+
+  const login = (email: string, _password: string, nextTrack: AppTrack = "post-mvp") => {
     const isAdmin = email.toLowerCase().includes("admin");
     setUser({
       email,
@@ -48,6 +62,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       isFirstLogin: !isAdmin,
       isAdmin,
     });
+    setTrack(nextTrack);
   };
 
   const logout = () => {
@@ -55,6 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsImpersonating(false);
     setImpersonatedTenant(null);
     setOriginalUser(null);
+    setTrack("post-mvp");
   };
 
   const dismissOnboarding = () => {
@@ -107,6 +123,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isImpersonating,
         impersonatedTenant,
         impersonationLogs,
+        track,
+        setAppTrack,
         login,
         logout,
         dismissOnboarding,

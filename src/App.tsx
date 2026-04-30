@@ -7,6 +7,19 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
 import Login from "./pages/Login";
+import LoginMvp from "./pages/mvp/Login";
+import MvpFirstTimeUser from "./pages/mvp/FirstTimeUser";
+import MvpOverview from "./pages/mvp/Overview";
+import MvpCreateEndpoint from "./pages/mvp/CreateEndpoint";
+import MvpCreateEndpointAlt from "./pages/mvp/CreateEndpointAlt";
+import MvpCosmos from "./pages/mvp/Cosmos";
+import MvpModelDetail from "./pages/mvp/ModelDetail";
+import MvpModelDetailAlt from "./pages/mvp/ModelDetailAlt";
+import MvpModelDetailAlt2 from "./pages/mvp/ModelDetailAlt2";
+import MvpGuidedModelSelection from "./pages/mvp/GuidedModelSelection";
+import MvpAppLayout from "./components/mvp/MvpAppLayout";
+import MvpAuthFlows from "./pages/flows/MvpAuthFlows";
+import PostMvpAuthFlows from "./pages/flows/PostMvpAuthFlows";
 import EntryChoice from "./pages/EntryChoice";
 import FirstTimeUser from "./pages/FirstTimeUser";
 import GetStarted from "./pages/GetStarted";
@@ -77,8 +90,11 @@ import ComponentToastLab from "./pages/ComponentToastLab";
 import ComponentToasterLab from "./pages/ComponentToasterLab";
 import ComponentMetricsLab from "./pages/ComponentMetricsLab";
 import ComponentModelCardLab from "./pages/ComponentModelCardLab";
+import ComponentEndpointCardLab from "./pages/ComponentEndpointCardLab";
 import ComponentEnergyScoreLab from "./pages/ComponentEnergyScoreLab";
+import ComponentAppHeaderLab from "./pages/ComponentAppHeaderLab";
 import ComponentShadowsLab from "./pages/ComponentShadowsLab";
+import ComponentStepperLab from "./pages/ComponentStepperLab";
 import NotFound from "./pages/NotFound";
 import ComponentLabsLayout from "./components/ComponentLabsLayout";
 import { COMPONENT_LABS_DEFAULT_PATH, SECTION_LABS_DEFAULT_PATH } from "./lib/component-labs";
@@ -86,18 +102,47 @@ import { COMPONENT_LABS_DEFAULT_PATH, SECTION_LABS_DEFAULT_PATH } from "./lib/co
 const queryClient = new QueryClient();
 
 const AuthGate = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, track } = useAuth();
 
   if (!isAuthenticated) {
     return (
       <Routes>
         <Route path="/" element={<EntryChoice />} />
+        <Route path="/flows/mvp" element={<MvpAuthFlows />} />
+        <Route path="/flows/post-mvp" element={<PostMvpAuthFlows />} />
+        <Route path="/mvp/login" element={<LoginMvp />} />
+        <Route path="/mvp/first-time-user" element={<MvpFirstTimeUser />} />
+        <Route path="/mvp/get-started" element={<GetStarted />} />
         <Route path="/first-time-user" element={<FirstTimeUser />} />
         <Route path="/login" element={<Login />} />
         <Route path="/get-started" element={<GetStarted />} />
         <Route path="/reset-password" element={<ResetPasswordRequest />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    );
+  }
+
+  if (track === "mvp") {
+    return (
+      <Routes>
+        <Route path="/" element={<Navigate to="/mvp/overview" replace />} />
+        <Route path="/mvp/login" element={<Navigate to="/mvp/overview" replace />} />
+        <Route path="/mvp/get-started" element={<Navigate to="/mvp/overview" replace />} />
+        <Route path="/login" element={<Navigate to="/mvp/overview" replace />} />
+        <Route path="/verify-email" element={<Navigate to="/mvp/overview" replace />} />
+        <Route element={<MvpAppLayout />}>
+          <Route path="/mvp/overview" element={<MvpOverview />} />
+          <Route path="/mvp/endpoints/new" element={<MvpCreateEndpoint />} />
+          <Route path="/mvp/cosmos/:modelId/alt2/endpoints/new" element={<MvpCreateEndpointAlt />} />
+          <Route path="/mvp/cosmos" element={<MvpCosmos />} />
+          <Route path="/mvp/cosmos/guided" element={<MvpGuidedModelSelection />} />
+          {/* More specific cosmos detail routes first so `:modelId` never shadows `/alt` or `/alt2`. */}
+          <Route path="/mvp/cosmos/:modelId/alt2" element={<MvpModelDetailAlt2 />} />
+          <Route path="/mvp/cosmos/:modelId/alt" element={<MvpModelDetailAlt />} />
+          <Route path="/mvp/cosmos/:modelId" element={<MvpModelDetail />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/mvp/overview" replace />} />
       </Routes>
     );
   }
@@ -109,6 +154,7 @@ const AuthGate = () => {
       <Route path="/get-started" element={<Navigate to="/overview" replace />} />
       <Route path="/reset-password" element={<Navigate to="/overview" replace />} />
       <Route path="/verify-email" element={<Navigate to="/overview" replace />} />
+      <Route path="/mvp/*" element={<Navigate to="/overview" replace />} />
       <Route element={<AppLayout />}>
         <Route path="/overview" element={<Overview />} />
         <Route path="/endpoints" element={<Endpoints />} />
@@ -130,10 +176,13 @@ const AuthGate = () => {
         <Route path="/dev/components" element={<ComponentLabsLayout />}>
           <Route index element={<Navigate to={COMPONENT_LABS_DEFAULT_PATH} replace />} />
           <Route path="sections" element={<Navigate to={SECTION_LABS_DEFAULT_PATH} replace />} />
+          <Route path="sections/app-header" element={<ComponentAppHeaderLab />} />
           <Route path="sections/metrics" element={<ComponentMetricsLab />} />
           <Route path="sections/energy-score" element={<ComponentEnergyScoreLab />} />
+          <Route path="sections/endpoint-card" element={<ComponentEndpointCardLab />} />
           <Route path="sections/model-card" element={<ComponentModelCardLab />} />
           <Route path="sections/shadows" element={<ComponentShadowsLab />} />
+          <Route path="sections/stepper" element={<ComponentStepperLab />} />
           <Route path="buttons" element={<ComponentButtonsLab />} />
           <Route path="alert-dialog" element={<ComponentAlertDialogLab />} />
           <Route path="alerts" element={<ComponentAlertsLab />} />

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ChevronLeft, Zap } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
+import { AuthBackdrop } from "@/components/AuthBackdrop";
 import { AuthFlowCardShell } from "@/components/AuthFlowCardShell";
 import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot, REGEXP_ONLY_DIGITS } from "@/components/ui/input-otp";
@@ -10,7 +11,6 @@ import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { clearPendingLogin, getPendingLogin } from "@/lib/pending-login";
 import { mvpPath, postMvpPath } from "@/config/prototype-shell";
-import { publicAssetUrl } from "@/lib/public-asset-url";
 
 const welcomeLogoLinkClass =
   "inline-flex items-center gap-2 rounded-md outline-none ring-offset-background transition-colors ease-standard focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
@@ -74,14 +74,7 @@ const VerifyEmail = () => {
 
   return (
     <div className="relative flex min-h-screen w-full flex-1 flex-col" data-testid="page-verify-email">
-      <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
-        <img
-          alt=""
-          className="h-full w-full object-cover"
-          src={publicAssetUrl("lovable-uploads/datacenter-login-bg.png")}
-        />
-        <div className="absolute inset-0 backdrop-blur-sm bg-overlay-scrim" />
-      </div>
+      <AuthBackdrop />
 
       <div className="relative z-10 flex min-h-0 flex-1 flex-col items-center lg:flex-row lg:items-stretch">
         <div className="relative hidden min-h-0 flex-1 flex-col items-center justify-center px-6 py-12 lg:flex lg:w-[55%]">

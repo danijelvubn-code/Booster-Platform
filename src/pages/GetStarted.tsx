@@ -2,11 +2,11 @@ import { useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { CheckCircle2, Eye, EyeOff, Zap } from "lucide-react";
 
+import { AuthBackdrop } from "@/components/AuthBackdrop";
 import { AuthFlowCardShell } from "@/components/AuthFlowCardShell";
 import { Button } from "@/components/ui/button";
 import { IS_MVP_BUILD, IS_POST_MVP_BUILD, isMvpShellPath, mvpPath, postMvpPath } from "@/config/prototype-shell";
 import { InputControl, InputRoot, InputSegment, Label } from "@/components/ui/input";
-import { publicAssetUrl } from "@/lib/public-asset-url";
 import { cn } from "@/lib/utils";
 
 /** Placeholder copy until org/user come from invite context. */
@@ -111,15 +111,7 @@ const GetStarted = () => {
 
   return (
     <div className="relative flex min-h-screen w-full flex-1 flex-col" data-testid="page-password-setup">
-      {/* Full-page background (behind all content) */}
-      <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
-        <img
-          alt=""
-          className="h-full w-full object-cover"
-          src={publicAssetUrl("lovable-uploads/datacenter-login-bg.png")}
-        />
-        <div className="absolute inset-0 backdrop-blur-sm bg-overlay-scrim" />
-      </div>
+      <AuthBackdrop />
 
       <div className="relative z-10 flex min-h-0 flex-1 flex-col items-center lg:flex-row lg:items-stretch">
         {/* Left — hero branding; logo links to welcome */}

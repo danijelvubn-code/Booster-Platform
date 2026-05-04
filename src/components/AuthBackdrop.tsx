@@ -1,16 +1,21 @@
 import { useEffect, useRef } from "react";
 
 /**
- * Full-bleed auth backdrop: a noise/particle field that gets pushed away from
- * the cursor, plus the existing scrim overlay. Drop-in replacement for the old
- * `<img>` background used on Login / VerifyEmail / ResetPasswordRequest /
- * GetStarted (mvp setup).
+ * Full-bleed auth backdrop:
+ *  1. A deep "universe" gradient layer — dark purple base with lightly visible
+ *     purple, blue, turquoise/green nebulae (radial gradients sourced from the
+ *     design tokens `--primary`, `--info`, `--success` and the dark
+ *     `--background`).
+ *  2. A noise field of light particles drawn on a `<canvas>`. Particles spring
+ *     back to their seed position and are pushed away from the cursor with a
+ *     quadratic falloff inside `repelRadius`. Density scales with viewport
+ *     area, so coverage is guaranteed at any size.
  *
- * The canvas covers the whole parent area (`absolute inset-0`); particles are
- * regenerated on resize so coverage is guaranteed at any viewport size.
+ * Particles use `--primary-foreground` (white-ish in both light and dark
+ * themes) so they read as bright pinpoints regardless of theme.
  *
- * Colors are sourced from the live `--foreground` design token so the effect
- * follows light/dark theme switches without hardcoded values.
+ * Honors `prefers-reduced-motion` by disabling the cursor repulsion
+ * (particles still render but stay at rest).
  */
 type Particle = {
   baseX: number;
@@ -24,7 +29,7 @@ type Particle = {
 };
 
 type AuthBackdropProps = {
-  /** Approx particle count per 10,000 px². Bigger = denser noise field. */
+  /** Approx particle count per 10,000 px². 6× the previous default. */
   density?: number;
   /** Distance (CSS px) at which the cursor pushes particles. */
   repelRadius?: number;
@@ -33,7 +38,7 @@ type AuthBackdropProps = {
 };
 
 export function AuthBackdrop({
-  density = 0.55,
+  density = 3.3,
   repelRadius = 160,
   repelStrength = 0.6,
 }: AuthBackdropProps) {
@@ -52,9 +57,9 @@ export function AuthBackdrop({
     let raf = 0;
     const pointer = { x: -9999, y: -9999, active: false };
 
-    const readForegroundColor = (alpha: number) => {
+    const readParticleColor = (alpha: number) => {
       const styles = getComputedStyle(canvas);
-      const fg = styles.getPropertyValue("--foreground").trim();
+      const fg = styles.getPropertyValue("--primary-foreground").trim();
       if (fg) return `oklch(${fg} / ${alpha})`;
       return `rgba(255, 255, 255, ${alpha})`;
     };
@@ -62,7 +67,7 @@ export function AuthBackdrop({
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const seedParticles = () => {
-      const targetCount = Math.max(40, Math.round((width * height * density) / 10000));
+      const targetCount = Math.max(120, Math.round((width * height * density) / 10000));
       particles = new Array(targetCount).fill(null).map(() => {
         const x = Math.random() * width;
         const y = Math.random() * height;
@@ -73,8 +78,8 @@ export function AuthBackdrop({
           y,
           vx: 0,
           vy: 0,
-          size: 0.6 + Math.random() * 1.1,
-          alpha: 0.18 + Math.random() * 0.32,
+          size: 0.5 + Math.random() * 0.9,
+          alpha: 0.22 + Math.random() * 0.4,
         };
       });
     };
@@ -130,10 +135,10 @@ export function AuthBackdrop({
         p.y += p.vy;
 
         const speed = Math.min(1, Math.hypot(p.vx, p.vy) * 0.35);
-        const alpha = Math.min(0.85, p.alpha + speed * 0.45);
-        ctx.fillStyle = readForegroundColor(alpha);
+        const alpha = Math.min(0.9, p.alpha + speed * 0.45);
+        ctx.fillStyle = readParticleColor(alpha);
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size + speed * 1.2, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, p.size + speed * 1.1, 0, Math.PI * 2);
         ctx.fill();
       }
 
@@ -158,10 +163,29 @@ export function AuthBackdrop({
     };
   }, [density, repelRadius, repelStrength]);
 
+  // Cosmic gradient stack — uses only design tokens via `oklch(var(--token))`.
+  // Tailwind 3 has no native multi-radial-gradient utility; expressing the
+  // nebula effect requires a single inline `background`. The colors and the
+  // dark base remain bound to design tokens so the layer follows theme.
+  const cosmicBackground = [
+    // bright purple core, top-left
+    "radial-gradient(120% 80% at 18% 12%, oklch(var(--primary) / 0.55), transparent 60%)",
+    // blue nebula, top-right
+    "radial-gradient(95% 70% at 82% 24%, oklch(var(--info) / 0.32), transparent 65%)",
+    // turquoise / green hint, mid-right
+    "radial-gradient(75% 65% at 72% 60%, oklch(var(--success) / 0.18), transparent 72%)",
+    // softer purple, bottom-left
+    "radial-gradient(70% 55% at 28% 88%, oklch(var(--primary) / 0.40), transparent 70%)",
+    // subtle blue accent, bottom-right
+    "radial-gradient(60% 50% at 90% 92%, oklch(var(--info) / 0.22), transparent 70%)",
+    // deep dark base
+    "radial-gradient(140% 100% at 50% 50%, oklch(0.16 0.04 295), oklch(0.10 0.03 295))",
+  ].join(", ");
+
   return (
-    <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden bg-background" aria-hidden="true">
-      <canvas ref={canvasRef} className="block h-full w-full" />
-      <div className="absolute inset-0 backdrop-blur-sm bg-overlay-scrim" />
+    <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
+      <div className="absolute inset-0" style={{ background: cosmicBackground }} />
+      <canvas ref={canvasRef} className="absolute inset-0 block h-full w-full" />
     </div>
   );
 }

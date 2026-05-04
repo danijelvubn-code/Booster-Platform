@@ -6,16 +6,19 @@ import { useEffect, useRef } from "react";
  *     purple, blue, turquoise/green nebulae (radial gradients sourced from the
  *     design tokens `--primary`, `--info`, `--success` and the dark
  *     `--background`).
- *  2. A noise field of light particles drawn on a `<canvas>`. Particles spring
- *     back to their seed position and are pushed away from the cursor with a
- *     quadratic falloff inside `repelRadius`. Density scales with viewport
- *     area, so coverage is guaranteed at any size.
+ *  2. A starfield canvas with two tiers of particles:
+ *       - an evenly distributed layer of brighter "near" stars
+ *       - many smaller "far" stars sampled around random cluster centers
+ *         (Gaussian offsets) so the field looks like real galactic clusters
+ *         rather than uniform noise.
  *
- * Particles use `--primary-foreground` (white-ish in both light and dark
- * themes) so they read as bright pinpoints regardless of theme.
+ * All stars twinkle (per-particle phase + speed + depth) and are pushed away
+ * from the cursor with a quadratic falloff inside `repelRadius`. Particles
+ * spring back to their seed position. Motion respects
+ * `prefers-reduced-motion`.
  *
- * Honors `prefers-reduced-motion` by disabling the cursor repulsion
- * (particles still render but stay at rest).
+ * Particle color is bound to `--primary-foreground` so the dots stay light in
+ * both light and dark themes.
  */
 type Particle = {
   baseX: number;
@@ -26,19 +29,35 @@ type Particle = {
   vy: number;
   size: number;
   alpha: number;
+  twinklePhase: number;
+  twinkleSpeed: number;
+  twinkleDepth: number;
 };
 
 type AuthBackdropProps = {
-  /** Approx particle count per 10,000 px². 6× the previous default. */
+  /** Approx count of evenly distributed "near" stars per 10,000 px². */
   density?: number;
+  /** Number of cluster centers (scales gently with viewport area). */
+  clusterCount?: number;
+  /** Average tiny stars per cluster (each cluster picks 0.5x–1.5x of this). */
+  starsPerCluster?: number;
   /** Distance (CSS px) at which the cursor pushes particles. */
   repelRadius?: number;
   /** Strength multiplier of the cursor push. */
   repelStrength?: number;
 };
 
+/** Standard normal sample via Box-Muller. */
+function gaussian(): number {
+  const u = Math.max(Math.random(), 1e-9);
+  const v = Math.max(Math.random(), 1e-9);
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
 export function AuthBackdrop({
   density = 3.3,
+  clusterCount = 14,
+  starsPerCluster = 38,
   repelRadius = 160,
   repelStrength = 0.6,
 }: AuthBackdropProps) {
@@ -67,21 +86,61 @@ export function AuthBackdrop({
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const seedParticles = () => {
-      const targetCount = Math.max(120, Math.round((width * height * density) / 10000));
-      particles = new Array(targetCount).fill(null).map(() => {
+      const arr: Particle[] = [];
+
+      // Tier 1 — evenly distributed brighter stars.
+      const uniformCount = Math.max(120, Math.round((width * height * density) / 10000));
+      for (let i = 0; i < uniformCount; i++) {
         const x = Math.random() * width;
         const y = Math.random() * height;
-        return {
+        arr.push({
           baseX: x,
           baseY: y,
           x,
           y,
           vx: 0,
           vy: 0,
-          size: 0.5 + Math.random() * 0.9,
-          alpha: 0.22 + Math.random() * 0.4,
-        };
-      });
+          size: 0.55 + Math.random() * 1.0,
+          alpha: 0.28 + Math.random() * 0.5,
+          twinklePhase: Math.random() * Math.PI * 2,
+          twinkleSpeed: reduceMotion ? 0 : 0.008 + Math.random() * 0.022,
+          twinkleDepth: 0.1 + Math.random() * 0.25,
+        });
+      }
+
+      // Tier 2 — cluster stars: many tiny, twinkly pinpoints concentrated
+      // around random centers (Gaussian spread). Cluster count scales gently
+      // with viewport area so dense screens still get plenty of clusters.
+      const referenceArea = 1280 * 720;
+      const scaledClusters = Math.max(
+        6,
+        Math.round(clusterCount * Math.sqrt((width * height) / referenceArea)),
+      );
+      for (let c = 0; c < scaledClusters; c++) {
+        const cx = Math.random() * width;
+        const cy = Math.random() * height;
+        const sigma = 50 + Math.random() * 120;
+        const count = Math.round(starsPerCluster * (0.5 + Math.random()));
+        for (let i = 0; i < count; i++) {
+          const x = Math.max(0, Math.min(width, cx + gaussian() * sigma));
+          const y = Math.max(0, Math.min(height, cy + gaussian() * sigma));
+          arr.push({
+            baseX: x,
+            baseY: y,
+            x,
+            y,
+            vx: 0,
+            vy: 0,
+            size: 0.18 + Math.random() * 0.4,
+            alpha: 0.14 + Math.random() * 0.45,
+            twinklePhase: Math.random() * Math.PI * 2,
+            twinkleSpeed: reduceMotion ? 0 : 0.012 + Math.random() * 0.045,
+            twinkleDepth: 0.25 + Math.random() * 0.45,
+          });
+        }
+      }
+
+      particles = arr;
     };
 
     const resize = () => {
@@ -134,8 +193,11 @@ export function AuthBackdrop({
         p.x += p.vx;
         p.y += p.vy;
 
+        p.twinklePhase += p.twinkleSpeed;
+        const twinkle = 1 + Math.sin(p.twinklePhase) * p.twinkleDepth;
         const speed = Math.min(1, Math.hypot(p.vx, p.vy) * 0.35);
-        const alpha = Math.min(0.9, p.alpha + speed * 0.45);
+        const alpha = Math.min(0.95, p.alpha * twinkle + speed * 0.4);
+
         ctx.fillStyle = readParticleColor(alpha);
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size + speed * 1.1, 0, Math.PI * 2);
@@ -161,24 +223,18 @@ export function AuthBackdrop({
       window.removeEventListener("pointerleave", deactivatePointer);
       window.removeEventListener("blur", deactivatePointer);
     };
-  }, [density, repelRadius, repelStrength]);
+  }, [density, clusterCount, starsPerCluster, repelRadius, repelStrength]);
 
   // Cosmic gradient stack — uses only design tokens via `oklch(var(--token))`.
   // Tailwind 3 has no native multi-radial-gradient utility; expressing the
   // nebula effect requires a single inline `background`. The colors and the
   // dark base remain bound to design tokens so the layer follows theme.
   const cosmicBackground = [
-    // bright purple core, top-left
     "radial-gradient(120% 80% at 18% 12%, oklch(var(--primary) / 0.55), transparent 60%)",
-    // blue nebula, top-right
     "radial-gradient(95% 70% at 82% 24%, oklch(var(--info) / 0.32), transparent 65%)",
-    // turquoise / green hint, mid-right
     "radial-gradient(75% 65% at 72% 60%, oklch(var(--success) / 0.18), transparent 72%)",
-    // softer purple, bottom-left
     "radial-gradient(70% 55% at 28% 88%, oklch(var(--primary) / 0.40), transparent 70%)",
-    // subtle blue accent, bottom-right
     "radial-gradient(60% 50% at 90% 92%, oklch(var(--info) / 0.22), transparent 70%)",
-    // deep dark base
     "radial-gradient(140% 100% at 50% 50%, oklch(0.16 0.04 295), oklch(0.10 0.03 295))",
   ].join(", ");
 

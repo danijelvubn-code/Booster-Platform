@@ -5,6 +5,12 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  base:
+    mode === "mvp"
+      ? "/booster/mvp/"
+      : mode === "post-mvp"
+        ? "/booster/post-mvp/"
+        : "/booster/",
   server: {
     host: "::",
     port: 8080,

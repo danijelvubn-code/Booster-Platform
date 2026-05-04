@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { postMvpPath, dsLabPath } from "@/config/prototype-shell";
 
 import { EndpointOverviewCard } from "@/components/EndpointOverviewCard";
 import { ComponentLabPageShell } from "@/components/dev/ComponentLabPageShell";
@@ -39,19 +40,19 @@ const ComponentEndpointCardLab = () => {
       nestedComponents={
         <ul className="list-disc space-y-1 pl-4 text-caption text-muted-foreground">
           <li>
-            <Link className="font-medium text-primary underline-offset-4 hover:underline" to="/dev/components/cards">
+            <Link className="font-medium text-primary underline-offset-4 hover:underline" to={dsLabPath("cards")}>
               Card
             </Link>
             {" — "}root surface.
           </li>
           <li>
-            <Link className="font-medium text-primary underline-offset-4 hover:underline" to="/dev/components/badges">
+            <Link className="font-medium text-primary underline-offset-4 hover:underline" to={dsLabPath("badges")}>
               Badge
             </Link>
             {" — "}full variant only.
           </li>
           <li>
-            <Link className="font-medium text-primary underline-offset-4 hover:underline" to="/dev/components/progress">
+            <Link className="font-medium text-primary underline-offset-4 hover:underline" to={dsLabPath("progress")}>
               Progress
             </Link>
             {" — "}full variant budget bar.

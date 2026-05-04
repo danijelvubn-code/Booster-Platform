@@ -3,6 +3,7 @@ import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { EndpointOverviewCard } from "@/components/EndpointOverviewCard";
+import { mvpPath } from "@/config/prototype-shell";
 import { endpoints } from "@/data/mockData";
 
 const overviewEndpoints = [...endpoints]
@@ -27,7 +28,7 @@ const MvpOverview = () => {
               </p>
             </div>
             <Button className="shrink-0" asChild>
-              <Link to="/mvp/endpoints/new">
+              <Link to={mvpPath("/endpoints/new")}>
                 <Plus className="h-icon-16 w-icon-16" aria-hidden />
                 Create Endpoint
               </Link>

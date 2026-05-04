@@ -13,11 +13,16 @@ import { useToast } from "@/hooks/use-toast";
 import GuardrailsStep, { defaultGuardrailsState, countEnabledGuardrails, type GuardrailsState } from "@/components/GuardrailsStep";
 import PerformanceProfileStep, { getProfileSpecs, type PerformanceProfile } from "@/components/PerformanceProfileStep";
 import CostTransparencyPanel from "@/components/CostTransparencyPanel";
+import { useAuth } from "@/contexts/AuthContext";
+import { endpointDetailPath, endpointsHubPath } from "@/lib/app-paths";
 
 const EditEndpoint = () => {
   const { endpointId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { track } = useAuth();
+  const hubPath = endpointsHubPath(track);
+  const detailPath = endpointDetailPath(endpointId ?? "", track);
   const ep = endpoints.find((s) => s.id === endpointId);
 
   const [config, setConfig] = useState({
@@ -38,7 +43,7 @@ const EditEndpoint = () => {
     return (
       <div className="container py-8">
         <p>Inference Endpoint not found.</p>
-        <Button variant="ghost" onClick={() => navigate("/endpoints")}>← Back to Inference Endpoints</Button>
+        <Button variant="ghost" onClick={() => navigate(hubPath)}>← Back to Inference Endpoints</Button>
       </div>
     );
   }
@@ -55,12 +60,12 @@ const EditEndpoint = () => {
     ep.name = config.name;
     ep.type = config.targetSpace as "Production" | "POC" | "Demo";
     toast({ title: "Inference Endpoint Updated", description: `"${config.name}" has been saved.` });
-    navigate(`/endpoints/${endpointId}`);
+    navigate(detailPath);
   };
 
   return (
     <div className="container space-y-6 py-8">
-      <Button variant="ghost" size="sm" className="-ml-3" onClick={() => navigate(`/endpoints/${endpointId}`)}>
+      <Button variant="ghost" size="sm" className="-ml-3" onClick={() => navigate(detailPath)}>
         <ArrowLeft className="h-4 w-4 mr-1" /> Back to Inference Endpoint
       </Button>
 
@@ -198,7 +203,7 @@ const EditEndpoint = () => {
       </div>
 
       <div className="flex justify-end gap-3">
-        <Button variant="outline" onClick={() => navigate(`/endpoints/${endpointId}`)}>Cancel</Button>
+        <Button variant="outline" onClick={() => navigate(detailPath)}>Cancel</Button>
         <Button onClick={handleSave} disabled={!config.name.trim()}>Save Changes</Button>
       </div>
     </div>

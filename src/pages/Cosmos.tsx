@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, SlidersHorizontal, Sparkles, Plus, ChevronDown, ArrowDownUp } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
+import { postMvpPath } from "@/config/prototype-shell";
 import { ModelCosmosCard } from "@/components/ModelCosmosCard";
 import {
   DropdownMenu,
@@ -193,7 +194,7 @@ const Cosmos = () => {
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2 sm:pb-0.5">
-          <Link to="/endpoints/new">
+          <Link to={postMvpPath("/endpoints/new")}>
             <Button>
               <Plus className="h-icon-16 w-icon-16" aria-hidden />
               Create Endpoint
@@ -299,7 +300,7 @@ const Cosmos = () => {
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Link to="/cosmos/guided" className="shrink-0">
+          <Link to={postMvpPath("/cosmos/guided")} className="shrink-0">
             <Button variant="outline">
               <Sparkles className="h-icon-16 w-icon-16" aria-hidden />
               Find Model for My Use Case

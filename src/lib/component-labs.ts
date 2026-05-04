@@ -1,71 +1,74 @@
+import { DESIGN_SYSTEM_LABS_ROOT, dsLabPath } from "@/config/prototype-shell";
+
+export { DESIGN_SYSTEM_LABS_ROOT };
+
 /**
  * Component lab routes and labels (single source of truth for nav + App routes).
- * Paths are full paths for NavLink / navigate.
+ * Paths are full paths for NavLink / navigate (under `/booster/design-system/dev/components/...`).
  */
 export const COMPONENT_LAB_LINKS = [
-  { label: "Accordion", path: "/dev/components/accordion" },
-  { label: "Alert Dialog", path: "/dev/components/alert-dialog" },
-  { label: "Alerts", path: "/dev/components/alerts" },
-  { label: "Aspect Ratio", path: "/dev/components/aspect-ratio" },
-  { label: "Avatars", path: "/dev/components/avatars" },
-  { label: "Badges", path: "/dev/components/badges" },
-  { label: "Breadcrumbs", path: "/dev/components/breadcrumbs" },
-  { label: "Buttons", path: "/dev/components/buttons" },
-  { label: "Calendar", path: "/dev/components/calendar" },
-  { label: "Cards", path: "/dev/components/cards" },
-  { label: "Carousel", path: "/dev/components/carousel" },
-  { label: "Checkbox", path: "/dev/components/checkbox" },
-  { label: "Collapsible", path: "/dev/components/collapsible" },
-  { label: "Command", path: "/dev/components/command" },
-  { label: "Context Menu", path: "/dev/components/context-menu" },
-  { label: "Dialog", path: "/dev/components/dialog" },
-  { label: "Dropdown Menu", path: "/dev/components/dropdown-menu" },
-  { label: "Drawer", path: "/dev/components/drawer" },
-  { label: "Hover Card", path: "/dev/components/hover-card" },
-  { label: "Input", path: "/dev/components/input" },
-  { label: "Input OTP", path: "/dev/components/input-otp" },
-  { label: "Line Chart", path: "/dev/components/line-chart" },
-  { label: "Menu Bar", path: "/dev/components/menubar" },
-  { label: "Pagination", path: "/dev/components/pagination" },
-  { label: "Popover", path: "/dev/components/popover" },
-  { label: "Progress", path: "/dev/components/progress" },
-  { label: "Radio Group", path: "/dev/components/radio-group" },
-  { label: "Resizable", path: "/dev/components/resizable" },
-  { label: "Scroll Area", path: "/dev/components/scroll-area" },
-  { label: "Select", path: "/dev/components/select" },
-  { label: "Separator", path: "/dev/components/separator" },
-  { label: "Sheet", path: "/dev/components/sheet" },
-  { label: "Sidebar", path: "/dev/components/sidebar" },
-  { label: "Skeleton", path: "/dev/components/skeleton" },
-  { label: "Slider", path: "/dev/components/slider" },
-  { label: "Sonner", path: "/dev/components/sonner" },
-  { label: "Switch", path: "/dev/components/switch" },
-  { label: "Table", path: "/dev/components/table" },
-  { label: "Tabs", path: "/dev/components/tabs" },
-  { label: "Textarea", path: "/dev/components/textarea" },
-  { label: "Toast", path: "/dev/components/toast" },
-  { label: "Toaster", path: "/dev/components/toaster" },
-  { label: "Toggle", path: "/dev/components/toggle" },
-  { label: "Toggle Group", path: "/dev/components/toggle-group" },
-  { label: "Tooltip", path: "/dev/components/tooltip" },
+  { label: "Accordion", path: dsLabPath("accordion") },
+  { label: "Alert Dialog", path: dsLabPath("alert-dialog") },
+  { label: "Alerts", path: dsLabPath("alerts") },
+  { label: "Aspect Ratio", path: dsLabPath("aspect-ratio") },
+  { label: "Avatars", path: dsLabPath("avatars") },
+  { label: "Badges", path: dsLabPath("badges") },
+  { label: "Breadcrumbs", path: dsLabPath("breadcrumbs") },
+  { label: "Buttons", path: dsLabPath("buttons") },
+  { label: "Calendar", path: dsLabPath("calendar") },
+  { label: "Cards", path: dsLabPath("cards") },
+  { label: "Carousel", path: dsLabPath("carousel") },
+  { label: "Checkbox", path: dsLabPath("checkbox") },
+  { label: "Collapsible", path: dsLabPath("collapsible") },
+  { label: "Command", path: dsLabPath("command") },
+  { label: "Context Menu", path: dsLabPath("context-menu") },
+  { label: "Dialog", path: dsLabPath("dialog") },
+  { label: "Dropdown Menu", path: dsLabPath("dropdown-menu") },
+  { label: "Drawer", path: dsLabPath("drawer") },
+  { label: "Hover Card", path: dsLabPath("hover-card") },
+  { label: "Input", path: dsLabPath("input") },
+  { label: "Input OTP", path: dsLabPath("input-otp") },
+  { label: "Line Chart", path: dsLabPath("line-chart") },
+  { label: "Menu Bar", path: dsLabPath("menubar") },
+  { label: "Pagination", path: dsLabPath("pagination") },
+  { label: "Popover", path: dsLabPath("popover") },
+  { label: "Progress", path: dsLabPath("progress") },
+  { label: "Radio Group", path: dsLabPath("radio-group") },
+  { label: "Resizable", path: dsLabPath("resizable") },
+  { label: "Scroll Area", path: dsLabPath("scroll-area") },
+  { label: "Select", path: dsLabPath("select") },
+  { label: "Separator", path: dsLabPath("separator") },
+  { label: "Sheet", path: dsLabPath("sheet") },
+  { label: "Sidebar", path: dsLabPath("sidebar") },
+  { label: "Skeleton", path: dsLabPath("skeleton") },
+  { label: "Slider", path: dsLabPath("slider") },
+  { label: "Sonner", path: dsLabPath("sonner") },
+  { label: "Switch", path: dsLabPath("switch") },
+  { label: "Table", path: dsLabPath("table") },
+  { label: "Tabs", path: dsLabPath("tabs") },
+  { label: "Textarea", path: dsLabPath("textarea") },
+  { label: "Toast", path: dsLabPath("toast") },
+  { label: "Toaster", path: dsLabPath("toaster") },
+  { label: "Toggle", path: dsLabPath("toggle") },
+  { label: "Toggle Group", path: dsLabPath("toggle-group") },
+  { label: "Tooltip", path: dsLabPath("tooltip") },
 ] as const;
 
 /**
  * Platform-specific building blocks — "Sections" tab (not shadcn primitives).
- * Add new entries here and register matching routes under `/dev/components/sections/…`.
  */
 export const SECTION_LAB_LINKS = [
-  { label: "App header", path: "/dev/components/sections/app-header" },
-  { label: "Energy score", path: "/dev/components/sections/energy-score" },
-  { label: "Endpoint card", path: "/dev/components/sections/endpoint-card" },
-  { label: "Metrics", path: "/dev/components/sections/metrics" },
-  { label: "Model card", path: "/dev/components/sections/model-card" },
-  { label: "Stepper", path: "/dev/components/sections/stepper" },
-  { label: "Shadows", path: "/dev/components/sections/shadows" },
+  { label: "App header", path: dsLabPath("sections/app-header") },
+  { label: "Energy score", path: dsLabPath("sections/energy-score") },
+  { label: "Endpoint card", path: dsLabPath("sections/endpoint-card") },
+  { label: "Metrics", path: dsLabPath("sections/metrics") },
+  { label: "Model card", path: dsLabPath("sections/model-card") },
+  { label: "Stepper", path: dsLabPath("sections/stepper") },
+  { label: "Shadows", path: dsLabPath("sections/shadows") },
 ] as const;
 
-/** Default lab when visiting `/dev/components` (Components tab). */
-export const COMPONENT_LABS_DEFAULT_PATH = "/dev/components/accordion" as const;
+/** Default lab when visiting the design-system components index. */
+export const COMPONENT_LABS_DEFAULT_PATH = dsLabPath("accordion");
 
 /** Default lab when switching to the Sections tab. */
-export const SECTION_LABS_DEFAULT_PATH = "/dev/components/sections/metrics" as const;
+export const SECTION_LABS_DEFAULT_PATH = dsLabPath("sections/metrics");

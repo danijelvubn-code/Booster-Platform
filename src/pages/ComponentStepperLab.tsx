@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import { postMvpPath, dsLabPath } from "@/config/prototype-shell";
 import { Link } from "react-router-dom";
 
 import { WizardStep } from "@/components/WizardStep";
@@ -84,7 +85,7 @@ const ComponentStepperLab = () => {
       nestedComponents={
         <ul className="list-disc space-y-1 pl-4 text-caption text-muted-foreground">
           <li>
-            <Link className="font-medium text-primary underline-offset-4 hover:underline" to="/dev/components/buttons">
+            <Link className="font-medium text-primary underline-offset-4 hover:underline" to={dsLabPath("buttons")}>
               Button
             </Link>
             {" — "}shared focus ring pattern.

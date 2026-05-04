@@ -38,6 +38,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { mvpPath } from "@/config/prototype-shell";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -332,7 +333,7 @@ const MvpGuidedModelSelection = () => {
       title: "Profile saved",
       description: `"${saveName.trim()}" has been saved. You can resume anytime.`,
     });
-    if (saveAndExit) navigate("/mvp/cosmos");
+    if (saveAndExit) navigate(mvpPath("/cosmos"));
   };
 
   const loadProfile = (profile: SavedUseCaseProfile) => {
@@ -359,7 +360,7 @@ const MvpGuidedModelSelection = () => {
     <div className="container space-y-6 py-8">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <Button variant="ghost" size="sm" className="-ml-3" onClick={() => navigate("/mvp/cosmos")}>
+        <Button variant="ghost" size="sm" className="-ml-3" onClick={() => navigate(mvpPath("/cosmos"))}>
           <ArrowLeft className="h-4 w-4 mr-1" /> Model Cosmos
         </Button>
       </div>
@@ -575,7 +576,7 @@ const MvpGuidedModelSelection = () => {
 
                         {/* Actions */}
                         <div className="flex gap-2 pt-1">
-                          <Link to={`/mvp/cosmos/${m.id}`}>
+                          <Link to={mvpPath(`/cosmos/${m.id}`)}>
                             <Button variant="outline" size="sm">
                               <ExternalLink className="h-3.5 w-3.5 mr-1" /> View Details
                             </Button>
@@ -606,7 +607,7 @@ const MvpGuidedModelSelection = () => {
             Next <ArrowRight className="h-4 w-4 ml-1" />
           </Button>
         ) : (
-          <Button variant="outline" onClick={() => navigate("/mvp/cosmos")}>
+          <Button variant="outline" onClick={() => navigate(mvpPath("/cosmos"))}>
             Back to Model Cosmos
           </Button>
         )}

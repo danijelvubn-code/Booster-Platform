@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "dev:mvp": "VITE_APP_VARIANT=mvp vite",
-    "build": "vite build",
+    "build": "npm run build:mvp && npm run build:post-mvp",
+    "build:mvp": "vite build --mode mvp --outDir dist-mvp",
+    "build:post-mvp": "vite build --mode post-mvp --outDir dist-post-mvp",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",

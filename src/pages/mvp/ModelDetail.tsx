@@ -7,6 +7,8 @@
  */
 import { Link, useParams } from "react-router-dom";
 
+import { mvpPath } from "@/config/prototype-shell";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -149,7 +151,7 @@ const MvpModelDetail = () => {
       <div className="container py-8">
         <p className="text-body-sm text-muted-foreground">Model not found.</p>
         <Button asChild variant="ghost" className="mt-4">
-          <Link to="/mvp/cosmos">All models</Link>
+          <Link to={mvpPath("/cosmos")}>All models</Link>
         </Button>
       </div>
     );
@@ -176,7 +178,7 @@ const MvpModelDetail = () => {
   return (
     <div className="container space-y-6 py-8">
       <Button asChild variant="ghost" size="sm" className="-ml-3">
-        <Link to="/mvp/cosmos">
+        <Link to={mvpPath("/cosmos")}>
           <ArrowLeft className="mr-1 h-icon-16 w-icon-16" aria-hidden />
           Model Cosmos
         </Link>
@@ -254,7 +256,7 @@ const MvpModelDetail = () => {
               ) : null}
 
               <Button asChild variant="default" size="default" className="w-full">
-                <Link to={`/mvp/endpoints/new?model=${model.id}`}>Add to Endpoint</Link>
+                <Link to={mvpPath(`/endpoints/new?model=${model.id}`)}>Add to Endpoint</Link>
               </Button>
             </CardContent>
           </Card>

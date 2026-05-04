@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ArrowRight, Check, Lock, Info, Rocket, Search, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { postMvpPath } from "@/config/prototype-shell";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { defaultGuardrailsState, countEnabledGuardrails, type GuardrailsState } from "@/components/GuardrailsStep";
@@ -165,7 +166,7 @@ const CreateEndpoint = () => {
       title: "Inference Endpoint Deployed",
       description: `"${config.name}" has been deployed successfully.`,
     });
-    navigate(`/endpoints/${newEndpointId}`);
+    navigate(postMvpPath(`/endpoints/${newEndpointId}`));
   };
 
   const estimatedCost = () => {
@@ -184,7 +185,7 @@ const CreateEndpoint = () => {
 
   return (
     <div className="container space-y-6 py-8">
-      <Button variant="ghost" size="sm" className="-ml-3" onClick={() => navigate("/endpoints")}>
+      <Button variant="ghost" size="sm" className="-ml-3" onClick={() => navigate(postMvpPath("/endpoints"))}>
         <ArrowLeft className="mr-1 h-4 w-4" /> Inference Endpoints
       </Button>
 

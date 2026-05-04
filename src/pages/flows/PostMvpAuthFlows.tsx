@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ChevronLeft, KeyRound, LogIn, UserPlus, Zap } from "lucide-react";
 
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { postMvpPath } from "@/config/prototype-shell";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 
@@ -13,12 +14,12 @@ const PostMvpAuthFlows = () => {
   const navigate = useNavigate();
 
   const goLoginFlow = () => {
-    navigate("/login");
+    navigate(postMvpPath("/login"));
   };
 
   const goSkipLogin = () => {
     login("user@booster.com", "Booster123#");
-    navigate("/overview");
+    navigate(postMvpPath("/overview"));
   };
 
   return (
@@ -93,7 +94,7 @@ const PostMvpAuthFlows = () => {
 
           <button
             type="button"
-            onClick={() => navigate("/first-time-user")}
+            onClick={() => navigate(postMvpPath("/first-time-user"))}
             className={cn(
               "text-left transition-colors ease-standard",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-lg",
@@ -119,7 +120,7 @@ const PostMvpAuthFlows = () => {
 
           <button
             type="button"
-            onClick={() => navigate("/reset-password")}
+            onClick={() => navigate(postMvpPath("/reset-password"))}
             className={cn(
               "text-left transition-colors ease-standard",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-lg",

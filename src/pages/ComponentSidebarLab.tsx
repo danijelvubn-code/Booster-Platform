@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { postMvpPath, dsLabPath } from "@/config/prototype-shell";
 
 import { ComponentLabPageShell } from "@/components/dev/ComponentLabPageShell";
 import { Link } from "react-router-dom";
@@ -66,42 +67,42 @@ const ComponentSidebarLab = () => {
       nestedComponents={
         <ul className="list-disc space-y-1 pl-4 text-caption text-muted-foreground">
           <li>
-            <Link className="font-medium text-primary underline-offset-4 hover:underline" to="/dev/components/buttons">
+            <Link className="font-medium text-primary underline-offset-4 hover:underline" to={dsLabPath("buttons")}>
               Button
             </Link>
             {" — "}
             <span className="text-muted-foreground">SidebarTrigger</span>
           </li>
           <li>
-            <Link className="font-medium text-primary underline-offset-4 hover:underline" to="/dev/components/input">
+            <Link className="font-medium text-primary underline-offset-4 hover:underline" to={dsLabPath("input")}>
               Input
             </Link>
             {" — "}
             <span className="text-muted-foreground">SidebarInput</span>
           </li>
           <li>
-            <Link className="font-medium text-primary underline-offset-4 hover:underline" to="/dev/components/separator">
+            <Link className="font-medium text-primary underline-offset-4 hover:underline" to={dsLabPath("separator")}>
               Separator
             </Link>
             {" — "}
             <span className="text-muted-foreground">SidebarSeparator</span>
           </li>
           <li>
-            <Link className="font-medium text-primary underline-offset-4 hover:underline" to="/dev/components/sheet">
+            <Link className="font-medium text-primary underline-offset-4 hover:underline" to={dsLabPath("sheet")}>
               Sheet
             </Link>
             {" — "}
             <span className="text-muted-foreground">mobile sidebar container</span>
           </li>
           <li>
-            <Link className="font-medium text-primary underline-offset-4 hover:underline" to="/dev/components/skeleton">
+            <Link className="font-medium text-primary underline-offset-4 hover:underline" to={dsLabPath("skeleton")}>
               Skeleton
             </Link>
             {" — "}
             <span className="text-muted-foreground">SidebarMenuSkeleton</span>
           </li>
           <li>
-            <Link className="font-medium text-primary underline-offset-4 hover:underline" to="/dev/components/tooltip">
+            <Link className="font-medium text-primary underline-offset-4 hover:underline" to={dsLabPath("tooltip")}>
               Tooltip
             </Link>
             {" — "}
@@ -122,7 +123,7 @@ const ComponentSidebarLab = () => {
     <div className="space-y-6 py-6">
       <div className="space-y-2">
         <Button asChild variant="ghost" size="sm" className="-ml-3">
-          <Link to="/overview">
+          <Link to={postMvpPath("/overview")}>
             <ArrowLeft className="mr-1 h-icon-16 w-icon-16" /> Back
           </Link>
         </Button>
@@ -171,7 +172,7 @@ const ComponentSidebarLab = () => {
                         <SidebarMenu>
                           <SidebarMenuItem>
                             <SidebarMenuButton asChild isActive tooltip="Overview">
-                              <Link to="/overview">
+                              <Link to={postMvpPath("/overview")}>
                                 <LayoutDashboard />
                                 <span>Overview</span>
                               </Link>
@@ -179,7 +180,7 @@ const ComponentSidebarLab = () => {
                           </SidebarMenuItem>
                           <SidebarMenuItem>
                             <SidebarMenuButton asChild tooltip="Endpoints">
-                              <Link to="/endpoints">
+                              <Link to={postMvpPath("/endpoints")}>
                                 <FileText />
                                 <span>Endpoints</span>
                               </Link>

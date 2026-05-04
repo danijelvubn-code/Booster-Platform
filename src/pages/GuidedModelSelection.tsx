@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import { postMvpPath } from "@/config/prototype-shell";
 import { models } from "@/data/mockData";
 import {
   getSavedUseCaseProfiles,
@@ -331,7 +332,7 @@ const GuidedModelSelection = () => {
       title: "Profile saved",
       description: `"${saveName.trim()}" has been saved. You can resume anytime.`,
     });
-    if (saveAndExit) navigate("/cosmos");
+    if (saveAndExit) navigate(postMvpPath("/cosmos"));
   };
 
   const loadProfile = (profile: SavedUseCaseProfile) => {
@@ -358,7 +359,7 @@ const GuidedModelSelection = () => {
     <div className="container space-y-6 py-8">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <Button variant="ghost" size="sm" className="-ml-3" onClick={() => navigate("/cosmos")}>
+        <Button variant="ghost" size="sm" className="-ml-3" onClick={() => navigate(postMvpPath("/cosmos"))}>
           <ArrowLeft className="h-4 w-4 mr-1" /> Model Cosmos
         </Button>
       </div>
@@ -605,7 +606,7 @@ const GuidedModelSelection = () => {
             Next <ArrowRight className="h-4 w-4 ml-1" />
           </Button>
         ) : (
-          <Button variant="outline" onClick={() => navigate("/cosmos")}>
+          <Button variant="outline" onClick={() => navigate(postMvpPath("/cosmos"))}>
             Back to Model Cosmos
           </Button>
         )}

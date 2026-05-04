@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getOverallModelScore } from "@/lib/model-metrics";
+import { mvpPath } from "@/config/prototype-shell";
 import { Badge } from "@/components/ui/badge";
 import ModelFilters, {
   type ModelFilterState,
@@ -194,7 +195,7 @@ const MvpCosmos = () => {
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2 sm:pb-0.5">
-          <Link to="/mvp/endpoints/new">
+          <Link to={mvpPath("/endpoints/new")}>
             <Button>
               <Plus className="h-icon-16 w-icon-16" aria-hidden />
               Create Endpoint
@@ -331,7 +332,7 @@ const MvpCosmos = () => {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {paginatedModels.map((model) => {
               // Alternative 2 route is explicit and consistent for every card.
-              const detailPath = `/mvp/cosmos/${model.id}/alt2`;
+              const detailPath = mvpPath(`/cosmos/${model.id}/alt2`);
               return (
                 <Link key={model.id} to={detailPath} className="block h-full min-w-0">
                   <ModelCosmosCard model={model} variant="basic" />

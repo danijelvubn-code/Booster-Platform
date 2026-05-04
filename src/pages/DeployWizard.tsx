@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import UseCaseSelect from "@/components/UseCaseSelect";
 import { ArrowLeft, Check, Info, Lock } from "lucide-react";
+import { postMvpPath } from "@/config/prototype-shell";
 
 type DeploymentType = "platform" | "external" | "opensource" | null;
 type ProvisioningType = "dedicated" | "proxied" | null;
@@ -83,7 +84,7 @@ const DeployWizard = () => {
       title: "Model Added",
       description: `"${config.name}" has been added to ${endpoints.find(s => s.id === targetEndpoint)?.name || "the endpoint"}.`,
     });
-    navigate(`/endpoints/${targetEndpoint}`);
+    navigate(postMvpPath(`/endpoints/${targetEndpoint}`));
   };
 
   // Model picker (skip deployment type selection — all models are Booster Powered)
@@ -93,8 +94,8 @@ const DeployWizard = () => {
       <div className="container space-y-6 py-8">
         <Button variant="ghost" size="sm" className="-ml-3" onClick={() => {
           const epId = params.get("space");
-          if (epId) navigate(`/endpoints/${epId}`);
-          else navigate("/endpoints");
+          if (epId) navigate(postMvpPath(`/endpoints/${epId}`));
+          else navigate(postMvpPath("/endpoints"));
         }}>
           <ArrowLeft className="h-4 w-4 mr-1" /> Back
         </Button>
@@ -152,7 +153,7 @@ const DeployWizard = () => {
         </div>
 
         <p className="text-xs text-muted-foreground">
-          Or <Link to="/cosmos" className="text-primary hover:underline">browse the full Model Cosmos</Link> for detailed comparisons.
+          Or <Link to={postMvpPath("/cosmos")} className="text-primary hover:underline">browse the full Model Cosmos</Link> for detailed comparisons.
         </p>
       </div>
     );

@@ -6,6 +6,7 @@ import { AuthFlowCardShell } from "@/components/AuthFlowCardShell";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { InputControl, InputLeadIcon, InputRoot, InputSegment, Label } from "@/components/ui/input";
+import { postMvpPath } from "@/config/prototype-shell";
 
 const welcomeLogoLinkClass =
   "inline-flex items-center gap-2 rounded-md outline-none ring-offset-background transition-colors ease-standard focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
@@ -127,7 +128,7 @@ const ResetPasswordRequest = () => {
                   Back
                 </Button>
               ) : (
-                <Link to="/login" className="absolute left-0">
+                <Link to={postMvpPath("/login")} className="absolute left-0">
                   <Button
                     type="button"
                     variant="ghost"
@@ -200,7 +201,7 @@ const ResetPasswordRequest = () => {
                 </div>
 
                 <Button type="button" size="lg" className="w-full" asChild>
-                  <Link to="/login">Back to Log In</Link>
+                  <Link to={postMvpPath("/login")}>Back to Log In</Link>
                 </Button>
 
                 <div className="flex items-center justify-center">

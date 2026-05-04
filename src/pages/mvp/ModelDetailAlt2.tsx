@@ -8,7 +8,8 @@
  * Siblings: `ModelDetail.tsx` (default), `ModelDetailAlt.tsx` (`/alt`)
  */
 import MvpModelDetailAlt from "./ModelDetailAlt";
+import { mvpPath } from "@/config/prototype-shell";
 
 export default function MvpModelDetailAlt2() {
-  return <MvpModelDetailAlt endpointFlowPath="/mvp/cosmos/:modelId/alt2/endpoints/new" />;
+  return <MvpModelDetailAlt endpointFlowPath={mvpPath("/cosmos/:modelId/alt2/endpoints/new")} />;
 }

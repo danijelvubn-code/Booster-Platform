@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { postMvpPath, dsLabPath } from "@/config/prototype-shell";
 
 import { ComponentLabPageShell } from "@/components/dev/ComponentLabPageShell";
 import { Link } from "react-router-dom";
@@ -61,7 +62,7 @@ const ComponentAlertDialogLab = () => {
       nestedComponents={
         <ul className="list-disc space-y-1 pl-4 text-caption text-muted-foreground">
           <li>
-            <Link className="font-medium text-primary underline-offset-4 hover:underline" to="/dev/components/buttons">
+            <Link className="font-medium text-primary underline-offset-4 hover:underline" to={dsLabPath("buttons")}>
               Button
             </Link>
             {" — "}
@@ -83,7 +84,7 @@ const ComponentAlertDialogLab = () => {
     <div className="space-y-6 py-6">
       <div className="space-y-2">
         <Button asChild variant="ghost" size="sm" className="-ml-3">
-          <Link to="/overview">
+          <Link to={postMvpPath("/overview")}>
             <ArrowLeft className="h-4 w-4 mr-1" /> Back
           </Link>
         </Button>

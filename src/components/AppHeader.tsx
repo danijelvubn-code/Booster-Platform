@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ChevronDown, HelpCircle, LayoutGrid, LogOut, Shield, User, Zap } from "lucide-react";
 
 import { useAuth } from "@/contexts/AuthContext";
+import { IS_COMBINED_PROTOTYPE, mvpPath, postMvpPath } from "@/config/prototype-shell";
+import { COMPONENT_LABS_DEFAULT_PATH } from "@/lib/component-labs";
 import { primaryNavItems } from "@/lib/app-nav";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -46,7 +48,7 @@ type AppHeaderProps = {
 const AppHeader = ({
   position = "sticky",
   badge,
-  logoHref = "/overview",
+  logoHref = postMvpPath("/overview"),
   comingSoonPaths,
   excludeNavPaths,
   navPathPrefix = "",
@@ -61,7 +63,7 @@ const AppHeader = ({
     const next = toMvp ? "mvp" : "post-mvp";
     if (next === track) return;
     setAppTrack(next);
-    navigate(next === "mvp" ? "/mvp/overview" : "/overview");
+    navigate(next === "mvp" ? mvpPath("/overview") : postMvpPath("/overview"));
   };
 
   const navItems = excludeNavPaths?.length
@@ -164,53 +166,59 @@ const AppHeader = ({
                 <span className="text-caption text-foreground/75">Theme</span>
                 <ThemeToggle />
               </div>
-              <div
-                className="flex items-center justify-between gap-2 border-b px-3 py-2"
-                onPointerDown={(e) => e.stopPropagation()}
-                onKeyDown={(e) => e.stopPropagation()}
-              >
-                <span className="shrink-0 text-caption text-foreground/75">Version</span>
-                <div className="flex min-w-0 items-center justify-end gap-2">
-                  <span
-                    className={cn(
-                      "shrink-0 text-caption",
-                      track === "post-mvp" ? "font-medium text-foreground" : "text-muted-foreground",
-                    )}
-                  >
-                    Post
-                  </span>
-                  <Switch
-                    id="app-version-toggle"
-                    checked={track === "mvp"}
-                    onCheckedChange={handleVersionSwitch}
-                    size="md"
-                    aria-label="Switch between Post MVP and MVP product"
-                  />
-                  <span
-                    className={cn(
-                      "shrink-0 text-caption",
-                      track === "mvp" ? "font-medium text-foreground" : "text-muted-foreground",
-                    )}
-                  >
-                    MVP
-                  </span>
+              {IS_COMBINED_PROTOTYPE ? (
+                <div
+                  className="flex items-center justify-between gap-2 border-b px-3 py-2"
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => e.stopPropagation()}
+                >
+                  <span className="shrink-0 text-caption text-foreground/75">Version</span>
+                  <div className="flex min-w-0 items-center justify-end gap-2">
+                    <span
+                      className={cn(
+                        "shrink-0 text-caption",
+                        track === "post-mvp" ? "font-medium text-foreground" : "text-muted-foreground",
+                      )}
+                    >
+                      Post
+                    </span>
+                    <Switch
+                      id="app-version-toggle"
+                      checked={track === "mvp"}
+                      onCheckedChange={handleVersionSwitch}
+                      size="md"
+                      aria-label="Switch between Post MVP and MVP product"
+                    />
+                    <span
+                      className={cn(
+                        "shrink-0 text-caption",
+                        track === "mvp" ? "font-medium text-foreground" : "text-muted-foreground",
+                      )}
+                    >
+                      MVP
+                    </span>
+                  </div>
                 </div>
-              </div>
+              ) : null}
               <div className="border-b p-1">
-                <DropdownMenuItem onClick={() => navigate("/account")}>
+                <DropdownMenuItem
+                  onClick={() => navigate(track === "mvp" ? mvpPath("/account") : postMvpPath("/account"))}
+                >
                   <User className="mr-2 h-icon-16 w-icon-16" aria-hidden />
                   Account
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/help")}>
+                <DropdownMenuItem onClick={() => navigate(track === "mvp" ? mvpPath("/help") : postMvpPath("/help"))}>
                   <HelpCircle className="mr-2 h-icon-16 w-icon-16" aria-hidden />
                   Help
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/dev/components")}>
-                  <LayoutGrid className="mr-2 h-icon-16 w-icon-16" aria-hidden />
-                  Components
-                </DropdownMenuItem>
+                {import.meta.env.DEV && IS_COMBINED_PROTOTYPE ? (
+                  <DropdownMenuItem onClick={() => navigate(COMPONENT_LABS_DEFAULT_PATH)}>
+                    <LayoutGrid className="mr-2 h-icon-16 w-icon-16" aria-hidden />
+                    Component labs
+                  </DropdownMenuItem>
+                ) : null}
                 {user?.isAdmin && !isImpersonating && (
-                  <DropdownMenuItem onClick={() => navigate("/admin")}>
+                  <DropdownMenuItem onClick={() => navigate(postMvpPath("/admin"))}>
                     <Shield className="mr-2 h-icon-16 w-icon-16" aria-hidden />
                     Admin Console
                   </DropdownMenuItem>

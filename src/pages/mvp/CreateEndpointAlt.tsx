@@ -37,6 +37,7 @@ import {
   modelHasVisionCapability,
 } from "@/lib/model-metrics";
 import { WizardStepper } from "@/components/WizardStepper";
+import { mvpPath } from "@/config/prototype-shell";
 
 type StepId = 0 | 1 | 2;
 type DeploymentMode = "recommended" | "manual";
@@ -414,7 +415,7 @@ export default function MvpCreateEndpointAlt() {
         title: "Endpoint deployed",
         description: `"${endpointName.trim()}" is live on ${selectedProvider.provider}.`,
       });
-      navigate("/mvp/overview");
+      navigate(mvpPath("/overview"));
     }, 900);
   };
 
@@ -463,7 +464,7 @@ export default function MvpCreateEndpointAlt() {
               </div>
             </div>
             <div className="mt-auto border-t border-border p-3">
-              <Button variant="outline" className="w-full" onClick={() => navigate("/mvp/cosmos")}>
+              <Button variant="outline" className="w-full" onClick={() => navigate(mvpPath("/cosmos"))}>
                 <RefreshCcw className="mr-1 h-icon-16 w-icon-16" /> Swap Model
               </Button>
             </div>

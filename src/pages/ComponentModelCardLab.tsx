@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { postMvpPath, dsLabPath } from "@/config/prototype-shell";
 
 import { ModelCosmosCard } from "@/components/ModelCosmosCard";
 import { ComponentLabPageShell } from "@/components/dev/ComponentLabPageShell";
@@ -31,26 +32,26 @@ const ComponentModelCardLab = () => {
       nestedComponents={
         <ul className="list-disc space-y-1 pl-4 text-caption text-muted-foreground">
           <li>
-            <Link className="font-medium text-primary underline-offset-4 hover:underline" to="/dev/components/cards">
+            <Link className="font-medium text-primary underline-offset-4 hover:underline" to={dsLabPath("cards")}>
               Card
             </Link>
             {" — "}root surface and padding.
           </li>
           <li>
-            <Link className="font-medium text-primary underline-offset-4 hover:underline" to="/dev/components/avatars">
+            <Link className="font-medium text-primary underline-offset-4 hover:underline" to={dsLabPath("avatars")}>
               Avatar
             </Link>
             {" — "}provider initials fallback.
           </li>
           <li>
-            <Link className="font-medium text-primary underline-offset-4 hover:underline" to="/dev/components/sections/metrics">
+            <Link className="font-medium text-primary underline-offset-4 hover:underline" to={dsLabPath("sections/metrics")}>
               Metrics
             </Link>
             {" — "}
             <code className="text-caption">MetricsRow</code> / <code className="text-caption">MetricCell</code> row.
           </li>
           <li>
-            <Link className="font-medium text-primary underline-offset-4 hover:underline" to="/dev/components/sections/energy-score">
+            <Link className="font-medium text-primary underline-offset-4 hover:underline" to={dsLabPath("sections/energy-score")}>
               Energy score
             </Link>
             {" — "}

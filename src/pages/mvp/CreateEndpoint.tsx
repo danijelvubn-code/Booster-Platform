@@ -14,6 +14,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useToast } from "@/hooks/use-toast";
 import { defaultGuardrailsState, countEnabledGuardrails, type GuardrailsState } from "@/components/GuardrailsStep";
 import { type PerformanceProfile } from "@/components/PerformanceProfileStep";
+import { mvpPath } from "@/config/prototype-shell";
 
 const ModelSearchSelect = ({ value, onChange }: { value: string; onChange: (id: string) => void }) => {
   const [open, setOpen] = useState(false);
@@ -99,7 +100,7 @@ const USE_CASE_PLACEHOLDER =
 
 /**
  * MVP create-endpoint wizard. Mirrors `pages/CreateEndpoint.tsx` but stays inside the MVP track:
- * back button uses browser history; success navigates to `/mvp/overview`.
+ * back button uses browser history; success navigates to MVP overview.
  * Edit independently from the post-MVP version.
  */
 const MvpCreateEndpoint = () => {
@@ -186,7 +187,7 @@ const MvpCreateEndpoint = () => {
       title: "Inference Endpoint Deployed",
       description: `"${config.name}" has been deployed successfully.`,
     });
-    navigate("/mvp/overview");
+    navigate(mvpPath("/overview"));
   };
 
   const estimatedCost = () => {

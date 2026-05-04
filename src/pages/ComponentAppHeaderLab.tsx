@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { postMvpPath, dsLabPath } from "@/config/prototype-shell";
 
 import AppHeader from "@/components/AppHeader";
 import { ComponentLabPageShell } from "@/components/dev/ComponentLabPageShell";
@@ -25,19 +26,19 @@ const ComponentAppHeaderLab = () => {
       nestedComponents={
         <ul className="list-disc space-y-1 pl-4 text-caption text-muted-foreground">
           <li>
-            <Link className="font-medium text-primary underline-offset-4 hover:underline" to="/dev/components/dropdown-menu">
+            <Link className="font-medium text-primary underline-offset-4 hover:underline" to={dsLabPath("dropdown-menu")}>
               Dropdown Menu
             </Link>
             {" — "}user menu (account, help, components, admin, sign out).
           </li>
           <li>
-            <Link className="font-medium text-primary underline-offset-4 hover:underline" to="/dev/components/tooltip">
+            <Link className="font-medium text-primary underline-offset-4 hover:underline" to={dsLabPath("tooltip")}>
               Tooltip
             </Link>
             {" — "}wraps nav items that declare a <code className="text-caption">tooltip</code>.
           </li>
           <li>
-            <Link className="font-medium text-primary underline-offset-4 hover:underline" to="/dev/components/buttons">
+            <Link className="font-medium text-primary underline-offset-4 hover:underline" to={dsLabPath("buttons")}>
               Button
             </Link>
             {" — "}user-menu trigger uses <code className="text-caption">variant=&quot;ghost&quot;</code>.

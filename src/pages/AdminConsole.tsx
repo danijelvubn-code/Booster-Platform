@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { postMvpPath } from "@/config/prototype-shell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -77,7 +78,7 @@ const AdminConsole = () => {
     if (!confirmTenant) return;
     startImpersonation(confirmTenant.name, confirmTenant.owner, confirmTenant.email);
     setConfirmTenant(null);
-    navigate("/overview");
+    navigate(postMvpPath("/overview"));
   };
 
   return (

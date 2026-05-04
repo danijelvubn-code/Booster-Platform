@@ -7,6 +7,8 @@
  */
 import { Link, useParams } from "react-router-dom";
 
+import { mvpPath } from "@/config/prototype-shell";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -272,7 +274,7 @@ type MvpModelDetailAltProps = {
   endpointFlowPath?: string;
 };
 
-const MvpModelDetailAlt = ({ endpointFlowPath = "/mvp/endpoints/new" }: MvpModelDetailAltProps) => {
+const MvpModelDetailAlt = ({ endpointFlowPath = mvpPath("/endpoints/new") }: MvpModelDetailAltProps) => {
   const { modelId } = useParams();
   const model = models.find((m) => m.id === modelId);
 
@@ -281,7 +283,7 @@ const MvpModelDetailAlt = ({ endpointFlowPath = "/mvp/endpoints/new" }: MvpModel
       <div className="container py-8">
         <p className="text-body-sm text-muted-foreground">Model not found.</p>
         <Button asChild variant="ghost" className="mt-4">
-          <Link to="/mvp/cosmos">All models</Link>
+          <Link to={mvpPath("/cosmos")}>All models</Link>
         </Button>
       </div>
     );
@@ -386,7 +388,7 @@ const MvpModelDetailAlt = ({ endpointFlowPath = "/mvp/endpoints/new" }: MvpModel
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link to="/mvp/cosmos">Model Cosmos</Link>
+              <Link to={mvpPath("/cosmos")}>Model Cosmos</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />

@@ -26,12 +26,16 @@ export const endpoints: Array<{
   /** Monthly budget cap in EUR (overview / portfolio cards). */
   monthlyBudgetEur: number;
   performanceProfile: "best-effort" | "premium" | "enterprise";
+  /** Shown on endpoint detail header. */
+  description?: string;
 }> = [
   {
     id: "sp-1",
     name: "Claims Processing",
     type: "Production" as const,
     defaultDeployment: "mistral-large-claims-v2",
+    description:
+      "Process insurance claims with structured extraction, fraud signals, and routing summaries for adjusters.",
     budgetUsed: 127,
     health: "OK" as const,
     monthlySpend: 14_200,
@@ -47,6 +51,8 @@ export const endpoints: Array<{
     name: "Contract Analysis",
     type: "Production" as const,
     defaultDeployment: "qwen-contracts",
+    description:
+      "Analyze legal contracts to identify key clauses, obligations, risks, and compliance requirements for legal review automation.",
     budgetUsed: 52,
     health: "OK" as const,
     monthlySpend: 9_800,
@@ -62,6 +68,7 @@ export const endpoints: Array<{
     name: "Coding Copilot",
     type: "Demo" as const,
     defaultDeployment: "codestral-v1",
+    description: "Assist engineers with inline completions, refactors, and explanations inside your IDE workflows.",
     budgetUsed: 75,
     health: "OK" as const,
     monthlySpend: 4_200,
@@ -77,6 +84,7 @@ export const endpoints: Array<{
     name: "Customer Support Bot",
     type: "POC" as const,
     defaultDeployment: "mistral-large-support",
+    description: "Resolve Tier‑1 tickets with grounded answers, handoffs, and macros aligned to your support playbook.",
     budgetUsed: 88,
     health: "At Risk" as const,
     monthlySpend: 3_000,
@@ -92,6 +100,7 @@ export const endpoints: Array<{
     name: "Getting Started",
     type: "POC" as const,
     defaultDeployment: "",
+    description: "A starter inference endpoint for onboarding experiments before you deploy production workloads.",
     budgetUsed: 0,
     health: "OK" as const,
     monthlySpend: 0,

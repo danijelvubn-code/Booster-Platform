@@ -4,6 +4,7 @@ import { CheckCircle2, Eye, EyeOff, Zap } from "lucide-react";
 
 import { AuthFlowCardShell } from "@/components/AuthFlowCardShell";
 import { Button } from "@/components/ui/button";
+import { IS_MVP_BUILD, mvpPath, postMvpPath } from "@/config/prototype-shell";
 import { InputControl, InputRoot, InputSegment, Label } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
@@ -67,8 +68,8 @@ const GetStarted = () => {
   const confirmHasError = confirm.length > 0 && (confirmTooLong || confirmPrefixMismatch);
   const passwordsMatch = password.length > 0 && password === confirm;
   const canSubmit = rules.allMet && passwordsMatch;
-  const isMvpFlow = location.pathname.startsWith("/mvp/");
-  const loginHref = isMvpFlow ? "/mvp/login" : "/login";
+  const isMvpFlow = IS_MVP_BUILD || location.pathname.startsWith("/mvp/");
+  const loginHref = isMvpFlow ? mvpPath("/login") : postMvpPath("/login");
   const welcomeHref = isMvpFlow ? "/flows/mvp" : "/flows/post-mvp";
 
   const stateParam = new URLSearchParams(location.search).get("state");

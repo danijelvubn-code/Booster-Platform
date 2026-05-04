@@ -21,7 +21,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Shield, Plus, MoreVertical, Pencil, Trash2, Database } from "lucide-react";
+import { Plus, MoreVertical, Pencil, Trash2, Database } from "lucide-react";
+import { postMvpPath } from "@/config/prototype-shell";
 import { useToast } from "@/hooks/use-toast";
 
 const fmt = (n: number) => {
@@ -62,7 +63,7 @@ const Endpoints = () => {
           <p className="text-muted-foreground">Manage your isolated inference endpoints and their deployments.</p>
         </div>
         <Button asChild>
-          <Link to="/endpoints/new"><Plus className="h-4 w-4 mr-1" /> Create Inference Endpoint</Link>
+          <Link to={postMvpPath("/endpoints/new")}><Plus className="h-4 w-4 mr-1" /> Create Inference Endpoint</Link>
         </Button>
       </div>
 
@@ -82,7 +83,7 @@ const Endpoints = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => navigate(`/endpoints/${ep.id}/edit`)}>
+                  <DropdownMenuItem onClick={() => navigate(postMvpPath(`/endpoints/${ep.id}/edit`))}>
                     <Pencil className="h-4 w-4 mr-2" /> Edit Inference Endpoint
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />

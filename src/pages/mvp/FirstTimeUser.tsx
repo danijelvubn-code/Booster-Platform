@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { mvpPath } from "@/config/prototype-shell";
 import { AlertCircle, CheckCircle2, ChevronLeft, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -58,7 +59,7 @@ const MvpFirstTimeUser = () => {
             <button
               key={state}
               type="button"
-              onClick={() => navigate(`/mvp/get-started?state=${state}`)}
+              onClick={() => navigate(mvpPath(`/get-started?state=${state}`))}
               className={cn(
                 "text-left transition-colors ease-standard",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-lg",

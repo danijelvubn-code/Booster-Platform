@@ -8,6 +8,7 @@ import { clearPendingLogin, setPendingLogin } from "@/lib/pending-login";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { InputControl, InputLeadIcon, InputRoot, InputSegment, Label } from "@/components/ui/input";
+import { postMvpPath } from "@/config/prototype-shell";
 
 const welcomeLogoLinkClass =
   "inline-flex items-center gap-2 rounded-md outline-none ring-offset-background transition-colors ease-standard focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
@@ -31,7 +32,7 @@ const Login = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/overview", { replace: true });
+      navigate(postMvpPath("/overview"), { replace: true });
     }
   }, [isAuthenticated, navigate]);
 
@@ -54,7 +55,9 @@ const Login = () => {
 
     setAuthError(null);
     setPendingLogin(normalizedEmail, password, "post-mvp");
-    navigate("/verify-email", { state: { email: normalizedEmail, returnLoginPath: "/login" } });
+    navigate(postMvpPath("/verify-email"), {
+      state: { email: normalizedEmail, returnLoginPath: postMvpPath("/login") },
+    });
   };
 
   return (
@@ -182,7 +185,7 @@ const Login = () => {
                 <div className="flex items-center justify-center">
                   <button
                     type="button"
-                    onClick={() => navigate("/reset-password")}
+                    onClick={() => navigate(postMvpPath("/reset-password"))}
                     className="text-body-sm text-info transition-colors ease-standard hover:text-info/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   >
                     Reset Password

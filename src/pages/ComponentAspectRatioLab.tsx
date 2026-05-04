@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { postMvpPath, dsLabPath } from "@/config/prototype-shell";
 
 import { COMPONENT_LAB_AUDIT_EMPTY, ComponentLabPageShell } from "@/components/dev/ComponentLabPageShell";
 import { Link } from "react-router-dom";
@@ -55,7 +56,7 @@ const ComponentAspectRatioLab = () => {
     <div className="space-y-6 py-6">
       <div className="space-y-2">
         <Button asChild variant="ghost" size="sm" className="-ml-3">
-          <Link to="/overview">
+          <Link to={postMvpPath("/overview")}>
             <ArrowLeft className="mr-1 h-4 w-4" /> Back
           </Link>
         </Button>

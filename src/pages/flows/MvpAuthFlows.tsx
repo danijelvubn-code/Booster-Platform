@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ChevronLeft, KeyRound, LogIn, Zap } from "lucide-react";
 
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { mvpPath, postMvpPath } from "@/config/prototype-shell";
 import { cn } from "@/lib/utils";
 
 /**
@@ -30,7 +31,7 @@ const MvpAuthFlows = () => {
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <button
             type="button"
-            onClick={() => navigate("/mvp/login")}
+            onClick={() => navigate(mvpPath("/login"))}
             className={cn(
               "text-left transition-colors ease-standard",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-lg",
@@ -56,7 +57,7 @@ const MvpAuthFlows = () => {
 
           <button
             type="button"
-            onClick={() => navigate("/mvp/first-time-user")}
+            onClick={() => navigate(mvpPath("/first-time-user"))}
             className={cn(
               "text-left transition-colors ease-standard",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-lg",
@@ -82,7 +83,7 @@ const MvpAuthFlows = () => {
 
           <button
             type="button"
-            onClick={() => navigate("/reset-password")}
+            onClick={() => navigate(postMvpPath("/reset-password"))}
             className={cn(
               "text-left transition-colors ease-standard",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-lg",

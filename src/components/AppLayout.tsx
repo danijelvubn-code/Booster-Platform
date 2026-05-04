@@ -2,6 +2,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import AppHeader from "@/components/AppHeader";
+import { IS_POST_MVP_BUILD, postMvpPath } from "@/config/prototype-shell";
 
 const AppLayout = () => {
   const navigate = useNavigate();
@@ -17,14 +18,17 @@ const AppLayout = () => {
             size="sm"
             variant="secondary"
             className="h-6 text-xs px-3 bg-destructive-foreground text-destructive hover:bg-destructive-foreground/90"
-            onClick={() => { stopImpersonation(); navigate("/admin"); }}
+            onClick={() => {
+              stopImpersonation();
+              navigate(postMvpPath("/admin"));
+            }}
           >
             Exit Impersonation
           </Button>
         </div>
       )}
 
-      <AppHeader />
+      <AppHeader logoHref={postMvpPath("/overview")} navPathPrefix={IS_POST_MVP_BUILD ? "" : "/post-mvp"} />
 
       {/* Impersonation watermark */}
       {isImpersonating && (

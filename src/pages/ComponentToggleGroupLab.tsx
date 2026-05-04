@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { postMvpPath, dsLabPath } from "@/config/prototype-shell";
 
 import { ComponentLabPageShell } from "@/components/dev/ComponentLabPageShell";
 import { Link } from "react-router-dom";
@@ -49,7 +50,7 @@ const ComponentToggleGroupLab = () => {
       nestedComponents={
         <ul className="list-disc space-y-1 pl-4 text-caption text-muted-foreground">
           <li>
-            <Link className="font-medium text-primary underline-offset-4 hover:underline" to="/dev/components/toggle">
+            <Link className="font-medium text-primary underline-offset-4 hover:underline" to={dsLabPath("toggle")}>
               Toggle
             </Link>
             {" — "}
@@ -69,7 +70,7 @@ const ComponentToggleGroupLab = () => {
     <div className="space-y-6 py-6">
       <div className="space-y-2">
         <Button asChild variant="ghost" size="sm" className="-ml-3">
-          <Link to="/overview">
+          <Link to={postMvpPath("/overview")}>
             <ArrowLeft className="mr-1 h-icon-16 w-icon-16" /> Back
           </Link>
         </Button>
@@ -159,7 +160,7 @@ const ComponentToggleGroupLab = () => {
           <CardTitle className="text-base">Standalone Toggle</CardTitle>
           <CardDescription>
             Single control outside a group (e.g. sidebar pin) — see the{" "}
-            <Link to="/dev/components/toggle" className="text-foreground underline underline-offset-4">
+            <Link to={dsLabPath("toggle")} className="text-foreground underline underline-offset-4">
               Toggle
             </Link>{" "}
             lab for variants, sizes, and states.

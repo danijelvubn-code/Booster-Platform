@@ -4,6 +4,7 @@ import { LayoutGrid } from "lucide-react";
 import {
   COMPONENT_LAB_LINKS,
   COMPONENT_LABS_DEFAULT_PATH,
+  DESIGN_SYSTEM_LABS_ROOT,
   SECTION_LAB_LINKS,
   SECTION_LABS_DEFAULT_PATH,
 } from "@/lib/component-labs";
@@ -13,7 +14,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const sortedComponents = [...COMPONENT_LAB_LINKS].sort((a, b) => a.label.localeCompare(b.label));
 const sortedSections = [...SECTION_LAB_LINKS].sort((a, b) => a.label.localeCompare(b.label));
 
-const isSectionsPath = (pathname: string) => pathname.startsWith("/dev/components/sections");
+const isSectionsPath = (pathname: string) => pathname.startsWith(`${DESIGN_SYSTEM_LABS_ROOT}/sections`);
 
 const ComponentLabsLayout = () => {
   const { pathname } = useLocation();

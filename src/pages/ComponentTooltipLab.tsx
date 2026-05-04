@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { postMvpPath, dsLabPath } from "@/config/prototype-shell";
 
 import { COMPONENT_LAB_AUDIT_EMPTY, ComponentLabPageShell } from "@/components/dev/ComponentLabPageShell";
 import { Link } from "react-router-dom";
@@ -55,7 +56,7 @@ const ComponentTooltipLab = () => {
     <div className="space-y-6 py-6">
       <div className="space-y-2">
         <Button asChild variant="ghost" size="sm" className="-ml-3">
-          <Link to="/overview">
+          <Link to={postMvpPath("/overview")}>
             <ArrowLeft className="mr-1 h-icon-16 w-icon-16" /> Back
           </Link>
         </Button>
@@ -68,7 +69,7 @@ const ComponentTooltipLab = () => {
           <span className="text-foreground">TooltipProvider</span> so most screens only need{" "}
           <span className="text-foreground">Tooltip</span>, <span className="text-foreground">TooltipTrigger</span>, and{" "}
           <span className="text-foreground">TooltipContent</span>. For richer preview panels see{" "}
-          <Link to="/dev/components/hover-card" className="text-foreground underline underline-offset-4">
+          <Link to={dsLabPath("hover-card")} className="text-foreground underline underline-offset-4">
             Hover card
           </Link>
           .

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { postMvpPath, dsLabPath } from "@/config/prototype-shell";
 
 import { EnergyScorePill } from "@/components/EnergyScorePill";
 import { Card } from "@/components/ui/card";
@@ -31,7 +32,7 @@ const ComponentEnergyScoreLab = () => {
       nestedComponents={
         <ul className="list-disc space-y-1 pl-4 text-caption text-muted-foreground">
           <li>
-            <Link className="font-medium text-primary underline-offset-4 hover:underline" to="/dev/components/sections/model-card">
+            <Link className="font-medium text-primary underline-offset-4 hover:underline" to={dsLabPath("sections/model-card")}>
               Model card
             </Link>
             {" — "}typical placement beside overall score.

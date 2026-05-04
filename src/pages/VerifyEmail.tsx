@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { clearPendingLogin, getPendingLogin } from "@/lib/pending-login";
+import { mvpPath, postMvpPath } from "@/config/prototype-shell";
 
 const welcomeLogoLinkClass =
   "inline-flex items-center gap-2 rounded-md outline-none ring-offset-background transition-colors ease-standard focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
@@ -29,11 +30,12 @@ const VerifyEmail = () => {
 
   const emailFromState = state?.email?.trim();
   const displayEmail = emailFromState || getPendingLogin()?.email || "";
-  const returnLoginPath = state?.returnLoginPath ?? "/login";
-  const welcomeHubPath = returnLoginPath.startsWith("/mvp/") ? "/flows/mvp" : "/flows/post-mvp";
-
-  const isMvpFlow = returnLoginPath.startsWith("/mvp/");
-  const overviewPath = isMvpFlow ? "/mvp/overview" : "/overview";
+  const pending = getPendingLogin();
+  const isMvpFlow = pending?.track === "mvp";
+  const overviewPath = isMvpFlow ? mvpPath("/overview") : postMvpPath("/overview");
+  const returnLoginPath =
+    state?.returnLoginPath ?? (isMvpFlow ? mvpPath("/login") : postMvpPath("/login"));
+  const welcomeHubPath = isMvpFlow ? "/flows/mvp" : "/flows/post-mvp";
 
   useEffect(() => {
     if (isAuthenticated) {

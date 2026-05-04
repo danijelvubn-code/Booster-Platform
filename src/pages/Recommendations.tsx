@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Euro, Zap, Leaf, Shield, XCircle, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { postMvpPath } from "@/config/prototype-shell";
 
 const typeIcon: Record<string, typeof Euro> = {
   "Cost Optimization": Euro,
@@ -82,8 +83,8 @@ const Recommendations = () => {
 
                     {!isIgnored && (
                       <div className="flex gap-2 pt-2 flex-wrap">
-                        <Button size="sm" onClick={() => navigate(`/deploy?model=${rec.recommendedModelId}`)}>Add to Endpoint</Button>
-                        <Button size="sm" variant="outline" onClick={() => navigate(`/cosmos/${rec.recommendedModelId}`)}>
+                        <Button size="sm" onClick={() => navigate(postMvpPath(`/deploy?model=${rec.recommendedModelId}`))}>Add to Endpoint</Button>
+                        <Button size="sm" variant="outline" onClick={() => navigate(postMvpPath(`/cosmos/${rec.recommendedModelId}`))}>
                           <Sparkles className="h-3.5 w-3.5 mr-1" /> Analyse further
                         </Button>
                         <Button

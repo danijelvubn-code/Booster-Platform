@@ -2,6 +2,7 @@ import { tenant, endpoints } from "@/data/mockData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { postMvpPath } from "@/config/prototype-shell";
 import { Euro, LineChart as LineChartIcon, Plus } from "lucide-react";
 import { EndpointOverviewCard } from "@/components/EndpointOverviewCard";
 import OnboardingModal from "@/components/OnboardingModal";
@@ -90,7 +91,7 @@ const Overview = () => {
         <div className="flex flex-col gap-4">
         {/* KPI row */}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <Link to="/account" className="block min-h-0">
+          <Link to={postMvpPath("/account")} className="block min-h-0">
             <Card className="h-full border border-border bg-card shadow-sm transition-colors hover:border-ring">
               <CardContent className="flex gap-3 p-4">
                 <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-md bg-accent shadow-xs">
@@ -107,7 +108,7 @@ const Overview = () => {
             </Card>
           </Link>
 
-          <Link to="/observe" className="block min-h-0">
+          <Link to={postMvpPath("/observe")} className="block min-h-0">
             <Card className="h-full border border-border bg-card shadow-sm transition-colors hover:border-ring">
               <CardContent className="flex gap-3 p-4">
                 <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-md bg-accent shadow-xs">
@@ -248,7 +249,7 @@ const Overview = () => {
               </p>
             </div>
             <Button className="shrink-0" asChild>
-              <Link to="/endpoints/new">
+              <Link to={postMvpPath("/endpoints/new")}>
                 <Plus className="h-icon-16 w-icon-16" aria-hidden />
                 Create Endpoint
               </Link>

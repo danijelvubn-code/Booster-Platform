@@ -12,10 +12,11 @@ import { useEffect, useRef } from "react";
  *         (Gaussian offsets) so the field looks like real galactic clusters
  *         rather than uniform noise.
  *
- * All stars twinkle (per-particle phase + speed + depth) and are pushed away
- * from the cursor with a quadratic falloff inside `repelRadius`. Particles
- * spring back to their seed position. Motion respects
- * `prefers-reduced-motion`.
+ * Each star pulses slowly and irregularly: two independent sine beats per
+ * particle (random phases, speeds, depths, offset) plus a subtle radius breath,
+ * so the field feels like distant variable stars rather than a uniform blink.
+ * Cursor repulsion uses a quadratic falloff inside `repelRadius`; particles
+ * spring back. `prefers-reduced-motion` freezes pulse animation.
  *
  * Particle color is bound to `--primary-foreground` so the dots stay light in
  * both light and dark themes.
@@ -29,9 +30,14 @@ type Particle = {
   vy: number;
   size: number;
   alpha: number;
-  twinklePhase: number;
-  twinkleSpeed: number;
-  twinkleDepth: number;
+  /** Two slow, uncorrelated sine waves → irregular brightness pulse. */
+  pulsePhase1: number;
+  pulsePhase2: number;
+  pulseSpeed1: number;
+  pulseSpeed2: number;
+  pulseDepth1: number;
+  pulseDepth2: number;
+  pulseOffset: number;
 };
 
 type AuthBackdropProps = {
@@ -102,13 +108,17 @@ export function AuthBackdrop({
           vy: 0,
           size: 0.55 + Math.random() * 1.0,
           alpha: 0.28 + Math.random() * 0.5,
-          twinklePhase: Math.random() * Math.PI * 2,
-          twinkleSpeed: reduceMotion ? 0 : 0.008 + Math.random() * 0.022,
-          twinkleDepth: 0.1 + Math.random() * 0.25,
+          pulsePhase1: Math.random() * Math.PI * 2,
+          pulsePhase2: Math.random() * Math.PI * 2,
+          pulseSpeed1: reduceMotion ? 0 : 0.0014 + Math.random() * 0.0038,
+          pulseSpeed2: reduceMotion ? 0 : 0.001 + Math.random() * 0.0032,
+          pulseDepth1: 0.07 + Math.random() * 0.16,
+          pulseDepth2: 0.05 + Math.random() * 0.14,
+          pulseOffset: Math.random() * Math.PI * 2,
         });
       }
 
-      // Tier 2 — cluster stars: many tiny, twinkly pinpoints concentrated
+      // Tier 2 — cluster stars: many tiny pinpoints concentrated around random
       // around random centers (Gaussian spread). Cluster count scales gently
       // with viewport area so dense screens still get plenty of clusters.
       const referenceArea = 1280 * 720;
@@ -133,9 +143,13 @@ export function AuthBackdrop({
             vy: 0,
             size: 0.18 + Math.random() * 0.4,
             alpha: 0.14 + Math.random() * 0.45,
-            twinklePhase: Math.random() * Math.PI * 2,
-            twinkleSpeed: reduceMotion ? 0 : 0.012 + Math.random() * 0.045,
-            twinkleDepth: 0.25 + Math.random() * 0.45,
+            pulsePhase1: Math.random() * Math.PI * 2,
+            pulsePhase2: Math.random() * Math.PI * 2,
+            pulseSpeed1: reduceMotion ? 0 : 0.0018 + Math.random() * 0.0045,
+            pulseSpeed2: reduceMotion ? 0 : 0.0012 + Math.random() * 0.004,
+            pulseDepth1: 0.12 + Math.random() * 0.28,
+            pulseDepth2: 0.1 + Math.random() * 0.22,
+            pulseOffset: Math.random() * Math.PI * 2,
           });
         }
       }
@@ -193,14 +207,25 @@ export function AuthBackdrop({
         p.x += p.vx;
         p.y += p.vy;
 
-        p.twinklePhase += p.twinkleSpeed;
-        const twinkle = 1 + Math.sin(p.twinklePhase) * p.twinkleDepth;
+        p.pulsePhase1 += p.pulseSpeed1;
+        p.pulsePhase2 += p.pulseSpeed2;
+        const pulseBright =
+          1 +
+          Math.sin(p.pulsePhase1) * p.pulseDepth1 +
+          Math.sin(p.pulsePhase2 + p.pulseOffset) * p.pulseDepth2;
+        const clampedBright = Math.min(1.35, Math.max(0.42, pulseBright));
+
         const speed = Math.min(1, Math.hypot(p.vx, p.vy) * 0.35);
-        const alpha = Math.min(0.95, p.alpha * twinkle + speed * 0.4);
+        const alpha = Math.min(0.95, p.alpha * clampedBright + speed * 0.4);
+
+        const pulseRadius =
+          1 +
+          (reduceMotion ? 0 : 0.07 * Math.sin(p.pulsePhase1 * 0.62 + p.pulseOffset * 0.41));
+        const radius = p.size * pulseRadius + speed * 1.1;
 
         ctx.fillStyle = readParticleColor(alpha);
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size + speed * 1.1, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
         ctx.fill();
       }
 

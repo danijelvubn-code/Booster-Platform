@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { publicAssetUrl } from "@/lib/public-asset-url";
 
 const checklistItems = [
   "24px avatar preserves circle shape and centered content",
@@ -120,7 +121,10 @@ const ComponentAvatarsLab = () => {
                 <div className="space-y-2">
                   <p className="text-caption text-muted-foreground">Initials fallback</p>
                   <Avatar className={size.avatarClassName}>
-                    <AvatarImage src="/__avatar_fallback_test__.png" alt={`${size.label} fallback avatar`} />
+                    <AvatarImage
+                      src={publicAssetUrl("__avatar_fallback_test__.png")}
+                      alt={`${size.label} fallback avatar`}
+                    />
                     <AvatarFallback className={size.fallbackTextClassName}>
                       {initialsBySize[size.label]}
                     </AvatarFallback>

@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ChevronLeft, KeyRound, LogIn, Zap } from "lucide-react";
 
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { mvpPath, postMvpPath } from "@/config/prototype-shell";
+import { IS_MVP_BUILD, mvpPath, postMvpPath } from "@/config/prototype-shell";
 import { cn } from "@/lib/utils";
 
 /**
@@ -28,7 +28,12 @@ const MvpAuthFlows = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div
+          className={cn(
+            "grid grid-cols-1 gap-4",
+            IS_MVP_BUILD ? "md:grid-cols-2" : "md:grid-cols-3",
+          )}
+        >
           <button
             type="button"
             onClick={() => navigate(mvpPath("/login"))}
@@ -81,31 +86,33 @@ const MvpAuthFlows = () => {
             </Card>
           </button>
 
-          <button
-            type="button"
-            onClick={() => navigate(postMvpPath("/reset-password"))}
-            className={cn(
-              "text-left transition-colors ease-standard",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-lg",
-            )}
-          >
-            <Card
+          {!IS_MVP_BUILD ? (
+            <button
+              type="button"
+              onClick={() => navigate(postMvpPath("/reset-password"))}
               className={cn(
-                "h-full cursor-pointer border-border bg-card shadow-sm",
-                "hover:border-ring hover:bg-accent/30",
+                "text-left transition-colors ease-standard",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-lg",
               )}
             >
-              <CardHeader className="flex flex-row items-start gap-4 space-y-0 p-6">
-                <KeyRound className="h-icon-24 w-icon-24 shrink-0 text-primary" aria-hidden />
-                <div className="min-w-0 space-y-1">
-                  <CardTitle className="text-h3 text-foreground">Reset password</CardTitle>
-                  <CardDescription className="text-body-sm text-muted-foreground">
-                    Shared reset flow; return to MVP login from the confirmation screen when testing MVP
-                  </CardDescription>
-                </div>
-              </CardHeader>
-            </Card>
-          </button>
+              <Card
+                className={cn(
+                  "h-full cursor-pointer border-border bg-card shadow-sm",
+                  "hover:border-ring hover:bg-accent/30",
+                )}
+              >
+                <CardHeader className="flex flex-row items-start gap-4 space-y-0 p-6">
+                  <KeyRound className="h-icon-24 w-icon-24 shrink-0 text-primary" aria-hidden />
+                  <div className="min-w-0 space-y-1">
+                    <CardTitle className="text-h3 text-foreground">Reset password</CardTitle>
+                    <CardDescription className="text-body-sm text-muted-foreground">
+                      Shared reset flow; return to MVP login from the confirmation screen when testing MVP
+                    </CardDescription>
+                  </div>
+                </CardHeader>
+              </Card>
+            </button>
+          ) : null}
         </div>
       </div>
     </div>

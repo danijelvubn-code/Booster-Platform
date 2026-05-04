@@ -7,8 +7,116 @@
   "redirects": [{ "source": "/", "destination": "/booster/", "permanent": false }],
   "rewrites": [
     {
+      "source": "/booster/mvp/post-mvp/assets/:path*",
+      "destination": "/assets/:path*"
+    },
+    {
+      "source": "/booster/mvp/post-mvp/lovable-uploads/:path*",
+      "destination": "/lovable-uploads/:path*"
+    },
+    {
+      "source": "/booster/mvp/post-mvp/logos/:path*",
+      "destination": "/logos/:path*"
+    },
+    {
+      "source": "/booster/mvp/post-mvp/first-time-user.svg",
+      "destination": "/first-time-user.svg"
+    },
+    {
+      "source": "/booster/mvp/post-mvp/login-illustration.svg",
+      "destination": "/login-illustration.svg"
+    },
+    {
+      "source": "/booster/mvp/post-mvp/design-building-blocks-illustration.svg",
+      "destination": "/design-building-blocks-illustration.svg"
+    },
+    {
+      "source": "/booster/mvp/post-mvp/placeholder.svg",
+      "destination": "/placeholder.svg"
+    },
+    {
+      "source": "/booster/mvp/post-mvp/robots.txt",
+      "destination": "/robots.txt"
+    },
+    {
+      "source": "/booster/mvp/post-mvp/favicon.svg",
+      "destination": "/favicon.svg"
+    },
+    {
+      "source": "/booster/mvp/post-mvp/favicon.ico",
+      "destination": "/favicon.ico"
+    },
+    {
+      "source": "/booster/mvp/assets/:path*",
+      "destination": "/assets/:path*"
+    },
+    {
+      "source": "/booster/mvp/lovable-uploads/:path*",
+      "destination": "/lovable-uploads/:path*"
+    },
+    {
+      "source": "/booster/mvp/logos/:path*",
+      "destination": "/logos/:path*"
+    },
+    {
+      "source": "/booster/mvp/first-time-user.svg",
+      "destination": "/first-time-user.svg"
+    },
+    {
+      "source": "/booster/mvp/login-illustration.svg",
+      "destination": "/login-illustration.svg"
+    },
+    {
+      "source": "/booster/mvp/design-building-blocks-illustration.svg",
+      "destination": "/design-building-blocks-illustration.svg"
+    },
+    {
+      "source": "/booster/mvp/placeholder.svg",
+      "destination": "/placeholder.svg"
+    },
+    {
+      "source": "/booster/mvp/robots.txt",
+      "destination": "/robots.txt"
+    },
+    {
+      "source": "/booster/mvp/favicon.svg",
+      "destination": "/favicon.svg"
+    },
+    {
+      "source": "/booster/mvp/favicon.ico",
+      "destination": "/favicon.ico"
+    },
+    {
       "source": "/booster/assets/:path*",
       "destination": "/assets/:path*"
+    },
+    {
+      "source": "/booster/lovable-uploads/:path*",
+      "destination": "/lovable-uploads/:path*"
+    },
+    {
+      "source": "/booster/logos/:path*",
+      "destination": "/logos/:path*"
+    },
+    {
+      "source": "/booster/first-time-user.svg",
+      "destination": "/first-time-user.svg"
+    },
+    {
+      "source": "/booster/login-illustration.svg",
+      "destination": "/login-illustration.svg"
+    },
+    {
+      "source": "/booster/design-building-blocks-illustration.svg",
+      "destination": "/design-building-blocks-illustration.svg"
+    },
+    {
+      "source": "/booster/placeholder.svg",
+      "destination": "/placeholder.svg"
+    },
+    {
+      "source": "/booster/robots.txt",
+      "destination": "/robots.txt"
     },
     {
       "source": "/booster/favicon.svg",
@@ -17,6 +125,30 @@
     {
       "source": "/booster/favicon.ico",
       "destination": "/favicon.ico"
+    },
+    {
+      "source": "/booster/mvp/post-mvp",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/booster/mvp/post-mvp/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/booster/mvp/post-mvp/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/booster/mvp",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/booster/mvp/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/booster/mvp/:path*",
+      "destination": "/index.html"
     },
     {
       "source": "/booster",

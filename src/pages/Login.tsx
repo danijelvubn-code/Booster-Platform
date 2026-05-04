@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { InputControl, InputLeadIcon, InputRoot, InputSegment, Label } from "@/components/ui/input";
 import { postMvpPath } from "@/config/prototype-shell";
+import { publicAssetUrl } from "@/lib/public-asset-url";
 
 const welcomeLogoLinkClass =
   "inline-flex items-center gap-2 rounded-md outline-none ring-offset-background transition-colors ease-standard focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
@@ -66,7 +67,7 @@ const Login = () => {
         <img
           alt=""
           className="h-full w-full object-cover"
-          src="/lovable-uploads/datacenter-login-bg.png"
+          src={publicAssetUrl("lovable-uploads/datacenter-login-bg.png")}
         />
         <div className="absolute inset-0 backdrop-blur-sm bg-overlay-scrim" />
       </div>

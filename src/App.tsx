@@ -62,6 +62,33 @@ const AuthGate = () => {
   const { isAuthenticated, track } = useAuth();
 
   if (!isAuthenticated) {
+    if (IS_MVP_BUILD) {
+      return (
+        <Routes>
+          <Route index element={<Navigate to="flows/mvp" replace />} />
+          <Route path="flows/mvp" element={<MvpAuthFlows />} />
+          <Route path={mvpAuthRouteSegment("/login")} element={<LoginMvp />} />
+          <Route path={mvpAuthRouteSegment("/first-time-user")} element={<MvpFirstTimeUser />} />
+          <Route path={mvpAuthRouteSegment("/get-started")} element={<GetStarted />} />
+          <Route path="*" element={<Navigate to="flows/mvp" replace />} />
+        </Routes>
+      );
+    }
+    if (IS_POST_MVP_BUILD) {
+      return (
+        <Routes>
+          <Route index element={<Navigate to="flows/post-mvp" replace />} />
+          <Route path="flows/post-mvp" element={<PostMvpAuthFlows />} />
+          <Route path={postMvpAuthRouteSegment("/first-time-user")} element={<FirstTimeUser />} />
+          <Route path={postMvpAuthRouteSegment("/login")} element={<Login />} />
+          <Route path={postMvpAuthRouteSegment("/get-started")} element={<GetStarted />} />
+          <Route path={postMvpAuthRouteSegment("/reset-password")} element={<ResetPasswordRequest />} />
+          <Route path={postMvpAuthRouteSegment("/verify-email")} element={<VerifyEmail />} />
+          <Route path="*" element={<Navigate to="flows/post-mvp" replace />} />
+        </Routes>
+      );
+    }
+
     return (
       <Routes>
         <Route index element={<EntryChoice />} />
@@ -146,14 +173,16 @@ const AuthGate = () => {
       <Route path={postMvpAuthRouteSegment("/get-started")} element={<Navigate to={postMvpPath("/overview")} replace />} />
       <Route path={postMvpAuthRouteSegment("/reset-password")} element={<Navigate to={postMvpPath("/overview")} replace />} />
       <Route path={postMvpAuthRouteSegment("/verify-email")} element={<Navigate to={postMvpPath("/overview")} replace />} />
-      <Route path="mvp/*" element={<Navigate to={postMvpPath("/overview")} replace />} />
       {IS_COMBINED_PROTOTYPE ? <DesignSystemLabsRoute /> : null}
       {IS_POST_MVP_BUILD ? (
         <Route element={<AppLayout />}>{postMvpAppOutletRoutes}</Route>
       ) : (
-        <Route path="post-mvp" element={<AppLayout />}>
-          {postMvpAppOutletRoutes}
-        </Route>
+        <>
+          <Route path="mvp/post-mvp" element={<AppLayout />}>
+            {postMvpAppOutletRoutes}
+          </Route>
+          <Route path="mvp/*" element={<Navigate to={postMvpPath("/overview")} replace />} />
+        </>
       )}
     </Routes>
   );

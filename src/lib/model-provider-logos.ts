@@ -1,16 +1,15 @@
-/** Public URL base for provider marks (files under `public/logos/model-sources/`). */
-const BASE = "/logos/model-sources" as const;
+import { publicAssetUrl } from "@/lib/public-asset-url";
 
 /** Exact `model.provider` string → logo path. */
 const MODEL_PROVIDER_LOGO_BY_PROVIDER: Record<string, string> = {
-  "Mistral AI": `${BASE}/mistral.svg`,
-  Meta: `${BASE}/meta.svg`,
-  Alibaba: `${BASE}/alibaba.svg`,
-  DeepSeek: `${BASE}/deep-seek.svg`,
-  Google: `${BASE}/google.svg`,
-  OpenAI: `${BASE}/openai.svg`,
-  EuroLLM: `${BASE}/eurollm.svg`,
-  Multiverse: `${BASE}/multiverse.svg`,
+  "Mistral AI": publicAssetUrl("logos/model-sources/mistral.svg"),
+  Meta: publicAssetUrl("logos/model-sources/meta.svg"),
+  Alibaba: publicAssetUrl("logos/model-sources/alibaba.svg"),
+  DeepSeek: publicAssetUrl("logos/model-sources/deep-seek.svg"),
+  Google: publicAssetUrl("logos/model-sources/google.svg"),
+  OpenAI: publicAssetUrl("logos/model-sources/openai.svg"),
+  EuroLLM: publicAssetUrl("logos/model-sources/eurollm.svg"),
+  Multiverse: publicAssetUrl("logos/model-sources/multiverse.svg"),
 };
 
 export function getProviderInitials(provider: string): string {
@@ -25,7 +24,7 @@ export function getProviderInitials(provider: string): string {
 export function getModelProviderLogoSrc(provider: string, modelName?: string): string | undefined {
   const p = provider.trim();
   if (p === "Alibaba" && modelName != null && /qwen/i.test(modelName)) {
-    return `${BASE}/qwen.svg`;
+    return publicAssetUrl("logos/model-sources/qwen.svg");
   }
   return MODEL_PROVIDER_LOGO_BY_PROVIDER[p];
 }

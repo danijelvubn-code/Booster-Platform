@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => ({
     mode === "mvp"
       ? "/booster/mvp/"
       : mode === "post-mvp"
-        ? "/booster/post-mvp/"
+        ? "/booster/mvp/post-mvp/"
         : "/booster/",
   server: {
     host: "::",

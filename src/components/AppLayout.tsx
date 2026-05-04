@@ -2,7 +2,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import AppHeader from "@/components/AppHeader";
-import { IS_POST_MVP_BUILD, postMvpPath } from "@/config/prototype-shell";
+import { IS_POST_MVP_BUILD, postMvpPath, POST_MVP_NAV_PREFIX_COMBINED } from "@/config/prototype-shell";
 
 const AppLayout = () => {
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ const AppLayout = () => {
         </div>
       )}
 
-      <AppHeader logoHref={postMvpPath("/overview")} navPathPrefix={IS_POST_MVP_BUILD ? "" : "/post-mvp"} />
+      <AppHeader logoHref={postMvpPath("/overview")} navPathPrefix={IS_POST_MVP_BUILD ? "" : POST_MVP_NAV_PREFIX_COMBINED} />
 
       {/* Impersonation watermark */}
       {isImpersonating && (

@@ -10,6 +10,7 @@ import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { clearPendingLogin, getPendingLogin } from "@/lib/pending-login";
 import { mvpPath, postMvpPath } from "@/config/prototype-shell";
+import { publicAssetUrl } from "@/lib/public-asset-url";
 
 const welcomeLogoLinkClass =
   "inline-flex items-center gap-2 rounded-md outline-none ring-offset-background transition-colors ease-standard focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
@@ -74,7 +75,11 @@ const VerifyEmail = () => {
   return (
     <div className="relative flex min-h-screen w-full flex-1 flex-col" data-testid="page-verify-email">
       <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
-        <img alt="" className="h-full w-full object-cover" src="/lovable-uploads/datacenter-login-bg.png" />
+        <img
+          alt=""
+          className="h-full w-full object-cover"
+          src={publicAssetUrl("lovable-uploads/datacenter-login-bg.png")}
+        />
         <div className="absolute inset-0 backdrop-blur-sm bg-overlay-scrim" />
       </div>
 

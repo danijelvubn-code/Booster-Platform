@@ -1,0 +1,62 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "installCommand": "npm install",
+  "buildCommand": "npm run build:post-mvp",
+  "outputDirectory": "dist",
+  "redirects": [{ "source": "/", "destination": "/booster/mvp/post-mvp/", "permanent": false }],
+  "rewrites": [
+    {
+      "source": "/booster/mvp/post-mvp/assets/:path*",
+      "destination": "/assets/:path*"
+    },
+    {
+      "source": "/booster/mvp/post-mvp/lovable-uploads/:path*",
+      "destination": "/lovable-uploads/:path*"
+    },
+    {
+      "source": "/booster/mvp/post-mvp/logos/:path*",
+      "destination": "/logos/:path*"
+    },
+    {
+      "source": "/booster/mvp/post-mvp/first-time-user.svg",
+      "destination": "/first-time-user.svg"
+    },
+    {
+      "source": "/booster/mvp/post-mvp/login-illustration.svg",
+      "destination": "/login-illustration.svg"
+    },
+    {
+      "source": "/booster/mvp/post-mvp/design-building-blocks-illustration.svg",
+      "destination": "/design-building-blocks-illustration.svg"
+    },
+    {
+      "source": "/booster/mvp/post-mvp/placeholder.svg",
+      "destination": "/placeholder.svg"
+    },
+    {
+      "source": "/booster/mvp/post-mvp/robots.txt",
+      "destination": "/robots.txt"
+    },
+    {
+      "source": "/booster/mvp/post-mvp/favicon.svg",
+      "destination": "/favicon.svg"
+    },
+    {
+      "source": "/booster/mvp/post-mvp/favicon.ico",
+      "destination": "/favicon.ico"
+    },
+    {
+      "source": "/booster/mvp/post-mvp",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/booster/mvp/post-mvp/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/booster/mvp/post-mvp/:path*",
+      "destination": "/index.html"
+    }
+  ]
+}

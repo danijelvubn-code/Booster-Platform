@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { COMPONENT_LABS_DEFAULT_PATH } from "@/lib/component-labs";
+import { publicAssetUrl } from "@/lib/public-asset-url";
 import { ChevronRight } from "lucide-react";
 
 /**
@@ -46,7 +47,7 @@ const EntryChoice = () => {
           <CardHeader className="gap-4 space-y-0">
             <div className="flex w-full justify-center">
               <img
-                src="/first-time-user.svg"
+                src={publicAssetUrl("first-time-user.svg")}
                 alt=""
                 className="h-entry-choice-illustration w-full max-w-full object-contain object-center"
               />
@@ -82,7 +83,7 @@ const EntryChoice = () => {
           <CardHeader className="gap-4 space-y-0">
             <div className="flex w-full justify-center">
               <img
-                src="/login-illustration.svg"
+                src={publicAssetUrl("login-illustration.svg")}
                 alt=""
                 className="h-entry-choice-illustration w-full max-w-full object-contain object-center"
               />
@@ -118,7 +119,7 @@ const EntryChoice = () => {
           <CardHeader className="gap-4 space-y-0">
             <div className="flex w-full justify-center">
               <img
-                src="/design-building-blocks-illustration.svg"
+                src={publicAssetUrl("design-building-blocks-illustration.svg")}
                 alt=""
                 className="h-entry-choice-illustration w-full max-w-full object-contain object-center"
               />

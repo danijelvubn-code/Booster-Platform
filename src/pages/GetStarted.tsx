@@ -4,8 +4,9 @@ import { CheckCircle2, Eye, EyeOff, Zap } from "lucide-react";
 
 import { AuthFlowCardShell } from "@/components/AuthFlowCardShell";
 import { Button } from "@/components/ui/button";
-import { IS_MVP_BUILD, mvpPath, postMvpPath } from "@/config/prototype-shell";
+import { IS_MVP_BUILD, IS_POST_MVP_BUILD, isMvpShellPath, mvpPath, postMvpPath } from "@/config/prototype-shell";
 import { InputControl, InputRoot, InputSegment, Label } from "@/components/ui/input";
+import { publicAssetUrl } from "@/lib/public-asset-url";
 import { cn } from "@/lib/utils";
 
 /** Placeholder copy until org/user come from invite context. */
@@ -68,7 +69,7 @@ const GetStarted = () => {
   const confirmHasError = confirm.length > 0 && (confirmTooLong || confirmPrefixMismatch);
   const passwordsMatch = password.length > 0 && password === confirm;
   const canSubmit = rules.allMet && passwordsMatch;
-  const isMvpFlow = IS_MVP_BUILD || location.pathname.startsWith("/mvp/");
+  const isMvpFlow = IS_MVP_BUILD || (!IS_POST_MVP_BUILD && isMvpShellPath(location.pathname));
   const loginHref = isMvpFlow ? mvpPath("/login") : postMvpPath("/login");
   const welcomeHref = isMvpFlow ? "/flows/mvp" : "/flows/post-mvp";
 
@@ -115,7 +116,7 @@ const GetStarted = () => {
         <img
           alt=""
           className="h-full w-full object-cover"
-          src="/lovable-uploads/datacenter-login-bg.png"
+          src={publicAssetUrl("lovable-uploads/datacenter-login-bg.png")}
         />
         <div className="absolute inset-0 backdrop-blur-sm bg-overlay-scrim" />
       </div>

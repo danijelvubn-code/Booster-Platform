@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ChevronDown, HelpCircle, LayoutGrid, LogOut, Shield, User, Zap } from "lucide-react";
+import { ChevronDown, HelpCircle, LayoutGrid, LogOut, Shield, User } from "lucide-react";
 
+import { BoosterLogo } from "@/components/brand/BoosterLogo";
 import { useAuth } from "@/contexts/AuthContext";
 import { IS_COMBINED_PROTOTYPE, mvpPath, postMvpPath } from "@/config/prototype-shell";
 import { COMPONENT_LABS_DEFAULT_PATH } from "@/lib/component-labs";
@@ -78,9 +79,12 @@ const AppHeader = ({
       )}
     >
       <div className="flex h-14 w-full items-center justify-between gap-4 px-6">
-        <Link to={logoHref} className="flex shrink-0 items-center gap-1.5 font-bold text-lg text-foreground">
-          <Zap className="h-icon-20 w-icon-20 text-primary fill-primary" aria-hidden />
-          <span>booster</span>
+        <Link
+          to={logoHref}
+          className="flex shrink-0 items-center gap-1.5 rounded-md outline-none ring-offset-background transition-colors ease-standard focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          aria-label="Booster home"
+        >
+          <BoosterLogo variant="lockup" tone="on-light" size="sm" presentation />
           {badge ? (
             <span className="ml-1 rounded-md border border-border px-2 py-0.5 text-caption font-medium text-muted-foreground">
               {badge}
@@ -207,10 +211,12 @@ const AppHeader = ({
                   <User className="mr-2 h-icon-16 w-icon-16" aria-hidden />
                   Account
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate(track === "mvp" ? mvpPath("/help") : postMvpPath("/help"))}>
-                  <HelpCircle className="mr-2 h-icon-16 w-icon-16" aria-hidden />
-                  Help
-                </DropdownMenuItem>
+                {track !== "mvp" ? (
+                  <DropdownMenuItem onClick={() => navigate(postMvpPath("/help"))}>
+                    <HelpCircle className="mr-2 h-icon-16 w-icon-16" aria-hidden />
+                    Help
+                  </DropdownMenuItem>
+                ) : null}
                 {import.meta.env.DEV && IS_COMBINED_PROTOTYPE ? (
                   <DropdownMenuItem onClick={() => navigate(COMPONENT_LABS_DEFAULT_PATH)}>
                     <LayoutGrid className="mr-2 h-icon-16 w-icon-16" aria-hidden />

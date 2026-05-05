@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
+import { BackToPrevious } from "@/components/model-detail/BackToPrevious";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  ArrowLeft,
   ArrowRight,
   ChevronDown,
   ChevronUp,
@@ -117,12 +117,7 @@ export function ModelDetailView({ model, cosmosListPath, endpointsNewPath }: Mod
 
   return (
     <div className="container space-y-6 py-8">
-      <Button asChild variant="ghost" size="sm" className="-ml-3">
-        <Link to={cosmosListPath}>
-          <ArrowLeft className="mr-1 h-icon-16 w-icon-16" aria-hidden />
-          All models
-        </Link>
-      </Button>
+      <BackToPrevious to={cosmosListPath} />
 
       {/* Hero */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">

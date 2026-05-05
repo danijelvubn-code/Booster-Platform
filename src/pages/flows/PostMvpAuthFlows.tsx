@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
-import { ChevronLeft, KeyRound, LogIn, UserPlus, Zap } from "lucide-react";
+import { ChevronLeft, KeyRound, LogIn, UserPlus } from "lucide-react";
 
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BoosterLogo } from "@/components/brand/BoosterLogo";
 import { postMvpPath } from "@/config/prototype-shell";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
@@ -81,7 +82,7 @@ const PostMvpAuthFlows = () => {
               )}
             >
               <CardHeader className="flex flex-row items-start gap-4 space-y-0 p-6">
-                <Zap className="h-icon-24 w-icon-24 shrink-0 text-primary" aria-hidden />
+                <BoosterLogo variant="mark" size="md" />
                 <div className="min-w-0 space-y-1">
                   <CardTitle className="text-h3 text-foreground">Skip login</CardTitle>
                   <CardDescription className="text-body-sm text-muted-foreground">

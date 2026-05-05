@@ -17,6 +17,7 @@ import MvpModelDetail from "./pages/mvp/ModelDetail";
 import MvpModelDetailAlt from "./pages/mvp/ModelDetailAlt";
 import MvpModelDetailAlt2 from "./pages/mvp/ModelDetailAlt2";
 import MvpGuidedModelSelection from "./pages/mvp/GuidedModelSelection";
+import MvpAccount from "./pages/mvp/Account";
 import MvpAppLayout from "./components/mvp/MvpAppLayout";
 import MvpAuthFlows from "./pages/flows/MvpAuthFlows";
 import PostMvpAuthFlows from "./pages/flows/PostMvpAuthFlows";
@@ -110,6 +111,7 @@ const AuthGate = () => {
   const mvpAppOutletRoutes = (
     <>
       <Route path="overview" element={<MvpOverview />} />
+      <Route path="account" element={<MvpAccount />} />
       <Route path="endpoints/new" element={<MvpCreateEndpoint />} />
       <Route path="endpoints/:endpointId/edit" element={<EditEndpoint />} />
       <Route path="endpoints/:endpointId" element={<EndpointDetail />} />

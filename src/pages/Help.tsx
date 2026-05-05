@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BoosterLogo } from "@/components/brand/BoosterLogo";
 import { ArrowRight, Zap, Box, Layers, Shield, Sparkles } from "lucide-react";
 
 const Help = () => (
@@ -9,7 +10,7 @@ const Help = () => (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Zap className="h-5 w-5 text-primary fill-primary" />
+          <BoosterLogo variant="mark" size="sm" />
           How Booster Routing Works
         </CardTitle>
       </CardHeader>

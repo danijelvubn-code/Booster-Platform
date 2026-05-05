@@ -16,7 +16,9 @@ import { useEffect, useRef } from "react";
  * particle (random phases, speeds, depths, offset) plus a subtle radius breath,
  * so the field feels like distant variable stars rather than a uniform blink.
  * Cursor repulsion uses a quadratic falloff inside `repelRadius`; particles
- * spring back. `prefers-reduced-motion` freezes pulse animation.
+ * spring back. `prefers-reduced-motion` freezes pulse animation. A handful of
+ * the largest near stars render faint diffraction spikes (cardinal + weaker
+ * diagonals) like a bright star through a small aperture.
  *
  * Particle color is bound to `--primary-foreground` so the dots stay light in
  * both light and dark themes.
@@ -38,6 +40,10 @@ type Particle = {
   pulseDepth1: number;
   pulseDepth2: number;
   pulseOffset: number;
+  /** Brighter “near” stars only: draw optical-style diffraction spikes. */
+  diffractionSpikes?: boolean;
+  /** Spike reach from center = radius × this multiplier. */
+  spikeLengthMul?: number;
 };
 
 type AuthBackdropProps = {
@@ -52,6 +58,47 @@ type AuthBackdropProps = {
   /** Strength multiplier of the cursor push. */
   repelStrength?: number;
 };
+
+/** How many of the largest tier-1 stars get optical-style spike rays. */
+const DIFFRACTION_SPIKE_STAR_COUNT = 4;
+
+function drawDiffractionSpikes(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  coreRadius: number,
+  spikeAlpha: number,
+  spikeLengthMul: number,
+  colorAtAlpha: (a: number) => string,
+): void {
+  const length = coreRadius * spikeLengthMul;
+  const inner = Math.max(coreRadius * 0.35, 1);
+  const cardinal = [0, Math.PI / 2, Math.PI, (3 * Math.PI) / 2];
+  const diagonal = [Math.PI / 4, (3 * Math.PI) / 4, (5 * Math.PI) / 4, (7 * Math.PI) / 4];
+
+  const drawRay = (angle: number, strength: number) => {
+    const x0 = cx + Math.cos(angle) * inner;
+    const y0 = cy + Math.sin(angle) * inner;
+    const x1 = cx + Math.cos(angle) * length;
+    const y1 = cy + Math.sin(angle) * length;
+    const g = ctx.createLinearGradient(x0, y0, x1, y1);
+    const a0 = spikeAlpha * strength * 0.55;
+    const a1 = spikeAlpha * strength * 0.18;
+    g.addColorStop(0, colorAtAlpha(a0));
+    g.addColorStop(0.42, colorAtAlpha(a1));
+    g.addColorStop(1, colorAtAlpha(0));
+    ctx.strokeStyle = g;
+    ctx.lineWidth = Math.max(0.55, Math.min(1.35, coreRadius * 0.11));
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x1, y1);
+    ctx.stroke();
+  };
+
+  for (const ang of cardinal) drawRay(ang, 1);
+  for (const ang of diagonal) drawRay(ang, 0.42);
+}
 
 /** Standard normal sample via Box-Muller. */
 function gaussian(): number {
@@ -118,9 +165,18 @@ export function AuthBackdrop({
         });
       }
 
+      const tier1Indices = Array.from({ length: uniformCount }, (_, i) => i);
+      tier1Indices.sort((i, j) => arr[j]!.size - arr[i]!.size);
+      const spikeN = Math.min(DIFFRACTION_SPIKE_STAR_COUNT, tier1Indices.length);
+      for (let s = 0; s < spikeN; s++) {
+        const star = arr[tier1Indices[s]!]!;
+        star.diffractionSpikes = true;
+        star.spikeLengthMul = 10 + Math.random() * 9;
+      }
+
       // Tier 2 — cluster stars: many tiny pinpoints concentrated around random
-      // around random centers (Gaussian spread). Cluster count scales gently
-      // with viewport area so dense screens still get plenty of clusters.
+      // centers (Gaussian spread). Cluster count scales gently with viewport
+      // area so dense screens still get plenty of clusters.
       const referenceArea = 1280 * 720;
       const scaledClusters = Math.max(
         6,
@@ -222,6 +278,10 @@ export function AuthBackdrop({
           1 +
           (reduceMotion ? 0 : 0.07 * Math.sin(p.pulsePhase1 * 0.62 + p.pulseOffset * 0.41));
         const radius = p.size * pulseRadius + speed * 1.1;
+
+        if (p.diffractionSpikes && p.spikeLengthMul != null) {
+          drawDiffractionSpikes(ctx, p.x, p.y, radius, alpha, p.spikeLengthMul, readParticleColor);
+        }
 
         ctx.fillStyle = readParticleColor(alpha);
         ctx.beginPath();

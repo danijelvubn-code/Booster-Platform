@@ -127,6 +127,11 @@
       0 12px 22px -8px hsl(0 0% 0% / 0.12);
 
     --tracking-normal: 0em;
+
+    /* Auth marketing hero — headline / subtitle beside login card. */
+    --font-size-auth-hero-headline: 4rem; /* 64px */
+    --font-size-auth-hero-subtitle: 1.75rem; /* 28px */
+
     --spacing: 0.25rem;
     /* Spacing scale (used for padding and gap). */
     --space-0: 0rem; /* 0px */
@@ -160,6 +165,7 @@
     --icon-size-28: 1.75rem; /* 28px */
     --icon-size-32: 2rem; /* 32px */
     --icon-size-40: 2.5rem; /* 40px */
+    --icon-size-60: 3.75rem; /* 60px — e.g. hero BoosterLogo (1.5× icon-40) */
     --icon-size-72: 4.5rem; /* 72px */
     --icon-container-size-104: 6.5rem; /* 104px */
 
@@ -361,6 +367,7 @@
     --icon-size-28: 1.75rem; /* 28px */
     --icon-size-32: 2rem; /* 32px */
     --icon-size-40: 2.5rem; /* 40px */
+    --icon-size-60: 3.75rem; /* 60px — e.g. hero BoosterLogo (1.5× icon-40) */
     --icon-size-72: 4.5rem; /* 72px */
     --icon-container-size-104: 6.5rem; /* 104px */
 
@@ -419,6 +426,22 @@
    */
   .text-info.text-info-hover-dim:hover {
     color: color-mix(in oklch, oklch(var(--info)) 88%, black 12%);
+  }
+
+  .text-auth-hero-headline {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-auth-hero-headline);
+    line-height: 1.12;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .text-auth-hero-subtitle {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-auth-hero-subtitle);
+    line-height: 1.35;
+    font-weight: 400;
+    letter-spacing: var(--tracking-normal);
   }
 
   .text-display {

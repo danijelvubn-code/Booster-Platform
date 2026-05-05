@@ -25,6 +25,7 @@ import ModelFilters, {
   applyModelFilters,
   isFiltersActive,
 } from "@/components/ModelFilters";
+import { PageHeader } from "@/components/layout";
 
 const COSMOS_PAGE_SIZE = 16;
 
@@ -186,23 +187,19 @@ const MvpCosmos = () => {
     <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain">
         <div className="container space-y-6 py-8">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-h1 font-bold tracking-tight">Model Cosmos</h1>
-          <p className="text-body-sm text-muted-foreground mt-1 max-w-page-intro">
-            Explore models designed for different tasks and performance needs. Assign to endpoints and switch anytime
-            without disruption.
-          </p>
-        </div>
-        <div className="flex shrink-0 items-center gap-2 sm:pb-0.5">
+      <PageHeader
+        title="Model Cosmos"
+        description="Explore models designed for different tasks and performance needs. Assign to endpoints and switch anytime without disruption."
+        descriptionMaxWidthPageIntro
+        actions={
           <Link to={mvpPath("/endpoints/new")}>
             <Button>
               <Plus className="h-icon-16 w-icon-16" aria-hidden />
               Create Endpoint
             </Button>
           </Link>
-        </div>
-      </div>
+        }
+      />
 
       {/* Search + filters (left) · Quick filter + guided (right) */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
@@ -329,7 +326,7 @@ const MvpCosmos = () => {
               )}
             </div>
           )}
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {paginatedModels.map((model) => {
               // Alternative 2 route is explicit and consistent for every card.
               const detailPath = mvpPath(`/cosmos/${model.id}/alt2`);

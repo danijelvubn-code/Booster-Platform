@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { ChevronLeft, Zap } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { AuthBackdrop } from "@/components/AuthBackdrop";
+import { AuthHeroBranding } from "@/components/AuthHeroBranding";
+import { BoosterLogo } from "@/components/brand/BoosterLogo";
 import { AuthFlowCardShell } from "@/components/AuthFlowCardShell";
 import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot, REGEXP_ONLY_DIGITS } from "@/components/ui/input-otp";
@@ -77,23 +79,25 @@ const VerifyEmail = () => {
       <AuthBackdrop />
 
       <div className="relative z-10 flex min-h-0 flex-1 flex-col items-center lg:flex-row lg:items-stretch">
-        <div className="relative hidden min-h-0 flex-1 flex-col items-center justify-center px-6 py-12 lg:flex lg:w-[55%]">
-          <Link to={welcomeHubPath} className={welcomeLogoLinkClass}>
-            <div className="flex items-center justify-center gap-3">
-              <Zap className="h-icon-40 w-icon-40 fill-primary text-primary" aria-hidden="true" />
-              <span className="text-display font-semibold tracking-tight text-primary-foreground">booster</span>
-            </div>
-          </Link>
+        <div className="relative hidden min-h-0 flex-1 flex-col items-center px-6 py-12 lg:flex lg:w-[55%]">
+          <div className="flex w-full max-w-[640px] shrink-0 justify-center">
+            <Link to={welcomeHubPath} className={welcomeLogoLinkClass} aria-label="Booster">
+              <BoosterLogo variant="lockup" tone="on-dark" size="xl" presentation />
+            </Link>
+          </div>
+          <div className="flex min-h-0 w-full max-w-[640px] flex-1 flex-col justify-center">
+            <AuthHeroBranding />
+          </div>
         </div>
 
         <AuthFlowCardShell
           onSubmit={handleSubmit}
           beforeCard={
-            <div className="mb-6 flex justify-center lg:hidden">
-              <Link to={welcomeHubPath} className={welcomeLogoLinkClass}>
-                <Zap className="h-icon-28 w-icon-28 fill-primary text-primary" aria-hidden="true" />
-                <span className="text-h2 font-bold text-primary-foreground">booster</span>
+            <div className="mb-6 flex flex-col items-center gap-6 lg:hidden">
+              <Link to={welcomeHubPath} className={welcomeLogoLinkClass} aria-label="Booster">
+                <BoosterLogo variant="lockup" tone="on-dark" size="lg" presentation />
               </Link>
+              <AuthHeroBranding align="center" />
             </div>
           }
           header={
@@ -110,8 +114,7 @@ const VerifyEmail = () => {
                 </Button>
               </Link>
               <Link to={welcomeHubPath} className={welcomeLogoLinkClass} aria-label="Back to welcome">
-                <Zap className="h-icon-16 w-icon-16 fill-primary text-primary" aria-hidden="true" />
-                <span className="text-caption-strong uppercase tracking-widest text-foreground">booster</span>
+                <BoosterLogo variant="lockup" tone="on-light" size="xs" presentation />
               </Link>
               <div className="invisible pointer-events-none absolute right-0" aria-hidden="true">
                 <span className="text-body-sm text-info">Reset Password</span>

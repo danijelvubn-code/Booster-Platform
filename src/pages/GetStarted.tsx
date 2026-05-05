@@ -1,8 +1,10 @@
 import { useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { CheckCircle2, Eye, EyeOff, Zap } from "lucide-react";
+import { CheckCircle2, Eye, EyeOff } from "lucide-react";
 
 import { AuthBackdrop } from "@/components/AuthBackdrop";
+import { AuthHeroBranding } from "@/components/AuthHeroBranding";
+import { BoosterLogo } from "@/components/brand/BoosterLogo";
 import { AuthFlowCardShell } from "@/components/AuthFlowCardShell";
 import { Button } from "@/components/ui/button";
 import { IS_MVP_BUILD, IS_POST_MVP_BUILD, isMvpShellPath, mvpPath, postMvpPath } from "@/config/prototype-shell";
@@ -115,35 +117,37 @@ const GetStarted = () => {
 
       <div className="relative z-10 flex min-h-0 flex-1 flex-col items-center lg:flex-row lg:items-stretch">
         {/* Left — hero branding; logo links to welcome */}
-        <div className="relative hidden min-h-0 flex-1 flex-col items-center justify-center px-6 py-12 lg:flex lg:w-[55%]">
-          <Link to={welcomeHref} className={welcomeLogoLinkClass}>
-            <div className="flex flex-col items-center justify-center gap-2 text-center">
-              <div className="flex items-center justify-center gap-3">
-                <Zap className="h-icon-40 w-icon-40 fill-primary text-primary" aria-hidden="true" />
-                <span className="text-display font-semibold tracking-tight text-primary-foreground">booster</span>
-              </div>
-              <span className="rounded-full border border-primary/30 bg-primary/20 px-4 py-2 text-caption-strong uppercase tracking-widest text-primary">
-                Beta Version
-              </span>
-            </div>
-          </Link>
+        <div className="relative hidden min-h-0 flex-1 flex-col items-center px-6 py-12 lg:flex lg:w-[55%]">
+          <div className="flex w-full max-w-[640px] shrink-0 justify-center">
+            <Link to={welcomeHref} className={welcomeLogoLinkClass} aria-label="Booster">
+              <BoosterLogo variant="lockup" tone="on-dark" size="xl" presentation />
+            </Link>
+          </div>
+          <div className="flex min-h-0 w-full max-w-[640px] flex-1 flex-col items-center justify-center gap-6">
+            <AuthHeroBranding />
+            <span className="rounded-full border border-primary/30 bg-primary/20 px-4 py-2 text-center text-caption-strong uppercase tracking-widest text-primary">
+              Beta Version
+            </span>
+          </div>
         </div>
 
         {/* Right — shared auth shell with switchable header/body/footer slots */}
         <AuthFlowCardShell
           onSubmit={isStatusScreen ? undefined : showSuccessStep ? handleSuccessSubmit : handleSubmit}
           beforeCard={
-            <div className="mb-6 flex justify-center lg:hidden">
-              <Link to={welcomeHref} className={welcomeLogoLinkClass}>
-                <Zap className="h-icon-28 w-icon-28 fill-primary text-primary" aria-hidden="true" />
-                <span className="text-h2 font-bold text-primary-foreground">booster</span>
+            <div className="mb-6 flex flex-col items-center gap-6 lg:hidden">
+              <Link to={welcomeHref} className={welcomeLogoLinkClass} aria-label="Booster">
+                <BoosterLogo variant="lockup" tone="on-dark" size="lg" presentation />
               </Link>
+              <AuthHeroBranding align="center" />
+              <span className="rounded-full border border-primary/30 bg-primary/20 px-4 py-2 text-caption-strong uppercase tracking-widest text-primary">
+                Beta Version
+              </span>
             </div>
           }
           header={
             <Link to={welcomeHref} className={welcomeLogoLinkClass} aria-label="Back to welcome">
-              <Zap className="h-icon-16 w-icon-16 fill-primary text-primary" aria-hidden="true" />
-              <span className="text-h3 font-semibold text-foreground">booster</span>
+              <BoosterLogo variant="lockup" tone="on-light" size="xs" presentation />
             </Link>
           }
           bodyClassName={showSuccessStep || isStatusScreen ? "space-y-6" : undefined}

@@ -1,65 +1,124 @@
+import type { LucideIcon } from "lucide-react";
+import { ArrowRight, BadgeCheck, BookOpen, Box, Globe2, Network, ShieldCheck } from "lucide-react";
+import { Link } from "react-router-dom";
+
 import { useAuth } from "@/contexts/AuthContext";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Zap, ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { mvpPath, postMvpPath } from "@/config/prototype-shell";
+
+type OnboardingRowProps = {
+  to: string;
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  onNavigate: () => void;
+};
+
+function OnboardingRow({ to, icon: Icon, title, description, onNavigate }: OnboardingRowProps) {
+  return (
+    <Link
+      to={to}
+      onClick={onNavigate}
+      className={cn(
+        "flex min-w-0 items-center gap-3 rounded-lg border border-border bg-card py-2 pl-2 pr-3 shadow-xs",
+        "transition-colors ease-standard hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+      )}
+    >
+      <span className="flex h-icon-40 w-icon-40 shrink-0 items-center justify-center rounded-md bg-primary/40 text-primary shadow-xs">
+        <Icon className="h-icon-24 w-icon-24" aria-hidden />
+      </span>
+      <span className="min-w-0 flex-1 text-left">
+        <span className="block font-semibold text-body-sm leading-normal text-foreground">{title}</span>
+        <span className="block text-body-sm leading-normal text-muted-foreground">{description}</span>
+      </span>
+      <span className="flex h-icon-40 w-icon-40 shrink-0 items-center justify-center rounded-md text-primary" aria-hidden>
+        <ArrowRight className="h-icon-24 w-icon-24" />
+      </span>
+    </Link>
+  );
+}
 
 const OnboardingModal = () => {
-  const { user, dismissOnboarding } = useAuth();
+  const { user, dismissOnboarding, track } = useAuth();
   const isOpen = user?.isFirstLogin ?? false;
 
-  return (
-    <Dialog open={isOpen} onOpenChange={() => dismissOnboarding()}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl">
-            <Zap className="h-5 w-5 text-primary fill-primary" />
-            How Booster Works
-          </DialogTitle>
-          <DialogDescription>
-            Understand the Booster architecture in 30 seconds
-          </DialogDescription>
-        </DialogHeader>
+  const organizationPath = track === "mvp" ? mvpPath("/overview") : postMvpPath("/account");
+  const endpointsPath = track === "mvp" ? mvpPath("/overview") : postMvpPath("/endpoints");
+  const cosmosPath = track === "mvp" ? mvpPath("/cosmos") : postMvpPath("/cosmos");
 
-        <div className="py-4 space-y-4">
-          {/* Visual diagram */}
-          <div className="bg-muted rounded-lg p-6 space-y-3">
-            {[
-              { label: "Tenant", desc: "Your organization account", color: "bg-primary text-primary-foreground" },
-              { label: "Inference Endpoints", desc: "Isolated projects with API endpoint URLs", color: "bg-primary/80 text-primary-foreground" },
-              { label: "Model Cosmos", desc: "Your model library — browse, compare & deploy", color: "bg-primary/60 text-primary-foreground" },
-              { label: "Models", desc: "Versioned model instances in an inference endpoint", color: "bg-primary/50 text-primary-foreground" },
-              { label: "Default", desc: "Serves 100% of live traffic", color: "bg-primary/40 text-primary-foreground" },
-            ].map((step, i) => (
-              <div key={step.label} className="flex items-center gap-3">
-                <div className={`w-8 h-8 rounded-md flex items-center justify-center text-sm font-bold ${step.color}`}>
-                  {i + 1}
-                </div>
-                <div className="flex-1">
-                  <div className="font-semibold text-sm">{step.label}</div>
-                  <div className="text-xs text-muted-foreground">{step.desc}</div>
-                </div>
-                {i < 4 && <ArrowRight className="h-4 w-4 text-muted-foreground" />}
-              </div>
-            ))}
+  return (
+    <Dialog open={isOpen} onOpenChange={(next) => !next && dismissOnboarding()}>
+      <DialogContent className="flex max-h-screen max-w-modal-lg flex-col gap-0 overflow-hidden bg-background p-0 shadow-lg sm:rounded-xl [&>button]:hidden">
+        <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto p-8 pb-6">
+          <DialogHeader className="space-y-2 text-left">
+            <DialogTitle className="text-h2 font-bold leading-snug tracking-tight text-foreground">
+              Welcome to the booster
+            </DialogTitle>
+            <DialogDescription className="text-body-sm leading-normal text-muted-foreground normal-case">
+              Here&apos;s a quick overview to get you started.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-3">
+            <OnboardingRow
+              to={organizationPath}
+              icon={BookOpen}
+              title="Organization"
+              description="Your shared workspace where users collaborate and usage is managed"
+              onNavigate={dismissOnboarding}
+            />
+            <OnboardingRow
+              to={endpointsPath}
+              icon={Network}
+              title="Endpoints"
+              description="Isolated workloads with stable API URL"
+              onNavigate={dismissOnboarding}
+            />
+            <OnboardingRow
+              to={cosmosPath}
+              icon={Globe2}
+              title="Model Cosmos"
+              description="Browse and compare models before assigning them to endpoints"
+              onNavigate={dismissOnboarding}
+            />
+            <OnboardingRow
+              to={cosmosPath}
+              icon={Box}
+              title="Models"
+              description="Model versions assigned to an endpoint"
+              onNavigate={dismissOnboarding}
+            />
           </div>
 
-          <p className="text-sm text-muted-foreground">
-            Browse available models in <strong>Model Cosmos</strong> — your model library. 
-            Each <strong>Inference Endpoint</strong> has one stable URL. The <strong>Default</strong> model 
-            serves all live traffic. Your input data and model responses are <strong>never</strong> used 
-            to train our models and will not be shared with other users or third parties.
+          <p className="text-body-sm leading-relaxed text-foreground">
+            Browse available models in Model Cosmos — your model library. Each Inference Endpoint has one stable URL.
+            The Default model serves all live traffic. Your input data and model responses are never used to train our models
+            and will not be shared with other users or third parties.
           </p>
+
+          <div className="flex gap-3 rounded-lg bg-muted px-4 py-3 text-foreground">
+            <ShieldCheck className="mt-0.5 h-icon-16 w-icon-16 shrink-0 text-primary" aria-hidden />
+            <p className="min-w-0 flex-1 text-body-sm leading-relaxed text-foreground">
+              Your input data and model responses are never used to train our models and will not be shared with other users
+              or third parties.
+            </p>
+            <BadgeCheck className="mt-0.5 h-icon-16 w-icon-16 shrink-0 text-success" aria-hidden />
+          </div>
         </div>
 
-        <Button onClick={dismissOnboarding} className="w-full">
-          Got it, let's go!
-        </Button>
+        <div className="shrink-0 border-t border-border bg-background p-8 pt-6">
+          <Button
+            type="button"
+            variant="default"
+            size="lg"
+            className="w-full rounded-lg bg-primary font-semibold text-primary-foreground shadow-xs hover:bg-primary/90 focus-visible:ring-primary"
+            onClick={() => dismissOnboarding()}
+          >
+            Got it, let&apos;s go!
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

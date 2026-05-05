@@ -19,6 +19,10 @@
       "destination": "/logos/:path*"
     },
     {
+      "source": "/booster/mvp/brand/:path*",
+      "destination": "/brand/:path*"
+    },
+    {
       "source": "/booster/mvp/first-time-user.svg",
       "destination": "/first-time-user.svg"
     },

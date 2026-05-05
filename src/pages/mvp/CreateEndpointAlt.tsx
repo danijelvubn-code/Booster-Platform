@@ -37,6 +37,7 @@ import {
   modelHasVisionCapability,
 } from "@/lib/model-metrics";
 import { WizardStepper } from "@/components/WizardStepper";
+import { PageHeader } from "@/components/layout";
 import { mvpPath } from "@/config/prototype-shell";
 
 type StepId = 0 | 1 | 2;
@@ -421,16 +422,16 @@ export default function MvpCreateEndpointAlt() {
 
   return (
     <div className="container max-w-6xl flex h-full min-h-0 flex-1 flex-col gap-4 overflow-hidden py-4">
-      <Button variant="ghost" size="sm" className="-ml-3 w-fit" onClick={() => navigate(-1)}>
-        <ArrowLeft className="mr-1 h-icon-16 w-icon-16" /> Back
-      </Button>
-
-      <header className="space-y-1">
-        <h1 className="text-h2 text-foreground">Deploy Inference Endpoint</h1>
-        <p className="text-body-sm text-muted-foreground">
-          Configure and deploy a model inference endpoint with safety and budget controls.
-        </p>
-      </header>
+      <PageHeader
+        leading={
+          <Button variant="ghost" size="sm" className="-ml-3 w-fit" onClick={() => navigate(-1)}>
+            <ArrowLeft className="mr-1 h-icon-16 w-icon-16" /> Back
+          </Button>
+        }
+        titleSize="section"
+        title="Deploy Inference Endpoint"
+        description="Configure and deploy a model inference endpoint with safety and budget controls."
+      />
 
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-endpoint-deploy-wizard">
         <aside className="h-full min-w-0 lg:col-span-1">

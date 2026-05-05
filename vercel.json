@@ -19,6 +19,10 @@
       "destination": "/logos/:path*"
     },
     {
+      "source": "/booster/mvp/post-mvp/brand/:path*",
+      "destination": "/brand/:path*"
+    },
+    {
       "source": "/booster/mvp/post-mvp/first-time-user.svg",
       "destination": "/first-time-user.svg"
     },
@@ -59,6 +63,10 @@
       "destination": "/logos/:path*"
     },
     {
+      "source": "/booster/mvp/brand/:path*",
+      "destination": "/brand/:path*"
+    },
+    {
       "source": "/booster/mvp/first-time-user.svg",
       "destination": "/first-time-user.svg"
     },
@@ -97,6 +105,10 @@
     {
       "source": "/booster/logos/:path*",
       "destination": "/logos/:path*"
+    },
+    {
+      "source": "/booster/brand/:path*",
+      "destination": "/brand/:path*"
     },
     {
       "source": "/booster/first-time-user.svg",

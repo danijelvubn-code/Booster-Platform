@@ -9,6 +9,7 @@ import { Link, useParams } from "react-router-dom";
 
 import { mvpPath } from "@/config/prototype-shell";
 
+import { SectionHeader } from "@/components/layout";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -481,7 +482,7 @@ const MvpModelDetailAlt = ({ endpointFlowPath = mvpPath("/endpoints/new") }: Mvp
             <div className="border-t border-border p-3">
               <Button asChild variant="default" size="default" className="w-full">
                 <Link to={`${endpointFlowPath.replace(":modelId", model.id)}?model=${model.id}`}>
-                  Add to Endpoint
+                  Create Inference Endpoint
                 </Link>
               </Button>
             </div>
@@ -494,7 +495,7 @@ const MvpModelDetailAlt = ({ endpointFlowPath = mvpPath("/endpoints/new") }: Mvp
           <section className="space-y-3">
             <SectionHeader
               title="Capabilities"
-              subtitle="Capability scores reflect the latest internal evaluation. Energy efficiency reflects energy consumption observed during those evaluations."
+              description="Capability scores reflect the latest internal evaluation. Energy efficiency reflects energy consumption observed during those evaluations."
               action={<CapabilitiesDetailDialog model={model} />}
             />
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -589,18 +590,11 @@ const MvpModelDetailAlt = ({ endpointFlowPath = mvpPath("/endpoints/new") }: Mvp
             </Card>
           </section>
 
-          {/* Benchmarks — single Detailed View at header; tiles are info-only */}
+          {/* Benchmarks — Detailed View lives on each tile so it deep-links to the right tab. */}
           <section className="space-y-3">
             <SectionHeader
               title="Benchmarks"
-              subtitle="Booster's proprietary score side by side with public benchmark frameworks."
-              action={
-                <BenchmarksDetailSheet model={model} rows={benchmarkRows}>
-                  <Button variant="outline" size="sm">
-                    Detailed View
-                  </Button>
-                </BenchmarksDetailSheet>
-              }
+              description="Booster's proprietary score side by side with public benchmark frameworks."
             />
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <BenchmarkTile
@@ -609,6 +603,13 @@ const MvpModelDetailAlt = ({ endpointFlowPath = mvpPath("/endpoints/new") }: Mvp
                 empty={qualityScore <= 0}
                 description="Booster's internal fit evaluation combining capability scores, real-world traces, and energy efficiency. Methodology stays private."
                 chips={["Proprietary methodology"]}
+                footer={
+                  <BenchmarksDetailSheet model={model} rows={benchmarkRows} defaultTab="booster">
+                    <Button variant="outline" size="sm">
+                      View detail
+                    </Button>
+                  </BenchmarksDetailSheet>
+                }
               />
               <BenchmarkTile
                 label="Public Benchmark Average"
@@ -616,6 +617,13 @@ const MvpModelDetailAlt = ({ endpointFlowPath = mvpPath("/endpoints/new") }: Mvp
                 empty={publicRows.length === 0}
                 description={publicDescription}
                 chips={publicCategories}
+                footer={
+                  <BenchmarksDetailSheet model={model} rows={benchmarkRows} defaultTab="public">
+                    <Button variant="outline" size="sm">
+                      View detail
+                    </Button>
+                  </BenchmarksDetailSheet>
+                }
               />
             </div>
           </section>
@@ -624,27 +632,6 @@ const MvpModelDetailAlt = ({ endpointFlowPath = mvpPath("/endpoints/new") }: Mvp
     </div>
   );
 };
-
-/** Shared section header — title, optional subtitle, and right-aligned action slot. */
-function SectionHeader({
-  title,
-  subtitle,
-  action,
-}: {
-  title: string;
-  subtitle?: string;
-  action?: React.ReactNode;
-}) {
-  return (
-    <div className="space-y-1">
-      <div className="flex items-center justify-between gap-4">
-        <h2 className="text-body-strong text-foreground">{title}</h2>
-        {action}
-      </div>
-      {subtitle ? <p className="text-body-sm text-muted-foreground py-1">{subtitle}</p> : null}
-    </div>
-  );
-}
 
 /** Compact capability row — icon + name on the left, score right-aligned (per Figma). */
 function CapabilityCard({ cap }: { cap: { name: string; score: number } }) {
@@ -750,12 +737,14 @@ function BenchmarkTile({
   description,
   chips,
   empty,
+  footer,
 }: {
   label: string;
   score: number;
   description: string;
   chips: string[];
   empty?: boolean;
+  footer?: React.ReactNode;
 }) {
   return (
     <Card className="p-0">
@@ -789,6 +778,7 @@ function BenchmarkTile({
             ))}
           </div>
         ) : null}
+        {footer ? <div className="mt-auto pt-2">{footer}</div> : null}
       </CardContent>
     </Card>
   );

@@ -28,8 +28,8 @@ const MvpOverview = () => {
             titleSize="overview"
             breakAt="md"
             introClassName="max-w-3xl"
-            title="Endpoints Above Average Usage"
-            description="Endpoints consuming more tokens than their expected monthly average based on their budget."
+            title="Inference Endpoints"
+            description="Manage inference endpoints and choose the preferred model for each use case."
             actions={
               <Button className="shrink-0" asChild>
                 <Link to={mvpPath("/endpoints/new")}>

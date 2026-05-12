@@ -84,7 +84,13 @@ const AppHeader = ({
           className="flex shrink-0 items-center gap-1.5 rounded-md outline-none ring-offset-background transition-colors ease-standard focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           aria-label="Booster home"
         >
-          <BoosterLogo variant="lockup" tone="on-light" size="sm" presentation />
+          <BoosterLogo
+            variant="lockup"
+            tone="on-light"
+            size="sm"
+            presentation
+            className="h-icon-40 w-auto"
+          />
           {badge ? (
             <span className="ml-1 rounded-md border border-border px-2 py-0.5 text-caption font-medium text-muted-foreground">
               {badge}

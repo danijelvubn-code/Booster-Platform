@@ -26,7 +26,7 @@ function OnboardingRow({ to, icon: Icon, title, description, onNavigate }: Onboa
         "transition-colors ease-standard hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
       )}
     >
-      <span className="flex h-icon-40 w-icon-40 shrink-0 items-center justify-center rounded-md bg-primary/40 text-primary shadow-xs">
+      <span className="flex h-icon-40 w-icon-40 shrink-0 items-center justify-center rounded-md bg-primary/12 text-primary shadow-xs">
         <Icon className="h-icon-24 w-icon-24" aria-hidden />
       </span>
       <span className="min-w-0 flex-1 text-left">
@@ -50,7 +50,11 @@ const OnboardingModal = () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={(next) => !next && dismissOnboarding()}>
-      <DialogContent className="flex max-h-screen max-w-modal-lg flex-col gap-0 overflow-hidden bg-background p-0 shadow-lg sm:rounded-xl [&>button]:hidden">
+      <DialogContent
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+        className="flex max-h-screen max-w-modal-lg flex-col gap-0 overflow-hidden bg-background p-0 shadow-lg sm:rounded-xl [&>button]:hidden"
+      >
         <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto p-8 pb-6">
           <DialogHeader className="space-y-2 text-left">
             <DialogTitle className="text-h2 font-bold leading-snug tracking-tight text-foreground">

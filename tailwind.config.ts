@@ -154,7 +154,7 @@ export default {
         "control-md": "var(--control-height-md)",
         "control-lg": "var(--control-height-lg)",
         "components-dropdown": "var(--components-dropdown-max-height)",
-        "model-cosmos-card-basic": "var(--model-cosmos-card-basic-height)",
+        "cosmos-card-basic": "var(--cosmos-card-basic-height)",
       },
       maxWidth: {
         "modal-sm": "var(--modal-size-sm)",

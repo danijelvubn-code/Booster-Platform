@@ -1,27 +1,18 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
-import path from "path";
-import { componentTagger } from "lovable-tagger";
+import { devtools } from '@tanstack/devtools-vite'
+import { tanstackStart } from '@tanstack/react-start/plugin/vite'
+import viteReact from '@vitejs/plugin-react'
+import { nitro } from 'nitro/vite'
+import { defineConfig } from 'vite'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
-// https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
-  base:
-    mode === "mvp"
-      ? "/booster/mvp/"
-      : mode === "post-mvp"
-        ? "/booster/mvp/post-mvp/"
-        : "/booster/",
-  server: {
-    host: "::",
-    port: 8080,
-    hmr: {
-      overlay: false,
-    },
-  },
-  plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
-  },
-}));
+const config = defineConfig({
+	plugins: [
+		devtools(),
+		nitro({ rollupConfig: { external: [/^@sentry\//] } }),
+		tsconfigPaths({ projects: ['./tsconfig.json'] }),
+		tanstackStart(),
+		viteReact(),
+	],
+})
+
+export default config

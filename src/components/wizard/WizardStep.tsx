@@ -11,7 +11,7 @@ export type WizardStepProps = ComponentPropsWithRef<'button'> & {
 
 // Base classes applied to all wizard steps
 const BASE_CLASSES =
-	'max-w-full truncate rounded-full px-4 py-2 text-center text-caption font-medium transition-colors ' +
+	'inline-flex h-8 max-w-full items-center justify-center truncate rounded-full px-4 py-0 text-center text-caption font-medium transition-colors ' +
 	'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
 
 // Status-specific styling (colors, borders, rings)

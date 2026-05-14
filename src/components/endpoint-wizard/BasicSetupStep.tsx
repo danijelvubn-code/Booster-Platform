@@ -21,6 +21,7 @@ type BasicSetupStepProps = {
 	setUseCase: (value: string) => void
 	selectedPreset: string | null
 	setSelectedPreset: (value: string | null) => void
+	showUseCasePresets?: boolean
 }
 
 export function BasicSetupStep({
@@ -30,6 +31,7 @@ export function BasicSetupStep({
 	setUseCase,
 	selectedPreset,
 	setSelectedPreset,
+	showUseCasePresets = true,
 }: BasicSetupStepProps) {
 	const endpointNameId = useId()
 	const useCaseId = useId()
@@ -51,7 +53,7 @@ export function BasicSetupStep({
 				</p>
 			</div>
 
-			<div className="space-y-2">
+			<div className="space-y-1">
 				<Label htmlFor={endpointNameId}>
 					Inference Endpoint Name <span className="text-destructive">*</span>
 				</Label>
@@ -62,38 +64,42 @@ export function BasicSetupStep({
 				/>
 			</div>
 
-			<div className="space-y-2">
-				<Label>Use Case Preset</Label>
-				<div className="flex flex-wrap gap-2">
-					{USE_CASE_PRESETS.map((preset) => (
-						<button
-							key={preset}
-							type="button"
-							onClick={() => handlePresetClick(preset)}
-							className={cn(
-								'rounded-md border px-3 py-1.5 text-body-sm transition-colors',
-								selectedPreset === preset
-									? 'border-primary bg-primary/10 text-primary'
-									: 'border-border bg-background text-muted-foreground hover:bg-muted',
-							)}
-						>
-							{preset}
-						</button>
-					))}
+			{showUseCasePresets ? (
+				<div className="space-y-1">
+					<Label>Use Case Preset</Label>
+					<div className="flex flex-wrap gap-2">
+						{USE_CASE_PRESETS.map((preset) => (
+							<button
+								key={preset}
+								type="button"
+								onClick={() => handlePresetClick(preset)}
+								className={cn(
+									'rounded-md border px-3 py-1.5 text-body-sm transition-colors',
+									selectedPreset === preset
+										? 'border-primary bg-primary/10 text-primary'
+										: 'border-border bg-background text-muted-foreground hover:bg-muted',
+								)}
+							>
+								{preset}
+							</button>
+						))}
+					</div>
 				</div>
-			</div>
+			) : null}
 
-			<div className="space-y-2">
-				<Label htmlFor={useCaseId}>Use Case Description</Label>
-				<Textarea
-					id={useCaseId}
-					required
-					placeholder="Describe your use case in a few sentences. For example: We need to process insurance claim documents and extract policy numbers, dates, and damage descriptions."
-					value={useCase}
-					onChange={(event) => setUseCase(event.target.value)}
-					rows={5}
-				/>
-				<p className="text-caption text-muted-foreground">
+			<div>
+				<div className="flex flex-col gap-1">
+					<Label htmlFor={useCaseId}>Use Case Description</Label>
+					<Textarea
+						id={useCaseId}
+						required
+						placeholder="Describe your use case in a few sentences. For example: We need to process insurance claim documents and extract policy numbers, dates, and damage descriptions."
+						value={useCase}
+						onChange={(event) => setUseCase(event.target.value)}
+						rows={5}
+					/>
+				</div>
+				<p className="mt-2 text-caption text-muted-foreground">
 					Use case context helps Booster recommend the best model and provider.
 				</p>
 			</div>

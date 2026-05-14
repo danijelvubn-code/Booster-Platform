@@ -7,13 +7,14 @@ import {
 	Binary,
 	BookAudio,
 	Box,
+	Braces,
 	Brain,
 	BrainCircuit,
-	Braces,
 	CircleStop,
 	Code2,
 	Cpu,
 	Database,
+	Table as FeatureTableIcon,
 	FileArchive,
 	FileText,
 	FileVolume,
@@ -23,22 +24,22 @@ import {
 	Image,
 	Info,
 	ListTree,
+	type LucideIcon,
+	Maximize,
+	MemoryStick,
 	MessageSquare,
 	MessageSquareDashed,
 	MessageSquareMore,
-	Maximize,
-	MemoryStick,
 	Mic,
 	Plus,
 	Scale,
 	Share2,
-	Table as FeatureTableIcon,
 	Type,
 	Video,
 	Weight,
-	type LucideIcon,
 } from 'lucide-react'
 import { useCallback, useMemo, useRef, useState } from 'react'
+import { AppSideSheetContent } from '@/components/layout/AppSideSheet'
 import {
 	Accordion,
 	AccordionContent,
@@ -50,13 +51,8 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { IconBox } from '@/components/ui/icon-box'
 import { Progress } from '@/components/ui/progress'
-import {
-	Sheet,
-	SheetContent,
-	SheetTitle,
-	SheetTrigger,
-} from '@/components/ui/sheet'
 import { Separator } from '@/components/ui/separator'
+import { Sheet, SheetTrigger } from '@/components/ui/sheet'
 import {
 	Table,
 	TableBody,
@@ -74,13 +70,11 @@ import {
 import { models } from '@/data/mockData'
 import {
 	getModelModalityLabel,
+	getOverallModelScore,
 	getParamSizeLabel,
 	type ModelRecord,
-	getOverallModelScore,
 } from '@/lib/model-metrics'
-import {
-	getModelProviderLogoSrc,
-} from '@/lib/model-provider-logos'
+import { getModelProviderLogoSrc } from '@/lib/model-provider-logos'
 import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/app/cosmos_/$modelId')({
@@ -461,7 +455,9 @@ function CapabilityCategoryDetailBody({
 }) {
 	if (!category.subcategogies || category.subcategogies.length === 0) {
 		return (
-			<p className="text-caption text-muted-foreground">No subcategories yet.</p>
+			<p className="text-caption text-muted-foreground">
+				No subcategories yet.
+			</p>
 		)
 	}
 	return (
@@ -490,7 +486,9 @@ function CapabilityCategoryDetailBody({
 								<TableBody>
 									{sub.benchmarks.map((b) => (
 										<TableRow key={b.id} className="hover:bg-transparent">
-											<TableCell className="font-mono text-body-sm">{b.id}</TableCell>
+											<TableCell className="font-mono text-body-sm">
+												{b.id}
+											</TableCell>
 											<TableCell className="text-right text-body-sm tabular-nums">
 												{b.weight}
 											</TableCell>
@@ -504,7 +502,9 @@ function CapabilityCategoryDetailBody({
 						</div>
 					) : (
 						<div className="border-t border-border px-3 py-2">
-							<p className="text-caption text-muted-foreground">No benchmarks yet.</p>
+							<p className="text-caption text-muted-foreground">
+								No benchmarks yet.
+							</p>
 						</div>
 					)}
 				</div>
@@ -514,12 +514,14 @@ function CapabilityCategoryDetailBody({
 }
 
 function getMockParameterCount(model: ModelRecord): number {
-	const explicitParam = getParamSizeLabel(model.name) ?? getParamSizeLabel(model.description)
+	const explicitParam =
+		getParamSizeLabel(model.name) ?? getParamSizeLabel(model.description)
 	if (explicitParam) {
 		return Number.parseFloat(explicitParam.replace('B', '')) * 1_000_000_000
 	}
 
-	const haystack = `${model.name} ${model.domain} ${model.category}`.toLowerCase()
+	const haystack =
+		`${model.name} ${model.domain} ${model.category}`.toLowerCase()
 	if (haystack.includes('mistral large')) return 123_000_000_000
 	if (haystack.includes('codestral')) return 22_000_000_000
 	if (haystack.includes('deepseek')) return 671_000_000_000
@@ -533,7 +535,9 @@ function getMockParameterCount(model: ModelRecord): number {
 function normalizeModel(model: ModelRecord): ModelYaml {
 	const score = getOverallModelScore(model)
 	const parameters = getMockParameterCount(model)
-	const hasVision = model.strengths.some((s) => /vision|image|multimodal/i.test(s))
+	const hasVision = model.strengths.some((s) =>
+		/vision|image|multimodal/i.test(s),
+	)
 	const hasCode = model.category === 'Code' || /code/i.test(model.domain)
 
 	return {
@@ -656,7 +660,9 @@ function formatSpecificationMemory(bytes: number | null | undefined): string {
 	return `${Math.round(bytes / 1_000_000_000)} GB`
 }
 
-function formatSpecificationContextWindow(tokens: number | null | undefined): string {
+function formatSpecificationContextWindow(
+	tokens: number | null | undefined,
+): string {
 	if (!tokens) return MISSING_VALUE_PLACEHOLDER
 	if (tokens >= 1000) return `${Math.round(tokens / 1000)}K tokens`
 	return `${tokens} tokens`
@@ -757,7 +763,9 @@ function ModelDetailSupportRow({
 	className?: string
 }) {
 	return (
-		<div className={cn('flex h-model-detail-row items-center gap-2', className)}>
+		<div
+			className={cn('flex h-model-detail-row items-center gap-2', className)}
+		>
 			<IconBox size="xlg" shape="circle">
 				<Icon
 					className={cn(
@@ -798,7 +806,9 @@ function SpecRow({
 	className?: string
 }) {
 	return (
-		<div className={cn('flex h-model-detail-row items-center gap-2', className)}>
+		<div
+			className={cn('flex h-model-detail-row items-center gap-2', className)}
+		>
 			<IconBox size="xlg" shape="circle">
 				<Icon className="text-hierarchy-secondary" aria-hidden />
 			</IconBox>
@@ -846,7 +856,10 @@ function RouteComponent() {
 	const scrollRootRef = useRef<HTMLDivElement | null>(null)
 	const [activeNav, setActiveNav] = useState<SectionId>('overview')
 
-	const modelYaml = useMemo(() => (model ? normalizeModel(model) : null), [model])
+	const modelYaml = useMemo(
+		() => (model ? normalizeModel(model) : null),
+		[model],
+	)
 	const capabilityRows = useMemo(
 		() => (modelYaml ? capabilityRowsFromYaml(modelYaml) : []),
 		[modelYaml],
@@ -891,13 +904,11 @@ function RouteComponent() {
 	const handleSectionScroll = useCallback(() => {
 		const rootTop = scrollRootRef.current?.getBoundingClientRect().top ?? 0
 		const nextActive =
-			[...SECTION_IDS]
-				.reverse()
-				.find((id) => {
-					const sectionTop =
-						sectionRefs.current[id]?.getBoundingClientRect().top ?? Infinity
-					return sectionTop - rootTop <= 120
-				}) ?? 'overview'
+			[...SECTION_IDS].reverse().find((id) => {
+				const sectionTop =
+					sectionRefs.current[id]?.getBoundingClientRect().top ?? Infinity
+				return sectionTop - rootTop <= 120
+			}) ?? 'overview'
 		setActiveNav(nextActive)
 	}, [])
 
@@ -1028,8 +1039,8 @@ function RouteComponent() {
 																</Button>
 															</TooltipTrigger>
 															<TooltipContent className="max-w-page-intro">
-																Aggregated score from model capability categories
-																in this catalog.
+																Aggregated score from model capability
+																categories in this catalog.
 															</TooltipContent>
 														</Tooltip>
 														<span className="text-display font-bold text-primary tabular-nums">
@@ -1234,130 +1245,115 @@ function RouteComponent() {
 													</Button>
 												</SheetTrigger>
 											</div>
-											<SheetContent
-												side="right"
-												className={cn(
-													'sm:max-w-modal-lg',
-													'flex flex-col overflow-hidden p-0',
-													'[&>button]:top-7 [&>button]:-translate-y-1/2 [&>button]:left-auto [&>button]:right-4',
-													'[&>button>svg]:h-icon-20 [&>button>svg]:w-icon-20',
-													'sm:top-6 sm:bottom-6 sm:right-6 sm:h-auto sm:rounded-2xl sm:shadow-lg',
-												)}
+											<AppSideSheetContent
+												title="Score breakdown"
+												description="Capability score breakdown by category and sub-scores for this model."
+												maxWidth="lg"
 											>
-												<div className="flex h-14 items-center border-b border-border px-6 pr-14">
-													<SheetTitle className="min-w-0 flex-1 truncate">
-														Score breakdown
-													</SheetTitle>
-												</div>
-												<div
-													className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto py-6 pl-6 pr-4"
-													style={{ scrollbarGutter: 'stable' }}
-												>
-													<div className="rounded-lg border border-border bg-card p-4">
-														<div className="flex items-center justify-between gap-4">
-															<div className="flex min-w-0 flex-1 items-center gap-3">
-																<Avatar className="h-icon-40 w-icon-40 shrink-0 rounded-md">
-																	{providerLogoSrc ? (
-																		<AvatarImage
-																			src={providerLogoSrc}
-																			alt=""
-																			className="size-full object-contain"
-																		/>
-																	) : null}
-																	<AvatarFallback className="rounded-md text-caption font-semibold">
-																		{providerInitials}
-																	</AvatarFallback>
-																</Avatar>
-																<p className="min-w-0 truncate text-[20px] font-semibold leading-none text-foreground">
-																	{modelYaml.name}
-																</p>
-															</div>
-															<div className="flex shrink-0 flex-col items-end gap-1 text-right">
-																<p className="text-[20px] font-semibold tabular-nums leading-none text-foreground">
-																	{formatScore(
-																		modelYaml.capabilities.inteligence_index,
-																	)}
-																</p>
-																<p className="text-caption text-muted-foreground">
-																	Intelligence index
-																</p>
-															</div>
+												<div className="rounded-lg border border-border bg-card p-4">
+													<div className="flex items-center justify-between gap-4">
+														<div className="flex min-w-0 flex-1 items-center gap-3">
+															<Avatar className="h-icon-40 w-icon-40 shrink-0 rounded-md">
+																{providerLogoSrc ? (
+																	<AvatarImage
+																		src={providerLogoSrc}
+																		alt=""
+																		className="size-full object-contain"
+																	/>
+																) : null}
+																<AvatarFallback className="rounded-md text-caption font-semibold">
+																	{providerInitials}
+																</AvatarFallback>
+															</Avatar>
+															<p className="min-w-0 truncate text-[20px] font-semibold leading-none text-foreground">
+																{modelYaml.name}
+															</p>
+														</div>
+														<div className="flex shrink-0 flex-col items-end gap-1 text-right">
+															<p className="text-[20px] font-semibold tabular-nums leading-none text-foreground">
+																{formatScore(
+																	modelYaml.capabilities.inteligence_index,
+																)}
+															</p>
+															<p className="text-caption text-muted-foreground">
+																Intelligence index
+															</p>
 														</div>
 													</div>
-
-													<Accordion
-														type="multiple"
-														className="w-full rounded-lg border border-border"
-													>
-														{capabilityAccordionBuckets.map((bucket) => {
-															const Icon = bucket.icon
-															return (
-																<AccordionItem
-																	key={bucket.label}
-																	value={bucket.label}
-																	className="border-border"
-																>
-																	<AccordionTrigger className="h-16 px-4 py-0 text-left text-body-sm [&>svg]:ml-3">
-																		<div className="flex w-full min-w-0 flex-1 items-center justify-between gap-4 text-left">
-																			<span className="flex min-w-0 flex-1 items-center gap-2 truncate text-left text-foreground">
-																				<IconBox size="lg" shape="circle">
-																					<Icon
-																						className="text-hierarchy-secondary"
-																						aria-hidden
-																					/>
-																				</IconBox>
-																				<span className="min-w-0 flex-1 truncate text-left text-body-sm-strong">
-																					{bucket.label}
-																				</span>
-																			</span>
-																			<span className="shrink-0 tabular-nums text-foreground">
-																				{formatScore(bucket.scorePercent)}
-																			</span>
-																		</div>
-																	</AccordionTrigger>
-																	<AccordionContent className="px-4 pb-4 pt-0 text-foreground">
-																		{bucket.sourceCategories.length === 0 ? (
-																			<p className="text-caption text-muted-foreground">
-																				No source categories mapped to this group
-																				yet.
-																			</p>
-																		) : (
-																			<div className="space-y-6">
-																				{bucket.sourceCategories.map((cat) => (
-																					<div
-																						key={cat.name}
-																						className="space-y-3"
-																					>
-																						{bucket.sourceCategories.length >
-																						1 ? (
-																							<div className="flex items-center justify-between gap-3 border-b border-border pb-2">
-																								<p className="text-body-sm-strong text-foreground">
-																									{cat.name}
-																								</p>
-																								<span className="text-body-sm tabular-nums text-muted-foreground">
-																									{formatScore(cat.score)}
-																								</span>
-																							</div>
-																						) : null}
-																						<CapabilityCategoryDetailBody
-																							category={cat}
-																						/>
-																					</div>
-																				))}
-																			</div>
-																		)}
-																	</AccordionContent>
-																</AccordionItem>
-															)
-														})}
-													</Accordion>
-
-													<p className="text-caption text-muted-foreground">
-														Sub-scores drill-down is available in the detailed
-														methodology view (prototype).
-													</p>
 												</div>
-											</SheetContent>
+
+												<Accordion
+													type="multiple"
+													className="w-full rounded-lg border border-border"
+												>
+													{capabilityAccordionBuckets.map((bucket) => {
+														const Icon = bucket.icon
+														return (
+															<AccordionItem
+																key={bucket.label}
+																value={bucket.label}
+																className="border-border"
+															>
+																<AccordionTrigger className="h-16 px-4 py-0 text-left text-body-sm [&>svg]:ml-3">
+																	<div className="flex w-full min-w-0 flex-1 items-center justify-between gap-4 text-left">
+																		<span className="flex min-w-0 flex-1 items-center gap-2 truncate text-left text-foreground">
+																			<IconBox size="lg" shape="circle">
+																				<Icon
+																					className="text-hierarchy-secondary"
+																					aria-hidden
+																				/>
+																			</IconBox>
+																			<span className="min-w-0 flex-1 truncate text-left text-body-sm-strong">
+																				{bucket.label}
+																			</span>
+																		</span>
+																		<span className="shrink-0 tabular-nums text-foreground">
+																			{formatScore(bucket.scorePercent)}
+																		</span>
+																	</div>
+																</AccordionTrigger>
+																<AccordionContent className="px-4 pb-4 pt-0 text-foreground">
+																	{bucket.sourceCategories.length === 0 ? (
+																		<p className="text-caption text-muted-foreground">
+																			No source categories mapped to this group
+																			yet.
+																		</p>
+																	) : (
+																		<div className="space-y-6">
+																			{bucket.sourceCategories.map((cat) => (
+																				<div
+																					key={cat.name}
+																					className="space-y-3"
+																				>
+																					{bucket.sourceCategories.length >
+																					1 ? (
+																						<div className="flex items-center justify-between gap-3 border-b border-border pb-2">
+																							<p className="text-body-sm-strong text-foreground">
+																								{cat.name}
+																							</p>
+																							<span className="text-body-sm tabular-nums text-muted-foreground">
+																								{formatScore(cat.score)}
+																							</span>
+																						</div>
+																					) : null}
+																					<CapabilityCategoryDetailBody
+																						category={cat}
+																					/>
+																				</div>
+																			))}
+																		</div>
+																	)}
+																</AccordionContent>
+															</AccordionItem>
+														)
+													})}
+												</Accordion>
+
+												<p className="text-caption text-muted-foreground">
+													Sub-scores drill-down is available in the detailed
+													methodology view (prototype).
+												</p>
+											</AppSideSheetContent>
 										</Sheet>
 
 										<div className="flex min-w-0 max-w-full flex-col gap-3 p-0">
@@ -1413,7 +1409,8 @@ function RouteComponent() {
 											const Icon = modalityIcon(row.key)
 											const supported = row.availability !== 'none'
 											const highlight =
-												row.availability === 'both' || row.availability === 'input'
+												row.availability === 'both' ||
+												row.availability === 'input'
 											return (
 												<div
 													key={row.key}

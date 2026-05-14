@@ -1,45 +1,47 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import {
+	Activity,
 	ArrowLeft,
 	ArrowRight,
-	Check,
 	Info,
-	Lock,
+	RefreshCcw,
 	Rocket,
-	Search,
-	X,
 } from 'lucide-react'
-import { useId, useMemo, useState } from 'react'
-import {
-	countEnabledGuardrails,
-	defaultGuardrailsState,
-	type GuardrailsState,
-} from '@/components/GuardrailsStep'
-import type { PerformanceProfile } from '@/components/PerformanceProfileStep'
+import { useMemo, useEffect, useState } from 'react'
+import { EndpointModelSelectSheet } from '@/components/endpoint-wizard/EndpointModelSelectSheet'
+import { BasicSetupStep } from '@/components/endpoint-wizard/BasicSetupStep'
+import { ProviderSelectionStep } from '@/components/endpoint-wizard/ProviderSelectionStep'
+import { ReviewStep } from '@/components/endpoint-wizard/ReviewStep'
+import { PageHeader } from '@/components/layout/PageHeader'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input, Label } from '@/components/ui/input'
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from '@/components/ui/popover'
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select'
+import { Card } from '@/components/ui/card'
 import { toast } from '@/components/ui/sonner'
-import { Textarea } from '@/components/ui/textarea'
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { deployments, endpoints, models } from '@/data/mockData'
+import { WizardStepper } from '@/components/wizard/WizardStepper'
+import {
+	deployments,
+	endpoints,
+	getProviderOptions,
+	models,
+	type Model,
+} from '@/data/mockData'
+import {
+	getModelModalityLabel,
+	getOverallModelScore,
+	getParamSizeLabel,
+	overallScoreTextClass,
+} from '@/lib/model-metrics'
+import {
+	getModelProviderLogoSrc,
+	getProviderInitials,
+} from '@/lib/model-provider-logos'
+import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/app/endpoints/create_endpoint')({
 	validateSearch: (search: Record<string, unknown>) => ({
@@ -48,474 +50,540 @@ export const Route = createFileRoute('/app/endpoints/create_endpoint')({
 	component: RouteComponent,
 })
 
-const ModelSearchSelect = ({
-	value,
-	onChange,
-}: {
-	value: string
-	onChange: (id: string) => void
-}) => {
-	const [open, setOpen] = useState(false)
-	const [search, setSearch] = useState('')
+type StepId = 0 | 1 | 2
+type EndpointType = 'Production' | 'POC' | 'Demo'
+type ProviderSort =
+	| 'recommended'
+	| 'lowest-cost'
+	| 'lowest-latency'
+	| 'highest-throughput'
+	| 'largest-context'
 
-	const filtered = useMemo(() => {
-		const q = search.toLowerCase()
-		return models.filter(
-			(m) =>
-				m.name.toLowerCase().includes(q) ||
-				m.provider.toLowerCase().includes(q),
-		)
-	}, [search])
+const ENDPOINT_WIZARD_STEPPER_ITEMS = [
+	{ id: 'basic', label: 'Basic' },
+	{ id: 'provider', label: 'Model Provider' },
+	{ id: 'review', label: 'Review & Deploy' },
+] as const
 
-	const selected = models.find((m) => m.id === value)
+function formatEurPer1M(value: number): string {
+	return `€${value.toFixed(2)} / 1M`
+}
 
+const MISSING_VALUE_PLACEHOLDER = '- -'
+
+function getModelDetailParameterCount(model: Model): number {
+	const explicitParam =
+		getParamSizeLabel(model.name) ?? getParamSizeLabel(model.description)
+	if (explicitParam) {
+		return Number.parseFloat(explicitParam.replace('B', '')) * 1_000_000_000
+	}
+
+	const haystack =
+		`${model.name} ${model.domain} ${model.category}`.toLowerCase()
+	if (haystack.includes('mistral large')) return 123_000_000_000
+	if (haystack.includes('codestral')) return 22_000_000_000
+	if (haystack.includes('deepseek')) return 671_000_000_000
+	if (haystack.includes('qwen')) return 72_000_000_000
+	if (haystack.includes('llama')) return 70_000_000_000
+	if (haystack.includes('code')) return 22_000_000_000
+	if (haystack.includes('enterprise')) return 72_000_000_000
+	return 32_000_000_000
+}
+
+function formatDetailParameters(parameters: number | null | undefined): string {
+	if (!parameters) return MISSING_VALUE_PLACEHOLDER
+	if (parameters >= 1_000_000_000) {
+		return `${Math.round(parameters / 1_000_000_000)}B`
+	}
+	if (parameters >= 1_000_000) return `${Math.round(parameters / 1_000_000)}M`
+	return String(parameters)
+}
+
+function formatDetailContextWindow(tokens: number | null | undefined): string {
+	if (!tokens) return MISSING_VALUE_PLACEHOLDER
+	if (tokens >= 1000) return `${Math.round(tokens / 1000)}K`
+	return String(tokens)
+}
+
+function formatDetailMemory(bytes: number | null | undefined): string {
+	if (!bytes) return MISSING_VALUE_PLACEHOLDER
+	return `${Math.round(bytes / 1_000_000_000)} GB`
+}
+
+function ModelSummaryRow({ label, value }: { label: string; value: string }) {
 	return (
-		<Popover open={open} onOpenChange={setOpen}>
-			<PopoverTrigger asChild>
-				<Button
-					variant="outline"
-					role="combobox"
-					className="h-control-md w-full justify-between font-normal"
-				>
-					<span className="truncate">
-						{selected
-							? `${selected.name} — ${selected.provider}`
-							: 'Search and select a model…'}
-					</span>
-					<span className="ml-2 flex shrink-0 items-center gap-1">
-						{selected && (
-							<button
-								type="button"
-								className="rounded-full p-0.5 hover:bg-muted"
-								onClick={(e) => {
-									e.stopPropagation()
-									onChange('')
-								}}
-							>
-								<X className="h-3.5 w-3.5 text-muted-foreground" />
-							</button>
-						)}
-						<Search className="h-4 w-4 opacity-50" />
-					</span>
-				</Button>
-			</PopoverTrigger>
-			<PopoverContent
-				className="w-[--radix-popover-trigger-width] z-50 bg-popover p-0"
-				align="start"
-			>
-				<div className="border-b border-border p-2">
-					<Input
-						placeholder="Search models…"
-						value={search}
-						onChange={(e) => setSearch(e.target.value)}
-						className="h-8"
-						autoFocus
-					/>
-				</div>
-				<div className="max-h-56 overflow-y-auto p-1">
-					{filtered.length > 0 ? (
-						filtered.map((m) => (
-							<button
-								type="button"
-								key={m.id}
-								onClick={() => {
-									onChange(m.id)
-									setOpen(false)
-									setSearch('')
-								}}
-								className={`flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-sm hover:bg-accent ${value === m.id ? 'bg-accent' : ''}`}
-							>
-								<span>
-									{m.name}{' '}
-									<span className="text-muted-foreground">— {m.provider}</span>
-								</span>
-								{value === m.id && (
-									<Check className="h-3.5 w-3.5 text-primary" />
-								)}
-							</button>
-						))
-					) : (
-						<p className="px-2 py-3 text-center text-sm text-muted-foreground">
-							No models found.
-						</p>
-					)}
-					{search === '' && filtered.length >= 3 && (
-						<p className="px-2 py-1.5 text-center text-xs text-muted-foreground">
-							Showing {filtered.length} of {models.length} models — use search
-							to find more
-						</p>
-					)}
-				</div>
-			</PopoverContent>
-		</Popover>
+		<div className="flex items-center justify-between gap-3 px-4 py-3">
+			<span className="text-body-sm text-muted-foreground">{label}</span>
+			<span className="min-w-0 truncate text-right text-body-sm text-foreground">
+				{value}
+			</span>
+		</div>
 	)
 }
 
-const STEPS = ['Basic Setup', 'Review & Deploy'] as const
-const HOSTING_PROVIDERS = ['Openchip', 'Scaleway', 'Booster EU'] as const
-const USE_CASE_PLACEHOLDER =
-	"Describe your use case in a few sentences, e.g., 'We need to process insurance claims documents and extract key information like policy numbers, dates, and damage amounts for automated underwriting.'"
+function ModelSummarySidebarEmpty({
+	onSelectModel,
+}: {
+	onSelectModel: () => void
+}) {
+	return (
+		<aside className="min-w-0 self-start lg:col-span-1 lg:flex lg:h-full lg:min-h-0 lg:flex-col">
+			<Card className="relative flex h-full min-h-0 flex-col overflow-hidden border-primary/30 p-0 lg:flex-1">
+				<div
+					aria-hidden
+					className="pointer-events-none absolute inset-0 rounded-lg bg-gradient-to-bl from-primary/10 via-transparent to-transparent"
+				/>
+				<div className="relative flex min-h-0 flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
+					<p className="max-w-[240px] text-body-sm text-muted-foreground">
+						Please select the underlying model that will serve this inference
+						endpoint.
+					</p>
+					<Button
+						type="button"
+						className="w-full max-w-[240px]"
+						onClick={onSelectModel}
+					>
+						Browse models
+					</Button>
+				</div>
+			</Card>
+		</aside>
+	)
+}
+
+function ModelSummarySidebar({
+	model,
+	providerCount,
+	onSwapModel,
+}: {
+	model: Model
+	providerCount: number
+	onSwapModel: () => void
+}) {
+	const providerLogoSrc = getModelProviderLogoSrc(model.provider, model.name)
+	const capabilityScore = getOverallModelScore(model)
+	const parameterCount = getModelDetailParameterCount(model)
+	const parameterLabel = formatDetailParameters(parameterCount)
+	const minMemoryLabel = formatDetailMemory(Math.max(parameterCount * 2, 0))
+	const modalityLabel = getModelModalityLabel(model)
+	const providerInitials = getProviderInitials(model.provider)
+	const licenseLabel =
+		model.hosting === 'Booster Powered' ? 'Commercial' : 'Open Source'
+
+	return (
+		<aside className="min-w-0 self-start lg:col-span-1 lg:flex lg:h-full lg:min-h-0 lg:flex-col">
+			<Card className="relative flex h-full min-h-0 flex-col overflow-hidden border-primary/30 p-0 lg:flex-1">
+				<div
+					aria-hidden
+					className="pointer-events-none absolute inset-0 rounded-lg bg-gradient-to-bl from-primary/10 via-transparent to-transparent"
+				/>
+
+				<div className="relative space-y-4 border-b border-border p-4">
+					<div className="flex items-start gap-3">
+						<Avatar className="h-icon-40 w-icon-40 rounded-lg border border-border bg-background">
+							{providerLogoSrc ? (
+								<AvatarImage src={providerLogoSrc} alt="" />
+							) : null}
+							<AvatarFallback className="rounded-lg text-body-sm-strong">
+								{providerInitials}
+							</AvatarFallback>
+						</Avatar>
+						<div className="min-w-0 flex-1">
+							<h2 className="truncate text-body-sm-strong text-foreground">
+								{model.name}
+							</h2>
+							<p className="text-caption text-muted-foreground">
+								{model.provider}
+							</p>
+						</div>
+					</div>
+
+					<p className="text-body-sm text-muted-foreground">
+						{model.description}
+					</p>
+
+					<div className="flex flex-wrap gap-2">
+						<Badge variant="success" appearance="pill" size="24">
+							{model.status}
+						</Badge>
+						<Badge variant="outline" appearance="ghost" size="24">
+							{modalityLabel}
+						</Badge>
+						<Badge variant="outline" appearance="ghost" size="24">
+							{licenseLabel}
+						</Badge>
+						<Badge variant="outline" appearance="ghost" size="24">
+							{providerCount} {providerCount === 1 ? 'provider' : 'providers'}
+						</Badge>
+					</div>
+				</div>
+
+				<div className="relative flex items-center justify-between gap-3 border-b border-border px-4 py-3">
+					<div className="flex items-center gap-1">
+						<span className="text-body-sm text-muted-foreground">
+							Capability score
+						</span>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<Info className="h-icon-16 w-icon-16 cursor-help text-muted-foreground" />
+							</TooltipTrigger>
+							<TooltipContent className="max-w-page-intro">
+								Aggregated score from model capability benchmarks in this
+								catalog.
+							</TooltipContent>
+						</Tooltip>
+					</div>
+					<span
+						className={cn(
+							'text-h2 leading-none tabular-nums',
+							overallScoreTextClass(capabilityScore),
+						)}
+					>
+						{capabilityScore}
+					</span>
+				</div>
+
+				<div className="relative divide-y divide-border">
+					<ModelSummaryRow label="Parameters" value={parameterLabel} />
+					<ModelSummaryRow
+						label="Context Window"
+						value={formatDetailContextWindow(model.contextLength)}
+					/>
+					<ModelSummaryRow label="Min. Memory" value={minMemoryLabel} />
+					<ModelSummaryRow
+						label="Input Tokens"
+						value={formatEurPer1M(model.inputCostPer1M)}
+					/>
+					<ModelSummaryRow
+						label="Output Tokens"
+						value={formatEurPer1M(model.outputCostPer1M)}
+					/>
+				</div>
+
+				<div className="relative mt-auto border-t border-border p-3">
+					<Button variant="outline" className="w-full" onClick={onSwapModel}>
+						<RefreshCcw className="mr-1 h-icon-16 w-icon-16" /> Swap Model
+					</Button>
+				</div>
+			</Card>
+		</aside>
+	)
+}
 
 function RouteComponent() {
 	const navigate = useNavigate()
-	const { model: preselectedModelId } = Route.useSearch()
-	const endpointNameId = useId()
-	const useCaseId = useId()
+	const { model: modelFromSearch } = Route.useSearch()
 
-	const preselectedModel = preselectedModelId
-		? models.find((m) => m.id === preselectedModelId)
-		: undefined
-	const [step, setStep] = useState(0)
-	const [useCaseDescription, setUseCaseDescription] = useState('')
-	const [config, setConfig] = useState({
-		name: '',
-		targetSpace: 'Production',
-		hostingProvider: 'Openchip' as (typeof HOSTING_PROVIDERS)[number],
-		modelId: preselectedModelId,
-		modelVersion: preselectedModel?.version || '',
-		region: 'scaleway-fr',
-		confidentialCompute: false,
-		performanceProfile: 'best-effort' as PerformanceProfile,
-		monthlyBudget: '1000000',
-		alertThreshold: '80',
-		hardCap: false,
-		emailAlerts: true,
-		perRequestTokenCap: '',
-	})
-	const [guardrails] = useState<GuardrailsState>(defaultGuardrailsState)
+	const selectedModel = useMemo(() => {
+		if (!modelFromSearch || !models.some((m) => m.id === modelFromSearch)) {
+			return null
+		}
+		return models.find((m) => m.id === modelFromSearch) ?? null
+	}, [modelFromSearch])
 
-	const isReviewStep = step === STEPS.length - 1
-	const selectedModel = models.find((m) => m.id === config.modelId)
-	const enabledGuardrailCount = countEnabledGuardrails(guardrails)
+	const [step, setStep] = useState<StepId>(0)
+	const [endpointName, setEndpointName] = useState('')
+	const [endpointType] = useState<EndpointType>('Production')
+	const [useCase, setUseCase] = useState('')
+	const [selectedPreset, setSelectedPreset] = useState<string | null>(null)
+	const [providerSort, setProviderSort] =
+		useState<ProviderSort>('highest-throughput')
+	const [selectedProviderId, setSelectedProviderId] =
+		useState<string>('recommended')
+	const [isDeploying, setIsDeploying] = useState(false)
+	const [modelPickerOpen, setModelPickerOpen] = useState(false)
+	const [modelPickerSeedId, setModelPickerSeedId] = useState<string | null>(
+		null,
+	)
 
-	const updateConfig = (key: string, value: string | boolean) => {
-		setConfig((prev) => ({ ...prev, [key]: value }))
+	const openModelPicker = (seedId: string | null) => {
+		setModelPickerSeedId(seedId)
+		setModelPickerOpen(true)
+	}
+
+	useEffect(() => {
+		if (!selectedModel && step > 0) {
+			setStep(0)
+		}
+	}, [selectedModel, step])
+
+	const providerOptions = useMemo(
+		() => (selectedModel ? getProviderOptions(selectedModel.id) : []),
+		[selectedModel],
+	)
+	const recommendedProvider = useMemo(
+		() =>
+			providerOptions.find((provider) => provider.recommended) ??
+			providerOptions[0] ??
+			null,
+		[providerOptions],
+	)
+	const selectedProvider = useMemo(() => {
+		if (!recommendedProvider) return null
+		return (
+			providerOptions.find((provider) => provider.id === selectedProviderId) ??
+			recommendedProvider
+		)
+	}, [providerOptions, recommendedProvider, selectedProviderId])
+
+	const sortedProviders = useMemo(() => {
+		const rows = [...providerOptions]
+		switch (providerSort) {
+			case 'lowest-cost':
+				rows.sort(
+					(a, b) =>
+						a.inputPer1M + a.outputPer1M - (b.inputPer1M + b.outputPer1M),
+				)
+				return rows
+			case 'lowest-latency':
+				rows.sort((a, b) => a.latencyMs - b.latencyMs)
+				return rows
+			case 'highest-throughput':
+				rows.sort((a, b) => b.tps - a.tps)
+				return rows
+			case 'largest-context':
+				rows.sort((a, b) => b.contextTokens - a.contextTokens)
+				return rows
+			default:
+				rows.sort(
+					(a, b) =>
+						Number(Boolean(b.recommended)) - Number(Boolean(a.recommended)),
+				)
+				return rows
+		}
+	}, [providerOptions, providerSort])
+
+	const canProceed = useMemo(() => {
+		if (!selectedModel) return false
+		if (step === 0) {
+			return endpointName.trim().length > 0 && useCase.trim().length > 0
+		}
+		if (step === 1) {
+			return Boolean(selectedProvider)
+		}
+		return true
+	}, [endpointName, selectedModel, selectedProvider, step, useCase])
+
+	const estimatedMonthlyCost = useMemo(() => {
+		if (!selectedProvider) return '0'
+		const averagePer1M =
+			(selectedProvider.inputPer1M + selectedProvider.outputPer1M) / 2
+		return averagePer1M.toFixed(0)
+	}, [selectedProvider])
+
+	const providerCount = 1
+
+	const goToStep = (target: StepId) => {
+		if (target < step) {
+			setStep(target)
+		}
+	}
+
+	const goNext = () => {
+		if (!canProceed) return
+		setStep((current) => (current < 2 ? ((current + 1) as StepId) : current))
+	}
+
+	const goBack = () => {
+		setStep((current) => (current > 0 ? ((current - 1) as StepId) : current))
 	}
 
 	const handleCreate = () => {
-		const newEndpointId = `sp-${Date.now()}`
-		const endpointUrl = `https://api.booster.ai/v1/endpoints/${config.targetSpace.toLowerCase()}/${config.name
-			.toLowerCase()
-			.replace(/\s+/g, '-')}`
-		endpoints.push({
-			id: newEndpointId,
-			name: config.name,
-			type: config.targetSpace as 'Production' | 'POC' | 'Demo',
-			defaultDeployment: selectedModel?.name ?? '—',
-			budgetUsed: 0,
-			health: 'OK',
-			monthlySpend: 0,
-			inputTokens: 0,
-			outputTokens: 0,
-			endpoint: endpointUrl,
-			tokenBudget: parseInt(config.monthlyBudget, 10) || 1_000_000,
-			monthlyBudgetEur: Math.max(
-				0,
-				Math.round((parseInt(config.monthlyBudget, 10) || 1_000_000) / 1000),
-			),
-			performanceProfile: config.performanceProfile,
-		})
-		if (selectedModel) {
-			const regionLabel =
-				config.region === 'scaleway-fr'
-					? 'EU-West'
-					: config.region === 'scaleway-nl'
-						? 'EU-West'
-						: config.region === 'scaleway-pl'
-							? 'EU-Central'
-							: 'EU-South'
+		if (!selectedModel || !selectedProvider || !canProceed || isDeploying)
+			return
+		setIsDeploying(true)
+
+		window.setTimeout(() => {
+			const newEndpointId = `sp-${Date.now()}`
+			const slug = endpointName.trim().toLowerCase().replace(/\s+/g, '-')
+			const endpointUrl = `https://api.booster.ai/v1/endpoints/${endpointType.toLowerCase()}/${slug}`
+
+			endpoints.push({
+				id: newEndpointId,
+				name: endpointName.trim(),
+				type: endpointType,
+				defaultDeployment: selectedModel.name,
+				description: useCase.trim(),
+				budgetUsed: 0,
+				health: 'OK',
+				monthlySpend: 0,
+				inputTokens: 0,
+				outputTokens: 0,
+				endpoint: endpointUrl,
+				tokenBudget: 1_000_000,
+				monthlyBudgetEur: Math.max(1, Math.round(Number(estimatedMonthlyCost))),
+				performanceProfile: 'best-effort',
+			})
+
 			deployments[newEndpointId] = [
 				{
 					id: `dep-${Date.now()}`,
-					name: `${selectedModel.name.toLowerCase().replace(/\s+/g, '-')}-${config.name.toLowerCase().replace(/\s+/g, '-')}`,
+					name: `${selectedModel.name.toLowerCase().replace(/\s+/g, '-')}-${slug}`,
 					model: selectedModel.name,
-					version: config.modelVersion || selectedModel.version,
+					version: selectedModel.version,
 					mode: 'Shared',
 					budgetUsed: 0,
 					slaStatus: 'OK',
-					region: regionLabel,
-					confidentialCompute: config.confidentialCompute,
-					latencyP50: 0,
-					costPer1MTokens: selectedModel.inputCostPer1M,
+					region:
+						selectedProvider.provider === 'Scaleway' ? 'EU-West' : 'EU-Central',
+					confidentialCompute: false,
+					latencyP50: selectedProvider.latencyMs,
+					costPer1MTokens: selectedProvider.inputPer1M,
 				},
 			]
-		} else {
-			deployments[newEndpointId] = []
-		}
-		toast.success('Inference Endpoint Deployed', {
-			description: `"${config.name}" has been deployed successfully.`,
-		})
-		navigate({ to: '/app/overview' })
-	}
 
-	const estimatedCost = () => {
-		if (!selectedModel) return '—'
-		const budget = parseInt(config.monthlyBudget, 10) || 0
-		const avg =
-			(selectedModel.inputCostPer1M + selectedModel.outputCostPer1M) / 2 / 1000
-		return `~$${((budget / 1000) * avg).toFixed(0)}`
-	}
-
-	const canProceed = () => {
-		if (step === 0) {
-			return (
-				config.name.trim().length > 0 && useCaseDescription.trim().length > 0
-			)
-		}
-		return true
+			toast.success('Inference endpoint deployed', {
+				description: `"${endpointName.trim()}" is live on ${selectedProvider.provider}.`,
+			})
+			navigate({ to: '/app/overview' })
+		}, 900)
 	}
 
 	return (
-		<div className="container space-y-6 py-8">
-			<Button
-				variant="ghost"
-				size="sm"
-				className="-ml-3"
-				onClick={() => window.history.back()}
-			>
-				<ArrowLeft className="mr-1 h-4 w-4" /> Back
-			</Button>
+		<>
+		<div className="container max-w-6xl flex h-[calc(100vh-3.5rem)] min-h-0 flex-col gap-4 overflow-hidden py-4">
+			<PageHeader
+				className="shrink-0"
+				leading={
+					<Button
+						variant="ghost"
+						size="sm"
+						className="-ml-3 w-fit"
+						onClick={() => window.history.back()}
+					>
+						<ArrowLeft className="mr-1 h-icon-16 w-icon-16" /> Back
+					</Button>
+				}
+				titleSize="section"
+				title="Create Inference Endpoint"
+				description="Configure and deploy a model inference endpoint with safety and budget controls."
+			/>
 
-			<div>
-				<h1 className="text-2xl font-bold">Create Inference Endpoint</h1>
-				<p className="mt-1 text-body-sm text-muted-foreground">
-					Configure and deploy a model inference endpoint with safety and budget
-					controls.
-				</p>
-			</div>
+			<div className="grid min-h-0 flex-1 basis-0 grid-cols-1 gap-4 overflow-hidden lg:grid-cols-endpoint-deploy-wizard">
+				{selectedModel ? (
+					<ModelSummarySidebar
+						model={selectedModel}
+						providerCount={providerCount}
+						onSwapModel={() => openModelPicker(selectedModel.id)}
+					/>
+				) : (
+					<ModelSummarySidebarEmpty
+						onSelectModel={() => openModelPicker(null)}
+					/>
+				)}
 
-			<div className="flex items-center gap-2">
-				{STEPS.map((s, i) => (
-					<div key={s} className="flex items-center gap-2">
-						<button
-							type="button"
-							onClick={() => {
-								if (i < step) setStep(i)
-							}}
-							className={`flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-medium transition-colors ${
-								i === step
-									? 'bg-primary text-primary-foreground'
-									: i < step
-										? 'cursor-pointer bg-primary/20 text-primary'
-										: 'bg-muted text-muted-foreground'
-							}`}
-						>
-							{i < step && <Check className="h-3.5 w-3.5" />}
-							<span className="whitespace-nowrap">{s}</span>
-						</button>
-						{i < STEPS.length - 1 && (
-							<div
-								className={`h-px w-6 ${i < step ? 'bg-primary' : 'bg-border'}`}
+				<section className="min-h-0 h-full min-w-0 lg:col-span-1">
+					<Card className="flex h-full flex-col overflow-hidden p-0">
+						<div className="flex h-endpoint-deploy-strip min-h-endpoint-deploy-strip shrink-0 items-center justify-center border-b border-border px-4">
+							<WizardStepper
+								className="min-h-0 min-w-0"
+								steps={[...ENDPOINT_WIZARD_STEPPER_ITEMS]}
+								currentStep={step}
+								onStepChange={(index) => goToStep(index as StepId)}
 							/>
-						)}
-					</div>
-				))}
-			</div>
+						</div>
 
-			<Card>
-				<CardHeader>
-					<CardTitle>{STEPS[step]}</CardTitle>
-				</CardHeader>
-				<CardContent className="space-y-4">
-					{step === 0 && (
-						<>
-							<div className="space-y-2">
-								<Label htmlFor={endpointNameId}>Inference Endpoint Name</Label>
-								<Input
-									id={endpointNameId}
-									placeholder="e.g. Claims Processing"
-									value={config.name}
-									onChange={(e) => updateConfig('name', e.target.value)}
+						{step === 0 ? (
+							<BasicSetupStep
+								endpointName={endpointName}
+								setEndpointName={setEndpointName}
+								useCase={useCase}
+								setUseCase={setUseCase}
+								selectedPreset={selectedPreset}
+								setSelectedPreset={setSelectedPreset}
+								showUseCasePresets={false}
+							/>
+						) : null}
+
+						{step === 1 ? (
+							selectedModel && selectedProvider ? (
+								<ProviderSelectionStep
+									providerSort={providerSort}
+									setProviderSort={setProviderSort}
+									selectedProvider={selectedProvider}
+									selectedProviderId={selectedProviderId}
+									setSelectedProviderId={setSelectedProviderId}
+									sortedProviders={sortedProviders}
 								/>
-							</div>
-							<div className="space-y-2">
-								<Label htmlFor={useCaseId}>
-									Use case <span className="text-destructive">*</span>
-								</Label>
-								<Textarea
-									id={useCaseId}
-									size="lg"
-									required
-									placeholder={USE_CASE_PLACEHOLDER}
-									value={useCaseDescription}
-									onChange={(e) => setUseCaseDescription(e.target.value)}
+							) : (
+								<div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 overflow-y-auto p-6 text-center">
+									<p className="max-w-md text-body-sm text-muted-foreground">
+										Select a model from the catalog to compare deployment
+										providers.
+									</p>
+								</div>
+							)
+						) : null}
+
+						{step === 2 ? (
+							selectedModel && selectedProvider ? (
+								<ReviewStep
+									endpointName={endpointName}
+									useCase={useCase}
+									selectedModel={selectedModel}
+									selectedProvider={selectedProvider}
+									estimatedMonthlyCost={estimatedMonthlyCost}
+									setStep={setStep}
 								/>
-							</div>
-							<div className="space-y-2">
-								<Label>Provider</Label>
-								<Select
-									value={config.hostingProvider}
-									onValueChange={(v) =>
-										updateConfig(
-											'hostingProvider',
-											v as (typeof HOSTING_PROVIDERS)[number],
-										)
-									}
+							) : null
+						) : null}
+
+						<div className="shrink-0 border-t border-border p-3">
+							<div className="flex items-center justify-between gap-3">
+								<Button
+									variant="outline"
+									onClick={goBack}
+									disabled={step === 0 || isDeploying}
 								>
-									<SelectTrigger>
-										<SelectValue />
-									</SelectTrigger>
-									<SelectContent>
-										{HOSTING_PROVIDERS.map((p) => (
-											<SelectItem key={p} value={p}>
-												{p}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-							</div>
-							<div className="space-y-2">
-								<Label>
-									Model selection{' '}
-									<span className="font-normal text-muted-foreground">
-										(optional — can be added later)
-									</span>
-								</Label>
-								<ModelSearchSelect
-									value={config.modelId}
-									onChange={(v) => {
-										const m = models.find((mod) => mod.id === v)
-										setConfig((prev) => ({
-											...prev,
-											modelId: v,
-											modelVersion: m?.version || '',
-										}))
-									}}
-								/>
-							</div>
-							{selectedModel?.availableVersions &&
-								selectedModel.availableVersions.length > 1 && (
-									<div className="space-y-2">
-										<div className="flex items-center gap-1.5">
-											<Label>Booster variant</Label>
-											<Tooltip>
-												<TooltipTrigger asChild>
-													<Info className="h-3.5 w-3.5 cursor-help text-muted-foreground" />
-												</TooltipTrigger>
-												<TooltipContent className="max-w-xs text-xs">
-													This is the serving profile of the model optimised and
-													hosted by Booster.
-												</TooltipContent>
-											</Tooltip>
-										</div>
-										<Select
-											value={config.modelVersion || selectedModel.version}
-											onValueChange={(v) => updateConfig('modelVersion', v)}
-										>
-											<SelectTrigger>
-												<SelectValue />
-											</SelectTrigger>
-											<SelectContent>
-												{selectedModel.availableVersions.map((v) => (
-													<SelectItem key={v} value={v}>
-														v{v}
-														{v === selectedModel.version ? ' (latest)' : ''}
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-									</div>
-								)}
-						</>
-					)}
+									<ArrowLeft className="mr-1 h-icon-16 w-icon-16" /> Back
+								</Button>
 
-					{isReviewStep && (
-						<div className="space-y-4">
-							<p className="text-body-sm text-muted-foreground">
-								Review your configuration before deploying. Default budget and
-								performance settings apply; you can change them in the product
-								later.
-							</p>
-							<div className="grid gap-4 md:grid-cols-2">
-								<Card className="bg-muted/50">
-									<CardContent className="space-y-2 p-4">
-										<p className="text-caption font-semibold uppercase tracking-wider text-muted-foreground">
-											Inference endpoint
-										</p>
-										<p className="font-semibold">{config.name || '—'}</p>
-										<Badge variant="secondary">{config.targetSpace}</Badge>
-										<p className="text-body-sm text-muted-foreground">
-											<span className="font-medium text-foreground">
-												Provider:
-											</span>{' '}
-											{config.hostingProvider}
-										</p>
-										{useCaseDescription && (
-											<p className="line-clamp-4 text-body-sm text-foreground/90">
-												{useCaseDescription}
-											</p>
+								{step < 2 ? (
+									<Button
+										onClick={goNext}
+										disabled={!canProceed || isDeploying}
+									>
+										Next <ArrowRight className="ml-1 h-icon-16 w-icon-16" />
+									</Button>
+								) : (
+									<Button
+										onClick={handleCreate}
+										disabled={!canProceed || isDeploying}
+									>
+										{isDeploying ? (
+											<>
+												<Activity className="mr-1 h-icon-16 w-icon-16" />
+												Deploying endpoint...
+											</>
+										) : (
+											<>
+												<Rocket className="mr-1 h-icon-16 w-icon-16" />
+												Deploy inference endpoint
+											</>
 										)}
-										{selectedModel && (
-											<p className="text-body-sm">{selectedModel.name}</p>
-										)}
-									</CardContent>
-								</Card>
-								<Card className="bg-muted/50">
-									<CardContent className="space-y-2 p-4">
-										<p className="text-caption font-semibold uppercase tracking-wider text-muted-foreground">
-											Budget
-										</p>
-										<p className="text-body-sm">
-											{parseInt(config.monthlyBudget, 10).toLocaleString()}{' '}
-											tokens/mo
-										</p>
-										<p className="text-xs text-muted-foreground">
-											Alert at {config.alertThreshold}%
-										</p>
-										<p className="text-xs text-muted-foreground">
-											Hard stop: {config.hardCap ? 'Yes' : 'No'}
-										</p>
-										{selectedModel && (
-											<p className="text-sm font-medium text-primary">
-												Est. cost: {estimatedCost()}/mo
-											</p>
-										)}
-										<p className="text-xs text-muted-foreground">
-											Guardrails:{' '}
-											{enabledGuardrailCount === 0
-												? 'None enabled'
-												: `${enabledGuardrailCount} enabled`}
-										</p>
-									</CardContent>
-								</Card>
-							</div>
-							<div className="mt-2 flex items-start gap-2 rounded-md border border-border bg-muted/50 p-3">
-								<Lock className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-								<p className="text-xs text-muted-foreground">
-									Your input data and model responses are never used to train
-									our models and will not be shared with other users or third
-									parties.
-								</p>
+									</Button>
+								)}
 							</div>
 						</div>
-					)}
-				</CardContent>
-			</Card>
-
-			<div className="flex justify-between">
-				<Button
-					variant="outline"
-					disabled={step === 0}
-					onClick={() => setStep((s) => s - 1)}
-				>
-					<ArrowLeft className="mr-1 h-4 w-4" /> Back
-				</Button>
-				{step < STEPS.length - 1 ? (
-					<Button
-						onClick={() => setStep((s) => s + 1)}
-						disabled={!canProceed()}
-					>
-						Next <ArrowRight className="ml-1 h-4 w-4" />
-					</Button>
-				) : (
-					<Button
-						onClick={handleCreate}
-						disabled={!config.name.trim() || !useCaseDescription.trim()}
-					>
-						<Rocket className="mr-1 h-4 w-4" /> Deploy inference endpoint
-					</Button>
-				)}
+					</Card>
+				</section>
 			</div>
 		</div>
+
+		<EndpointModelSelectSheet
+			open={modelPickerOpen}
+			onOpenChange={setModelPickerOpen}
+			models={models}
+			initialSelectedModelId={modelPickerSeedId}
+			onConfirm={(modelId) => {
+				navigate({
+					to: '/app/endpoints/create_endpoint',
+					search: { model: modelId },
+					replace: true,
+				})
+				setModelPickerOpen(false)
+			}}
+		/>
+		</>
 	)
 }

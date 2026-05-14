@@ -11,7 +11,7 @@ const Avatar = React.forwardRef<
 		ref={ref}
 		// Avatar shape is intentionally semantic-circular via radius-full token.
 		className={cn(
-			'relative flex h-avatar w-avatar shrink-0 overflow-hidden rounded-full',
+			'relative flex h-avatar w-avatar shrink-0 overflow-hidden rounded-full [&>*]:size-full',
 			className,
 		)}
 		{...props}
@@ -25,7 +25,10 @@ const AvatarImage = React.forwardRef<
 >(({ className, ...props }, ref) => (
 	<AvatarPrimitive.Image
 		ref={ref}
-		className={cn('aspect-square h-full w-full', className)}
+		className={cn(
+			'block size-full max-h-full max-w-full object-cover',
+			className,
+		)}
 		{...props}
 	/>
 ))
@@ -38,7 +41,7 @@ const AvatarFallback = React.forwardRef<
 	<AvatarPrimitive.Fallback
 		ref={ref}
 		className={cn(
-			'flex h-full w-full items-center justify-center rounded-full bg-muted text-label',
+			'flex size-full items-center justify-center rounded-full bg-transparent text-muted-foreground text-label',
 			className,
 		)}
 		{...props}

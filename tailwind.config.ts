@@ -109,6 +109,15 @@ export default {
         8: "var(--space-32)",
         10: "var(--space-40)",
         20: "var(--space-80)",
+        "icon-16": "var(--icon-size-16)",
+        "icon-20": "var(--icon-size-20)",
+        "icon-24": "var(--icon-size-24)",
+        "icon-28": "var(--icon-size-28)",
+        "icon-32": "var(--icon-size-32)",
+        "icon-40": "var(--icon-size-40)",
+        "icon-60": "var(--icon-size-60)",
+        "icon-72": "var(--icon-size-72)",
+        "model-detail-kpi-x": "var(--layout-model-detail-kpi-x)",
       },
       borderRadius: {
         sm: "var(--radius-sm)",
@@ -141,6 +150,7 @@ export default {
         "component-labs-audit": "var(--layout-component-labs-audit-panel)",
       },
       height: {
+        "model-detail-row": "var(--layout-model-detail-row-height)",
         "endpoint-deploy-strip": "var(--layout-endpoint-deploy-strip-height)",
         "icon-16": "var(--icon-size-16)",
         "icon-20": "var(--icon-size-20)",

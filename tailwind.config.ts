@@ -20,6 +20,12 @@ export default {
         ring: "oklch(var(--ring) / <alpha-value>)",
         background: "oklch(var(--background) / <alpha-value>)",
         foreground: "oklch(var(--foreground) / <alpha-value>)",
+        hierarchy: {
+          primary: "oklch(var(--foreground) / var(--foreground-alpha-primary))",
+          secondary: "oklch(var(--foreground) / var(--foreground-alpha-secondary))",
+          muted: "oklch(var(--foreground) / var(--foreground-alpha-muted))",
+          disabled: "oklch(var(--foreground) / var(--foreground-alpha-disabled))",
+        },
         overlay: {
           scrim: "var(--overlay-scrim)",
         },

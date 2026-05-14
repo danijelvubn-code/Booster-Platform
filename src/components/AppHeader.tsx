@@ -1,6 +1,5 @@
 import { Link, useLocation, useNavigate } from '@tanstack/react-router'
 import { ChevronDown, HelpCircle, LogOut, User } from 'lucide-react'
-import type { ReactNode } from 'react'
 
 import { BoosterLogo } from '@/components/brand/BoosterLogo'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -22,14 +21,14 @@ import { useAuth } from '@/hooks/use-auth'
 import { primaryNavItems } from '@/lib/app-nav'
 import { cn } from '@/lib/utils'
 
+const PRIMARY_NAV_TOOLTIP_DELAY_MS = 1000
+
 type AppHeaderProps = {
 	/**
 	 * Use `static` in section labs / previews so the header does not stick over surrounding content.
 	 * Defaults to `sticky` for the real app shell.
 	 */
 	position?: 'sticky' | 'static'
-	/** Optional pill rendered next to the logo (e.g. `"MVP"`). */
-	badge?: ReactNode
 	/** Override the logo target (defaults to `/overview`). */
 	logoHref?: string
 	/**
@@ -51,7 +50,6 @@ type AppHeaderProps = {
  */
 export default function AppHeader({
 	position = 'sticky',
-	badge,
 	logoHref = postMvpPath('/overview'),
 	comingSoonPaths,
 	excludeNavPaths,
@@ -87,16 +85,12 @@ export default function AppHeader({
 						tone="on-light"
 						size="sm"
 						presentation
+						className="h-icon-40"
 					/>
-					{badge ? (
-						<span className="ml-1 rounded-md border border-border px-2 py-0.5 text-caption font-medium text-muted-foreground">
-							{badge}
-						</span>
-					) : null}
 				</Link>
 
 				<nav
-					className="flex min-w-0 flex-1 flex-wrap items-center justify-center gap-2"
+					className="flex h-14 min-w-0 flex-1 flex-wrap items-center justify-center gap-2"
 					aria-label="Primary"
 				>
 					{navItems.map((item) => {
@@ -108,7 +102,8 @@ export default function AppHeader({
 						const soonPill = isSoon ? (
 							<span
 								key="soon-pill"
-								className="ml-0.5 rounded-md border border-border px-1.5 py-0.5 text-caption font-medium uppercase tracking-wide text-muted-foreground"
+								aria-label="Coming soon"
+								className="ml-0.5 rounded-md border border-border px-1.5 py-0.5 text-caption font-medium uppercase tracking-wide text-hierarchy-muted"
 							>
 								Soon
 							</span>
@@ -128,8 +123,8 @@ export default function AppHeader({
 								key={item.path}
 								aria-disabled="true"
 								className={cn(
-									'flex cursor-not-allowed items-center gap-1.5 rounded-md px-3 py-2 text-body-sm font-medium',
-									'text-muted-foreground/75',
+									'flex h-14 cursor-not-allowed items-center gap-1.5 px-3 text-body-sm font-medium',
+									'text-hierarchy-disabled',
 								)}
 							>
 								{labelGroup}
@@ -139,10 +134,12 @@ export default function AppHeader({
 								key={item.path}
 								to={itemHref}
 								className={cn(
-									'flex items-center gap-1.5 rounded-md px-3 py-2 text-body-sm font-medium transition-colors ease-standard',
+									'app-header-nav-underline-host relative flex h-14 items-center gap-1.5 px-3 text-body-sm font-medium',
+									'outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+									'after:pointer-events-none after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:origin-left after:scale-x-0 after:bg-primary after:transition-transform after:duration-150 after:ease-linear',
 									isActive
-										? 'bg-primary/10 text-primary'
-										: 'text-muted-foreground hover:bg-accent hover:text-foreground',
+										? 'text-primary after:scale-x-100'
+										: 'text-hierarchy-secondary transition-colors hover:text-primary',
 								)}
 							>
 								{labelGroup}
@@ -152,7 +149,10 @@ export default function AppHeader({
 						const tooltipText = isSoon ? 'Coming soon' : item.tooltip
 						if (tooltipText) {
 							return (
-								<TooltipProvider key={item.path} delayDuration={300}>
+								<TooltipProvider
+									key={item.path}
+									delayDuration={PRIMARY_NAV_TOOLTIP_DELAY_MS}
+								>
 									<Tooltip>
 										<TooltipTrigger asChild>{itemEl}</TooltipTrigger>
 										<TooltipContent

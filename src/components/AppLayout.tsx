@@ -5,7 +5,6 @@ export default function AppLayout() {
 	return (
 		<div className="mvp-shell flex min-h-0 flex-1 flex-col overflow-hidden bg-background">
 			<AppHeader
-				badge="MVP"
 				logoHref="/app/overview"
 				navPathPrefix="/app"
 				comingSoonPaths={['/observe', '/optimize']}

@@ -30,6 +30,7 @@ import {
 	getProviderOptions,
 	models,
 	type Model,
+	type ProviderOption,
 } from '@/data/mockData'
 import {
 	getModelModalityLabel,
@@ -67,6 +68,21 @@ const ENDPOINT_WIZARD_STEPPER_ITEMS = [
 
 function formatEurPer1M(value: number): string {
 	return `€${value.toFixed(2)} / 1M`
+}
+
+/** Cheapest selectable row uses lowest combined In+Out €/1M, then lowest In, then Out. */
+function pickCheapestProviderOption(
+	providers: ProviderOption[],
+): ProviderOption | null {
+	if (providers.length === 0) return null
+	return providers.reduce((best, p) => {
+		const sum = p.inputPer1M + p.outputPer1M
+		const bestSum = best.inputPer1M + best.outputPer1M
+		if (sum !== bestSum) return sum < bestSum ? p : best
+		if (p.inputPer1M !== best.inputPer1M)
+			return p.inputPer1M < best.inputPer1M ? p : best
+		return p.outputPer1M < best.outputPer1M ? p : best
+	})
 }
 
 const MISSING_VALUE_PLACEHOLDER = '- -'
@@ -155,10 +171,14 @@ function ModelSummarySidebar({
 	model,
 	providerCount,
 	onSwapModel,
+	inputCostPer1M,
+	outputCostPer1M,
 }: {
 	model: Model
 	providerCount: number
 	onSwapModel: () => void
+	inputCostPer1M: number
+	outputCostPer1M: number
 }) {
 	const providerLogoSrc = getModelProviderLogoSrc(model.provider, model.name)
 	const capabilityScore = getOverallModelScore(model)
@@ -252,11 +272,11 @@ function ModelSummarySidebar({
 					<ModelSummaryRow label="Min. Memory" value={minMemoryLabel} />
 					<ModelSummaryRow
 						label="Input Tokens"
-						value={formatEurPer1M(model.inputCostPer1M)}
+						value={formatEurPer1M(inputCostPer1M)}
 					/>
 					<ModelSummaryRow
 						label="Output Tokens"
-						value={formatEurPer1M(model.outputCostPer1M)}
+						value={formatEurPer1M(outputCostPer1M)}
 					/>
 				</div>
 
@@ -311,6 +331,23 @@ function RouteComponent() {
 		() => (selectedModel ? getProviderOptions(selectedModel.id) : []),
 		[selectedModel],
 	)
+
+	const selectableProviderOptions = useMemo(
+		() =>
+			providerOptions.filter((p) => p.id !== 'model-provider-fallback'),
+		[providerOptions],
+	)
+
+	const cheapestSelectableProvider = useMemo(
+		() => pickCheapestProviderOption(selectableProviderOptions),
+		[selectableProviderOptions],
+	)
+
+	useEffect(() => {
+		if (!selectedModel?.id || !cheapestSelectableProvider) return
+		setSelectedProviderId(cheapestSelectableProvider.id)
+	}, [selectedModel?.id, cheapestSelectableProvider?.id])
+
 	const recommendedProvider = useMemo(
 		() =>
 			providerOptions.find((provider) => provider.recommended) ??
@@ -371,7 +408,12 @@ function RouteComponent() {
 		return averagePer1M.toFixed(0)
 	}, [selectedProvider])
 
-	const providerCount = 1
+	const providerCount = selectableProviderOptions.length || 1
+
+	const summaryInputCostPer1M =
+		selectedProvider?.inputPer1M ?? selectedModel?.inputCostPer1M ?? 0
+	const summaryOutputCostPer1M =
+		selectedProvider?.outputPer1M ?? selectedModel?.outputCostPer1M ?? 0
 
 	const goToStep = (target: StepId) => {
 		if (target < step) {
@@ -465,6 +507,8 @@ function RouteComponent() {
 						model={selectedModel}
 						providerCount={providerCount}
 						onSwapModel={() => openModelPicker(selectedModel.id)}
+						inputCostPer1M={summaryInputCostPer1M}
+						outputCostPer1M={summaryOutputCostPer1M}
 					/>
 				) : (
 					<ModelSummarySidebarEmpty

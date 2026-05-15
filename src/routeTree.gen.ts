@@ -22,6 +22,7 @@ import { Route as AppEndpointsCreate_endpointRouteImport } from './routes/app/en
 import { Route as AppEndpointsEndpointIdRouteImport } from './routes/app/endpoints.$endpointId'
 import { Route as AppCosmosGuidedRouteImport } from './routes/app/cosmos_.guided'
 import { Route as AppCosmosModelIdRouteImport } from './routes/app/cosmos_.$modelId'
+import { Route as AppEndpointsEndpointIdSettingsRouteImport } from './routes/app/endpoints.$endpointId.settings'
 import { Route as AppEndpointsEndpointIdDeployRouteImport } from './routes/app/endpoints.$endpointId.deploy'
 
 const AppRouteRoute = AppRouteRouteImport.update({
@@ -91,6 +92,12 @@ const AppCosmosModelIdRoute = AppCosmosModelIdRouteImport.update({
   path: '/cosmos/$modelId',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppEndpointsEndpointIdSettingsRoute =
+  AppEndpointsEndpointIdSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AppEndpointsEndpointIdRoute,
+  } as any)
 const AppEndpointsEndpointIdDeployRoute =
   AppEndpointsEndpointIdDeployRouteImport.update({
     id: '/deploy',
@@ -113,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/app/endpoints/create_endpoint': typeof AppEndpointsCreate_endpointRoute
   '/app/endpoints/deploy_endpoint': typeof AppEndpointsDeploy_endpointRoute
   '/app/endpoints/$endpointId/deploy': typeof AppEndpointsEndpointIdDeployRoute
+  '/app/endpoints/$endpointId/settings': typeof AppEndpointsEndpointIdSettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -129,6 +137,7 @@ export interface FileRoutesByTo {
   '/app/endpoints/create_endpoint': typeof AppEndpointsCreate_endpointRoute
   '/app/endpoints/deploy_endpoint': typeof AppEndpointsDeploy_endpointRoute
   '/app/endpoints/$endpointId/deploy': typeof AppEndpointsEndpointIdDeployRoute
+  '/app/endpoints/$endpointId/settings': typeof AppEndpointsEndpointIdSettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -146,6 +155,7 @@ export interface FileRoutesById {
   '/app/endpoints/create_endpoint': typeof AppEndpointsCreate_endpointRoute
   '/app/endpoints/deploy_endpoint': typeof AppEndpointsDeploy_endpointRoute
   '/app/endpoints/$endpointId/deploy': typeof AppEndpointsEndpointIdDeployRoute
+  '/app/endpoints/$endpointId/settings': typeof AppEndpointsEndpointIdSettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
     | '/app/endpoints/create_endpoint'
     | '/app/endpoints/deploy_endpoint'
     | '/app/endpoints/$endpointId/deploy'
+    | '/app/endpoints/$endpointId/settings'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -180,6 +191,7 @@ export interface FileRouteTypes {
     | '/app/endpoints/create_endpoint'
     | '/app/endpoints/deploy_endpoint'
     | '/app/endpoints/$endpointId/deploy'
+    | '/app/endpoints/$endpointId/settings'
   id:
     | '__root__'
     | '/'
@@ -196,6 +208,7 @@ export interface FileRouteTypes {
     | '/app/endpoints/create_endpoint'
     | '/app/endpoints/deploy_endpoint'
     | '/app/endpoints/$endpointId/deploy'
+    | '/app/endpoints/$endpointId/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -297,6 +310,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCosmosModelIdRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/endpoints/$endpointId/settings': {
+      id: '/app/endpoints/$endpointId/settings'
+      path: '/settings'
+      fullPath: '/app/endpoints/$endpointId/settings'
+      preLoaderRoute: typeof AppEndpointsEndpointIdSettingsRouteImport
+      parentRoute: typeof AppEndpointsEndpointIdRoute
+    }
     '/app/endpoints/$endpointId/deploy': {
       id: '/app/endpoints/$endpointId/deploy'
       path: '/deploy'
@@ -309,11 +329,13 @@ declare module '@tanstack/react-router' {
 
 interface AppEndpointsEndpointIdRouteChildren {
   AppEndpointsEndpointIdDeployRoute: typeof AppEndpointsEndpointIdDeployRoute
+  AppEndpointsEndpointIdSettingsRoute: typeof AppEndpointsEndpointIdSettingsRoute
 }
 
 const AppEndpointsEndpointIdRouteChildren: AppEndpointsEndpointIdRouteChildren =
   {
     AppEndpointsEndpointIdDeployRoute: AppEndpointsEndpointIdDeployRoute,
+    AppEndpointsEndpointIdSettingsRoute: AppEndpointsEndpointIdSettingsRoute,
   }
 
 const AppEndpointsEndpointIdRouteWithChildren =

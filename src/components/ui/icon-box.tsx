@@ -19,6 +19,7 @@ const iconBoxVariants = cva(
         lg: "h-6 w-6 p-0.5",
         xlg: "h-8 w-8 p-[6px]",
         xxlg: "h-10 w-10 p-2",
+        xxxlg: "h-12 w-12 p-[6px]",
       },
       shape: {
         square: "rounded-md",
@@ -40,6 +41,7 @@ const glyphSlotVariants = cva("inline-flex min-h-0 min-w-0 items-center justify-
       lg: "h-5 w-5",
       xlg: "h-5 w-5",
       xxlg: "h-6 w-6",
+      xxxlg: "h-9 w-9",
     },
   },
   defaultVariants: { size: "md" },

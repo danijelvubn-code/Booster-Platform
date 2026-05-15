@@ -132,14 +132,8 @@ function RouteComponent() {
 			<BackButton
 				to={`/app/endpoints/${endpoint.id}`}
 				label={`Back to ${endpoint.name}`}
+				className="ml-0 self-start"
 			/>
-
-			<div className="space-y-2">
-				<h1 className="text-h2 text-foreground">{endpoint.name}</h1>
-				<p className="break-all font-mono text-body-sm text-muted-foreground">
-					{endpoint.endpoint}
-				</p>
-			</div>
 
 			<div className="flex flex-col gap-8 lg:flex-row lg:items-start">
 				<SettingsNav

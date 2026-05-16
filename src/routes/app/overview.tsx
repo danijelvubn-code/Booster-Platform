@@ -24,14 +24,20 @@ function RouteComponent() {
 	return (
 		<>
 			<OnboardingModal />
-			<PageContainer className="pt-6 pb-6" gap="">
+			<PageContainer className="pt-6 pb-6" gap="gap-8">
+				<PageHeader
+					title="Overview"
+					description="Monitor your endpoints and model inference activity across the platform."
+					descriptionMaxWidthPageIntro
+				/>
+
 				<section className="flex flex-col gap-3">
 					<PageHeader
 						titleSize="overview"
 						breakAt="md"
 						introClassName="max-w-3xl"
-						title="Endpoints Above Average Usage"
-						description="Endpoints consuming more tokens than their expected monthly average based on their budget."
+						title="Endpoints"
+						description="View and manage the stable API endpoints your applications use for model inference."
 						actions={
 							<Button className="shrink-0" asChild>
 								<Link

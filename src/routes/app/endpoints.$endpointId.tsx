@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { IconBox } from '@/components/ui/icon-box'
-import { deployments, endpoints, models, type Model } from '@/data/mockData'
+import { deployments, endpoints, type Model, models } from '@/data/mockData'
 import { formatTokens } from '@/lib/formatters'
 import {
 	getModelProviderLogoSrc,
@@ -15,10 +15,28 @@ import {
 import { toastMessages } from '@/lib/toast-messages'
 
 export const Route = createFileRoute('/app/endpoints/$endpointId')({
+	validateSearch: (search: Record<string, unknown>) => ({
+		returnTo:
+			typeof search.returnTo === 'string' && search.returnTo.startsWith('/app/')
+				? search.returnTo
+				: '/app/overview',
+		returnLabel:
+			typeof search.returnLabel === 'string' && search.returnLabel.trim()
+				? search.returnLabel.trim()
+				: 'Endpoints',
+	}),
 	component: RouteComponent,
 })
 
-function UnderlyingModelSummary({ model }: { model: Model }) {
+function UnderlyingModelSummary({
+	model,
+	endpointId,
+	endpointName,
+}: {
+	model: Model
+	endpointId: string
+	endpointName: string
+}) {
 	const providerLogoSrc = getModelProviderLogoSrc(model.provider, model.name)
 	const providerInitials = getProviderInitials(model.provider)
 
@@ -43,6 +61,10 @@ function UnderlyingModelSummary({ model }: { model: Model }) {
 				<Link
 					to="/app/cosmos/$modelId"
 					params={{ modelId: model.id }}
+					search={{
+						returnTo: `/app/endpoints/${endpointId}`,
+						returnLabel: endpointName,
+					}}
 					className="text-[20px] font-bold leading-7 tracking-tight text-foreground transition-colors ease-standard hover:text-primary"
 				>
 					{model.name}
@@ -66,6 +88,7 @@ function UnderlyingModelSummary({ model }: { model: Model }) {
 
 function RouteComponent() {
 	const { endpointId } = Route.useParams()
+	const { returnTo, returnLabel } = Route.useSearch()
 	const location = useLocation()
 	const endpoint = endpoints.find((s) => s.id === endpointId)
 	const deploymentList = deployments[endpointId] ?? []
@@ -108,8 +131,8 @@ function RouteComponent() {
 	return (
 		<div className="container space-y-4 py-6">
 				<BackButton
-					to="/app/overview"
-					label="Back to Overview"
+					to={returnTo}
+					label={`Back to ${returnLabel}`}
 					className="ml-0"
 				/>
 
@@ -155,6 +178,7 @@ function RouteComponent() {
 									<Link
 										to="/app/endpoints/$endpointId/settings"
 										params={{ endpointId: endpoint.id }}
+									search={{ returnTo, returnLabel }}
 									>
 										<Settings
 											className="mr-2 h-icon-16 w-icon-16"
@@ -169,7 +193,11 @@ function RouteComponent() {
 						{underlyingModel ? (
 							<>
 								<div className="h-px bg-border/80" aria-hidden />
-								<UnderlyingModelSummary model={underlyingModel} />
+								<UnderlyingModelSummary
+									model={underlyingModel}
+									endpointId={endpoint.id}
+									endpointName={endpoint.name}
+								/>
 							</>
 						) : null}
 					</div>

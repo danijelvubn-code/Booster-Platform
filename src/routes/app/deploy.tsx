@@ -52,7 +52,11 @@ function RouteComponent() {
 			navigate({
 				to: '/app/endpoints/$endpointId/deploy',
 				params: { endpointId: selectedEndpointId },
-				search: { model: modelId },
+				search: {
+					model: modelId,
+					returnTo: `/app/deploy?model=${encodeURIComponent(modelId)}`,
+					returnLabel: 'Deploy',
+				},
 			})
 		}
 	}
@@ -67,7 +71,10 @@ function RouteComponent() {
 					navigate({
 						to: '/app/cosmos/$modelId',
 						params: { modelId },
-						search: { hosting: '' },
+						search: {
+							returnTo: `/app/deploy?model=${encodeURIComponent(modelId)}`,
+							returnLabel: 'Deploy',
+						},
 					})
 				}
 			>

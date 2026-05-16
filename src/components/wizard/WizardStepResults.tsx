@@ -118,7 +118,14 @@ export function WizardStepResults({ state, results }: WizardStepResultsProps) {
 									</div>
 								)}
 								<div className="flex gap-2 pt-1">
-									<Link to="/app/cosmos/$modelId" params={{ modelId: m.id }}>
+									<Link
+										to="/app/cosmos/$modelId"
+										params={{ modelId: m.id }}
+										search={{
+											returnTo: '/app/cosmos/guided',
+											returnLabel: 'Guided recommendations',
+										}}
+									>
 										<Button variant="outline" size="sm">
 											<ExternalLink className="h-3.5 w-3.5 mr-1" /> View Details
 										</Button>

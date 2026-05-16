@@ -52,6 +52,7 @@ function EndpointOverviewCardBasic({
 				<Link
 					to="/app/endpoints/$endpointId"
 					params={{ endpointId: endpoint.id }}
+					search={{ returnTo: '/app/overview', returnLabel: 'Endpoints' }}
 					className="flex flex-col gap-3 text-left outline-none ring-offset-background focus-visible:rounded-md focus-visible:ring-2 focus-visible:ring-ring"
 				>
 					<div className="flex min-w-0 items-start gap-2">
@@ -115,6 +116,7 @@ function EndpointOverviewCardFull({
 					<Link
 						to="/app/endpoints/$endpointId"
 						params={{ endpointId: endpoint.id }}
+						search={{ returnTo: '/app/overview', returnLabel: 'Endpoints' }}
 						className="flex min-w-0 flex-1 flex-col gap-4 text-left outline-none ring-offset-background focus-visible:rounded-md focus-visible:ring-2 focus-visible:ring-ring"
 					>
 						<div className="space-y-3">
@@ -209,6 +211,10 @@ function EndpointOverviewCardFull({
 								<Link
 									to="/app/endpoints/$endpointId"
 									params={{ endpointId: endpoint.id }}
+									search={{
+										returnTo: '/app/overview',
+										returnLabel: 'Endpoints',
+									}}
 								>
 									View endpoint
 								</Link>

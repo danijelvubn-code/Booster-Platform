@@ -76,6 +76,7 @@ export function ModelCosmosResults({
 							key={model.id}
 							to="/app/cosmos/$modelId"
 							params={{ modelId: model.id }}
+							search={{ returnTo: '/app/cosmos', returnLabel: 'Cosmos' }}
 							className="block h-full min-w-0"
 						>
 							<ModelCosmosCard model={model} variant="basic" />

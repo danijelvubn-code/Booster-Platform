@@ -66,7 +66,7 @@ function ModelCosmosPage() {
 	return (
 		<div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
 			<div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain">
-				<PageContainer gap="space-y-6">
+				<PageContainer gap="space-y-6" className="py-6">
 					<PageHeader
 						title="Model Cosmos"
 						description="Explore models designed for different tasks and performance needs. Assign to endpoints and switch anytime without disruption."

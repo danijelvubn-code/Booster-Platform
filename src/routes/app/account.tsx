@@ -33,9 +33,9 @@ function RouteComponent() {
 	const tokenUsage = user?.tokenUsage ?? { inputTokens: 0, outputTokens: 0 }
 
 	return (
-		<PageContainer className="pb-10">
-			<div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
-				<PageHeader title={displayName} titleSize="display" />
+		<PageContainer className="py-6">
+			<div className="flex w-full flex-col gap-8">
+				<PageHeader title={displayName} />
 
 				<CardGrid cols={{ xs: 1, sm: 2 }}>
 					<StatCard icon={Zap} label="Plan" value={plan} />

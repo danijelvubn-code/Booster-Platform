@@ -57,6 +57,10 @@ function RouteComponent() {
 						navigate({
 							to: '/app/endpoints/$endpointId',
 							params: { endpointId },
+							search: {
+								returnTo: `/app/endpoints/${endpointId}/deploy`,
+								returnLabel: 'Deploy',
+							},
 						})
 					}
 				>
@@ -115,7 +119,14 @@ function RouteComponent() {
 			description: `${selectedModel.name} has been deployed to "${endpoint.name}"`,
 		})
 
-		navigate({ to: '/app/endpoints/$endpointId', params: { endpointId } })
+		navigate({
+			to: '/app/endpoints/$endpointId',
+			params: { endpointId },
+			search: {
+				returnTo: `/app/endpoints/${endpointId}/deploy?model=${encodeURIComponent(preselectedModelId)}`,
+				returnLabel: 'Deploy',
+			},
+		})
 	}
 
 	// TypeScript assertion: selectedModel is guaranteed to exist after early returns
@@ -128,7 +139,14 @@ function RouteComponent() {
 				size="sm"
 				className="-ml-3"
 				onClick={() =>
-					navigate({ to: '/app/endpoints/$endpointId', params: { endpointId } })
+					navigate({
+						to: '/app/endpoints/$endpointId',
+						params: { endpointId },
+						search: {
+							returnTo: `/app/endpoints/${endpointId}/deploy?model=${encodeURIComponent(preselectedModelId)}`,
+							returnLabel: 'Deploy',
+						},
+					})
 				}
 			>
 				<ArrowLeft className="mr-2 h-4 w-4" /> Back to Endpoint

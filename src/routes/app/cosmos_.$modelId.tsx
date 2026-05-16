@@ -78,6 +78,16 @@ import { getModelProviderLogoSrc } from '@/lib/model-provider-logos'
 import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/app/cosmos_/$modelId')({
+	validateSearch: (search: Record<string, unknown>) => ({
+		returnTo:
+			typeof search.returnTo === 'string' && search.returnTo.startsWith('/app/')
+				? search.returnTo
+				: '/app/cosmos',
+		returnLabel:
+			typeof search.returnLabel === 'string' && search.returnLabel.trim()
+				? search.returnLabel.trim()
+				: 'Cosmos',
+	}),
 	component: RouteComponent,
 })
 
@@ -312,13 +322,7 @@ function featureRowsFromYaml(model: ModelYaml) {
 	]
 }
 
-function BackToPrevious({
-	to,
-	label = 'All models',
-}: {
-	to: string
-	label?: string
-}) {
+function BackToPrevious({ to, label }: { to: string; label: string }) {
 	return (
 		<Button asChild variant="ghost" size="sm" className="-ml-3">
 			<Link to={to}>
@@ -849,6 +853,7 @@ function OverviewMetaChip({
 
 function RouteComponent() {
 	const { modelId } = Route.useParams()
+	const { returnTo, returnLabel } = Route.useSearch()
 	const model = models.find((m) => m.id === modelId)
 	const sectionRefs = useRef<Partial<Record<SectionId, HTMLDivElement | null>>>(
 		{},
@@ -884,8 +889,6 @@ function RouteComponent() {
 		() => (modelYaml ? specRowsFromYaml(modelYaml) : []),
 		[modelYaml],
 	)
-	const cosmosListPath = '/app/cosmos'
-
 	const assignRef = useCallback(
 		(id: SectionId) => (node: HTMLDivElement | null) => {
 			sectionRefs.current[id] = node
@@ -954,7 +957,7 @@ function RouteComponent() {
 				onScroll={handleSectionScroll}
 			>
 				<div className="container space-y-6 py-8">
-					<BackToPrevious to={cosmosListPath} />
+					<BackToPrevious to={returnTo} label={`Back to ${returnLabel}`} />
 
 					<div className="flex items-start gap-10 rounded-lg">
 						<NavRail active={activeNav} onSelect={scrollToSection} />

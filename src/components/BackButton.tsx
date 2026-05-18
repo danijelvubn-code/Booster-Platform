@@ -22,7 +22,7 @@ export function BackButton({
 			variant="ghost"
 			size="sm"
 			className={cn(
-				'-ml-3 h-auto px-3 py-2 text-body-sm text-muted-foreground hover:text-foreground',
+				'-ml-3 h-auto w-fit self-start px-3 py-2 text-body-sm text-muted-foreground hover:text-foreground',
 				className,
 			)}
 		>

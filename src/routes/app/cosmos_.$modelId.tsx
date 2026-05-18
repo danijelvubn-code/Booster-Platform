@@ -1561,7 +1561,7 @@ function RouteComponent() {
 									ref={assignRef('specifications')}
 									data-section="specifications"
 									id="model-detail-specifications"
-									className="flex flex-wrap items-start gap-16 px-6 max-lg:flex-col max-lg:gap-6"
+									className="mb-6 flex flex-wrap items-start gap-16 px-6 max-lg:flex-col max-lg:gap-6"
 								>
 									<SectionTitle className="w-auto shrink-0">
 										Specifications

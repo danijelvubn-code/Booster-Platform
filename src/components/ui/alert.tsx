@@ -7,10 +7,10 @@ import { cn } from '@/lib/utils'
 const alertVariants = cva('relative w-full border', {
 	variants: {
 		variant: {
-			info: 'border-info/30 bg-info/12 text-foreground',
-			success: 'border-success/30 bg-success/12 text-foreground',
-			warning: 'border-warning/30 bg-warning/12 text-foreground',
-			destructive: 'border-destructive/30 bg-destructive/12 text-foreground',
+			info: 'border-info/30 bg-info/4 text-foreground',
+			success: 'border-success/30 bg-success/4 text-foreground',
+			warning: 'border-warning/30 bg-warning/4 text-foreground',
+			destructive: 'border-destructive/30 bg-destructive/4 text-foreground',
 		},
 		layout: {
 			inline: 'rounded-lg',

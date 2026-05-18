@@ -66,41 +66,37 @@ function ModelCosmosPage() {
 	const hasActiveFilters = isFiltersActive(filters)
 
 	return (
-		<div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-			<div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain">
-				<PageContainer gap="space-y-6" className="py-6">
-					<PageHeader
-						title="Model Cosmos"
-						description="Explore models designed for different tasks and performance needs. Assign to endpoints and switch anytime without disruption."
-						descriptionMaxWidthPageIntro
-					/>
+		<PageContainer gap="space-y-6" className="py-6">
+			<PageHeader
+				title="Model Cosmos"
+				description="Explore models designed for different tasks and performance needs. Assign to endpoints and switch anytime without disruption."
+				descriptionMaxWidthPageIntro
+			/>
 
-					<ModelCosmosSearchBar
-						search={search}
-						setSearch={setSearch}
-						showFilters={showFilters}
-						setShowFilters={setShowFilters}
-						hasActiveFilters={hasActiveFilters}
-						sort={sort}
-						onSortChange={setSort}
-						totalResults={sortedFiltered.length}
-						page={page}
-						pageSize={COSMOS_PAGE_SIZE}
-					/>
+			<ModelCosmosSearchBar
+				search={search}
+				setSearch={setSearch}
+				showFilters={showFilters}
+				setShowFilters={setShowFilters}
+				hasActiveFilters={hasActiveFilters}
+				sort={sort}
+				onSortChange={setSort}
+				totalResults={sortedFiltered.length}
+				page={page}
+				pageSize={COSMOS_PAGE_SIZE}
+			/>
 
-					<ModelCosmosResults
-						showFilters={showFilters}
-						catalog={models}
-						filters={filters}
-						setFilters={setFilters}
-						filtered={filtered}
-						sortedFiltered={sortedFiltered}
-						page={page}
-						setPage={setPage}
-						pageSize={COSMOS_PAGE_SIZE}
-					/>
-				</PageContainer>
-			</div>
-		</div>
+			<ModelCosmosResults
+				showFilters={showFilters}
+				catalog={models}
+				filters={filters}
+				setFilters={setFilters}
+				filtered={filtered}
+				sortedFiltered={sortedFiltered}
+				page={page}
+				setPage={setPage}
+				pageSize={COSMOS_PAGE_SIZE}
+			/>
+		</PageContainer>
 	)
 }

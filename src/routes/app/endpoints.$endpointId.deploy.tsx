@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { toast } from '@/components/ui/sonner'
 import { Switch } from '@/components/ui/switch'
+import { PageContainer } from '@/components/layout/PageContainer'
 import { deployments, endpoints, models } from '@/data/mockData'
 
 export const Route = createFileRoute('/app/endpoints/$endpointId/deploy')({
@@ -32,27 +33,27 @@ function RouteComponent() {
 
 	if (!endpoint) {
 		return (
-			<div className="container py-8">
+			<PageContainer gap="gap-4" className="py-8">
 				<Button
 					variant="ghost"
 					size="sm"
-					className="-ml-3"
+					className="-ml-3 self-start"
 					onClick={() => navigate({ to: '/app/overview' })}
 				>
 					<ArrowLeft className="mr-2 h-4 w-4" /> Back to Endpoints
 				</Button>
-				<p className="mt-4 text-muted-foreground">Endpoint not found.</p>
-			</div>
+				<p className="text-muted-foreground">Endpoint not found.</p>
+			</PageContainer>
 		)
 	}
 
 	if (!model) {
 		return (
-			<div className="container py-8">
+			<PageContainer gap="gap-4" className="py-8">
 				<Button
 					variant="ghost"
 					size="sm"
-					className="-ml-3"
+					className="-ml-3 self-start"
 					onClick={() =>
 						navigate({
 							to: '/app/endpoints/$endpointId',
@@ -66,18 +67,19 @@ function RouteComponent() {
 				>
 					<ArrowLeft className="mr-2 h-4 w-4" /> Back to Endpoint
 				</Button>
-				<p className="mt-4 text-muted-foreground">
+				<p className="text-muted-foreground">
 					No model selected. Please select a model from the catalog first.
 				</p>
 				<Button
 					variant="link"
+					className="self-start px-0"
 					onClick={() =>
 						navigate({ to: '/app/cosmos', search: { hosting: '' } })
 					}
 				>
 					Go to Model Catalog
 				</Button>
-			</div>
+			</PageContainer>
 		)
 	}
 
@@ -133,11 +135,11 @@ function RouteComponent() {
 	if (!selectedModel) return null
 
 	return (
-		<div className="container space-y-6 py-8">
+		<PageContainer gap="space-y-6" className="py-8">
 			<Button
 				variant="ghost"
 				size="sm"
-				className="-ml-3"
+				className="-ml-3 self-start"
 				onClick={() =>
 					navigate({
 						to: '/app/endpoints/$endpointId',
@@ -238,6 +240,6 @@ function RouteComponent() {
 					Add to Endpoint <Check className="ml-2 h-4 w-4" />
 				</Button>
 			</div>
-		</div>
+		</PageContainer>
 	)
 }

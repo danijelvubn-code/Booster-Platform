@@ -3,15 +3,17 @@ import AppHeader from '@/components/AppHeader'
 
 export default function AppLayout() {
 	return (
-		<div className="mvp-shell flex min-h-0 flex-1 flex-col overflow-hidden bg-background">
+		<div className="mvp-shell flex h-dvh flex-col overflow-hidden bg-background">
 			<AppHeader
 				logoHref="/app/overview"
 				navPathPrefix="/app"
 				comingSoonPaths={['/observe', '/optimize']}
 			/>
 
-			{/* Main Content — relative so routes can fill with absolute inset-0 if needed */}
-			<main className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+			{/* Main Content — relative so routes can fill with absolute inset-0 if needed.
+			    `pt-[57px]` reserves the height of the fixed AppHeader (h-14 inner + 1px border-b)
+			    so route scroll containers start below the header instead of underneath it. */}
+			<main className="relative flex min-h-0 flex-1 flex-col overflow-hidden pt-[57px]">
 				<Outlet />
 			</main>
 		</div>

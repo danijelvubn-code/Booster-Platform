@@ -25,10 +25,11 @@ const PRIMARY_NAV_TOOLTIP_DELAY_MS = 1000
 
 type AppHeaderProps = {
 	/**
-	 * Use `static` in section labs / previews so the header does not stick over surrounding content.
-	 * Defaults to `sticky` for the real app shell.
+	 * Use `static` in section labs / previews so the header does not overlay surrounding content.
+	 * Defaults to `fixed` for the real app shell — header is pinned to the viewport top and stays
+	 * accessible regardless of any inner scroll containers.
 	 */
-	position?: 'sticky' | 'static'
+	position?: 'fixed' | 'static'
 	/** Override the logo target (defaults to `/overview`). */
 	logoHref?: string
 	/**
@@ -49,7 +50,7 @@ type AppHeaderProps = {
  * Used by `AppLayout` for the real app shell.
  */
 export default function AppHeader({
-	position = 'sticky',
+	position = 'fixed',
 	logoHref = postMvpPath('/overview'),
 	comingSoonPaths,
 	excludeNavPaths,
@@ -71,7 +72,7 @@ export default function AppHeader({
 		<header
 			className={cn(
 				'z-50 w-full border-b border-border bg-card',
-				position === 'sticky' ? 'sticky top-0' : 'static',
+				position === 'fixed' ? 'fixed inset-x-0 top-0' : 'static',
 			)}
 		>
 			<div className="flex h-14 w-full items-center justify-between gap-4 px-6">

@@ -1,27 +1,31 @@
 /** Model Catalog filter types + pure filter/sort helpers (Cosmos). */
 export type {
 	CapabilityScorePreset,
+	CatalogPriceSliderBoundsEUR,
 	CategoryScoreThreshold,
 	ContextWindowPreset,
 	MinMemoryPreset,
 	ModelFilterState,
 	ModelSizePreset,
 	ModelSortId,
-	PricePreset,
 } from '@/lib/model-catalog-filters'
 export { MODEL_SORT_LABELS } from '@/lib/model-catalog-filters'
 export {
 	allProviderOptions,
 	applyModelFilters,
 	BOOSTER_POWERED_PROVIDER,
+	catalogPriceSliderBoundsEUR,
+	catalogPriceSliderCeilingEUR,
 	compareModelsForSort,
 	defaultFilters,
 	defaultSort,
 	isFiltersActive,
 	modelMatchesProvider,
+	moreFiltersSheetBadgeCount,
 	modalityOptionCounts,
 	providerOptionCounts,
 	sortModels,
+	toggleStringList,
 	visibleAccessFormats,
 	visibleApiCapabilities,
 	visibleBaseModels,

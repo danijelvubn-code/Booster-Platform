@@ -35,7 +35,7 @@ function ModelCosmosPage() {
 		...(hostingParam ? { hosting: [hostingParam] } : {}),
 	}))
 	const [sort, setSort] = useState<ModelSortId>(defaultSort)
-	const [showFilters, setShowFilters] = useState(true)
+	const [showFilters, setShowFilters] = useState(false)
 	const [page, setPage] = useState(1)
 
 	const filtered = useMemo(

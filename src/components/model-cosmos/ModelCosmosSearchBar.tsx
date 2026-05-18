@@ -15,6 +15,7 @@ import {
 	MODEL_SORT_LABELS,
 	type ModelSortId,
 } from '@/lib/model-catalog-filters'
+import { getPaginationWindow } from '@/lib/pagination-window'
 import { cn } from '@/lib/utils'
 
 interface ModelCosmosSearchBarProps {
@@ -46,9 +47,7 @@ export function ModelCosmosSearchBar({
 	className,
 }: ModelCosmosSearchBarProps) {
 	const sortCommittedRef = useRef(false)
-	const totalPages = Math.max(1, Math.ceil(totalResults / pageSize))
-	const safePage = Math.min(page, totalPages)
-	const pageStart = (safePage - 1) * pageSize
+	const pagination = getPaginationWindow(totalResults, page, pageSize)
 
 	return (
 		<div
@@ -92,8 +91,8 @@ export function ModelCosmosSearchBar({
 			<div className="flex min-w-0 shrink-0 flex-nowrap items-center justify-end gap-x-3 overflow-x-auto px-1 py-1 sm:ml-auto">
 				{totalResults > 0 ? (
 					<span className="text-caption shrink-0 text-muted-foreground whitespace-nowrap text-right">
-						Showing {pageStart + 1}–
-						{Math.min(pageStart + pageSize, totalResults)} of {totalResults}
+						Showing {pagination.displayRangeStart}–{pagination.displayRangeEnd}{' '}
+						of {totalResults}
 					</span>
 				) : null}
 				<Select

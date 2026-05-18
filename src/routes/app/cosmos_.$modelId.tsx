@@ -10,6 +10,7 @@ import {
 	Braces,
 	Brain,
 	BrainCircuit,
+	CheckCircle2,
 	CircleStop,
 	Code2,
 	Cpu,
@@ -66,7 +67,7 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { models } from '@/data/mockData'
+import { getProviderOptions, models } from '@/data/mockData'
 import {
 	getModelModalityLabel,
 	getOverallModelScore,
@@ -100,6 +101,7 @@ const SECTION_IDS = [
 	'features',
 	'specifications',
 	'sources',
+	'providers',
 ] as const
 
 const NAV: Array<{ id: SectionId; label: string }> = [
@@ -110,6 +112,7 @@ const NAV: Array<{ id: SectionId; label: string }> = [
 	{ id: 'features', label: 'Features' },
 	{ id: 'specifications', label: 'Specifications' },
 	{ id: 'sources', label: 'Sources' },
+	{ id: 'providers', label: 'Providers' },
 ]
 
 type ModalityValue = 'input_output' | 'input_only' | 'unsupported'
@@ -406,6 +409,10 @@ function scoreToPercent(score: number): number {
 
 function formatScore(score: number): string {
 	return `${scoreToPercent(score)}%`
+}
+
+function formatEurPer1M(value: number): string {
+	return `€${value.toFixed(2)}`
 }
 
 const CAPABILITY_ROW_DEFS = [
@@ -888,6 +895,15 @@ function RouteComponent() {
 		() => (modelYaml ? specRowsFromYaml(modelYaml) : []),
 		[modelYaml],
 	)
+	const providerRows = useMemo(
+		() =>
+			model
+				? getProviderOptions(model.id).filter(
+						(provider) => provider.id !== 'model-provider-fallback',
+					)
+				: [],
+		[model],
+	)
 	const assignRef = useCallback(
 		(id: SectionId) => (node: HTMLDivElement | null) => {
 			sectionRefs.current[id] = node
@@ -1095,7 +1111,7 @@ function RouteComponent() {
 								</div>
 							</div>
 
-							<div className="mb-[30vh] flex min-w-0 flex-col gap-8 overflow-x-clip rounded-lg border border-border bg-card shadow-sm">
+							<div className="flex min-w-0 flex-col gap-8 overflow-x-clip rounded-lg border border-border bg-card shadow-sm">
 								<div className="px-6 pt-8">
 									<div className="flex flex-wrap items-stretch gap-5 md:flex-nowrap">
 										<StatColumn isFirst showDivider>
@@ -1567,38 +1583,104 @@ function RouteComponent() {
 										))}
 									</div>
 								</div>
+							</div>
 
-								<Separator />
-
-								<div
-									ref={assignRef('sources')}
-									data-section="sources"
-									id="model-detail-sources"
-									className="flex min-w-0 gap-16 px-6 pb-6 max-lg:flex-col max-lg:gap-6"
-								>
-									<SectionTitle>Sources</SectionTitle>
-									<div className="flex min-w-0 flex-1 flex-col gap-3">
-										{modelYaml.sources.map((source) => (
-											<div
-												key={`${source.type}-${source.repo}`}
-												className="flex items-center gap-3 rounded-md border border-border p-3"
-											>
-												<IconBox size="xlg" shape="circle" className="bg-muted">
-													<FileText
-														className="text-hierarchy-secondary"
-														aria-hidden
-													/>
-												</IconBox>
-												<div className="min-w-0">
-													<p className="text-body-sm-strong text-foreground">
-														{source.repo}
-													</p>
-													<p className="text-body-sm text-muted-foreground">
-														{source.type}
-													</p>
-												</div>
+							<div
+								ref={assignRef('sources')}
+								data-section="sources"
+								id="model-detail-sources"
+								className="flex min-w-0 gap-16 rounded-lg border border-border bg-card px-6 py-6 shadow-sm max-lg:flex-col max-lg:gap-6"
+							>
+								<SectionTitle>Sources</SectionTitle>
+								<div className="flex min-w-0 flex-1 flex-col gap-3">
+									{modelYaml.sources.map((source) => (
+										<div
+											key={`${source.type}-${source.repo}`}
+											className="flex items-center gap-3 rounded-md border border-border p-3"
+										>
+											<IconBox size="xlg" shape="circle" className="bg-muted">
+												<FileText
+													className="text-hierarchy-secondary"
+													aria-hidden
+												/>
+											</IconBox>
+											<div className="min-w-0">
+												<p className="text-body-sm-strong text-foreground">
+													{source.repo}
+												</p>
+												<p className="text-body-sm text-muted-foreground">
+													{source.type}
+												</p>
 											</div>
-										))}
+										</div>
+									))}
+								</div>
+							</div>
+
+							<div
+								ref={assignRef('providers')}
+								data-section="providers"
+								id="model-detail-providers"
+								className="mb-[30vh] flex min-w-0 flex-col gap-4 rounded-lg border border-border bg-card px-6 py-6 shadow-sm"
+							>
+								<SectionTitle>Providers</SectionTitle>
+								<div className="min-w-0">
+									<div className="overflow-x-auto rounded-lg border border-border">
+										<Table>
+											<TableHeader>
+												<TableRow className="h-14 hover:bg-transparent">
+													<TableHead>Provider</TableHead>
+													<TableHead>Context</TableHead>
+													<TableHead className="text-right">In / 1M</TableHead>
+													<TableHead className="text-right">Out / 1M</TableHead>
+													<TableHead className="text-right">Latency</TableHead>
+													<TableHead className="text-right">TPS</TableHead>
+													<TableHead className="text-right">Quant.</TableHead>
+													<TableHead className="text-right">Certs</TableHead>
+												</TableRow>
+											</TableHeader>
+											<TableBody>
+												{providerRows.map((provider) => (
+													<TableRow
+														key={provider.id}
+														className="h-14 hover:bg-muted/50"
+													>
+														<TableCell className="text-body-sm text-foreground">
+															{provider.provider}
+														</TableCell>
+														<TableCell className="text-body-sm text-foreground">
+															{provider.context}
+														</TableCell>
+														<TableCell className="text-right text-body-sm text-foreground">
+															{formatEurPer1M(provider.inputPer1M)}
+														</TableCell>
+														<TableCell className="text-right text-body-sm text-foreground">
+															{formatEurPer1M(provider.outputPer1M)}
+														</TableCell>
+														<TableCell className="text-right text-body-sm text-foreground">
+															{provider.latencyMs}ms
+														</TableCell>
+														<TableCell className="text-right text-body-sm text-foreground">
+															{provider.tps.toFixed(1)}
+														</TableCell>
+														<TableCell className="text-right text-body-sm text-foreground">
+															{provider.quant}
+														</TableCell>
+														<TableCell className="text-right">
+															<Badge
+																variant="success"
+																appearance="ghost"
+																size="24"
+																className="font-normal"
+																leadingIcon={<CheckCircle2 aria-hidden />}
+															>
+																{provider.certs.join(', ')}
+															</Badge>
+														</TableCell>
+													</TableRow>
+												))}
+											</TableBody>
+										</Table>
 									</div>
 								</div>
 							</div>

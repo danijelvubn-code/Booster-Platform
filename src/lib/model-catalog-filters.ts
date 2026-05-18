@@ -10,6 +10,7 @@ import {
 	getCatalogModalities,
 	getCatalogQuantizations,
 	getLicenseCategory,
+	getCapabilitySubcategoryScore,
 	getModelBaseFamily,
 	getModelOriginLabel,
 	getParamBillions,
@@ -28,34 +29,65 @@ export type ModelSortId =
 
 export const MODEL_SORT_LABELS: Record<ModelSortId, string> = {
 	recommended: 'Recommended',
-	capability_desc: 'Top capability',
+	capability_desc: 'Capability score',
 	input_price_asc: 'Lowest input cost',
 	output_price_asc: 'Lowest output cost',
 	context_desc: 'Largest context',
 	newest: 'Newest',
 }
 
-export type PricePreset = 'any' | 'lower' | 'mid' | 'higher'
+const PRICE_SLIDER_STEP = 0.05
 
-export type ContextWindowPreset =
-	| 'any'
-	| '32k'
-	| '64k'
-	| '128k'
-	| '256k'
+/** Snaps the slider ceiling above catalog max with small headroom, on €/1M axis. */
+export function catalogPriceSliderCeilingEUR(
+	maxObserved: number,
+	step: number = PRICE_SLIDER_STEP,
+): number {
+	if (!Number.isFinite(maxObserved) || maxObserved <= 0) {
+		return Math.max(step * 40, 1)
+	}
+	const padded = maxObserved * 1.05
+	return Math.ceil(padded / step) * step
+}
+
+export interface CatalogPriceSliderBoundsEUR {
+	step: typeof PRICE_SLIDER_STEP
+	input: { min: number; ceiling: number }
+	output: { min: number; ceiling: number }
+}
+
+export function catalogPriceSliderBoundsEUR(
+	catalog: typeof models,
+): CatalogPriceSliderBoundsEUR {
+	if (catalog.length === 0) {
+		return {
+			step: PRICE_SLIDER_STEP,
+			input: { min: 0, ceiling: 10 },
+			output: { min: 0, ceiling: 20 },
+		}
+	}
+	let maxIn = 0
+	let maxOut = 0
+	for (const m of catalog) {
+		if (m.inputCostPer1M > maxIn) maxIn = m.inputCostPer1M
+		if (m.outputCostPer1M > maxOut) maxOut = m.outputCostPer1M
+	}
+	return {
+		step: PRICE_SLIDER_STEP,
+		input: { min: 0, ceiling: catalogPriceSliderCeilingEUR(maxIn) },
+		output: { min: 0, ceiling: catalogPriceSliderCeilingEUR(maxOut) },
+	}
+}
+
+export type ContextWindowPreset = 'any' | '32k' | '64k' | '128k' | '256k'
 
 export type ModelSizePreset = 'any' | 'lt10' | 'b10_50' | 'b50_100' | 'b100p'
 
 export type CapabilityScorePreset = 'any' | '60' | '70' | '80' | '90'
 
-export type CategoryScoreThreshold = '0' | '70' | '80' | '90'
+export type CategoryScoreThreshold = '0' | '60' | '70' | '80' | '90'
 
-export type MinMemoryPreset =
-	| 'any'
-	| 'lt50'
-	| '50_150'
-	| '150_300'
-	| '300p'
+export type MinMemoryPreset = 'any' | 'lt50' | '50_150' | '150_300' | '300p'
 
 export interface ModelFilterState {
 	/** Exact match on `model.hosting` (e.g. deep links `?hosting=Booster Powered`). */
@@ -65,9 +97,17 @@ export interface ModelFilterState {
 	modalities: string[]
 	apiCapabilities: string[]
 	features: string[]
-	pricePreset: PricePreset
+	/**
+	 * Max input EUR per 1M tokens (inclusive). `null` = no ceiling (slider at catalog max UI).
+	 */
+	priceInputMaxPer1M: number | null
+	/**
+	 * Max output EUR per 1M tokens (inclusive). `null` = no ceiling (slider at catalog max UI).
+	 */
+	priceOutputMaxPer1M: number | null
 	capabilityCategory: CapabilityCategoryId | ''
 	capabilityCategoryMin: CategoryScoreThreshold
+	capabilitySubcategories: string[]
 	contextWindow: ContextWindowPreset
 	modelSize: ModelSizePreset
 	minMemory: MinMemoryPreset
@@ -86,9 +126,11 @@ export const defaultFilters: ModelFilterState = {
 	modalities: [],
 	apiCapabilities: [],
 	features: [],
-	pricePreset: 'any',
+	priceInputMaxPer1M: null,
+	priceOutputMaxPer1M: null,
 	capabilityCategory: '',
 	capabilityCategoryMin: '0',
+	capabilitySubcategories: [],
 	contextWindow: 'any',
 	modelSize: 'any',
 	minMemory: 'any',
@@ -102,10 +144,27 @@ export const defaultFilters: ModelFilterState = {
 
 export const defaultSort: ModelSortId = 'recommended'
 
-const CONTEXT_MIN_MAP: Record<
-	Exclude<ContextWindowPreset, 'any'>,
-	number
-> = {
+/** Toggle membership of `item` in a multi-select string filter list. */
+export function toggleStringList(list: string[], item: string): string[] {
+	return list.includes(item) ? list.filter((i) => i !== item) : [...list, item]
+}
+
+/**
+ * Counts active “More filters” dimensions for the toolbar badge (sheet-only scope).
+ */
+export function moreFiltersSheetBadgeCount(filters: ModelFilterState): number {
+	return (
+		(filters.contextWindow !== 'any' ? 1 : 0) +
+		(filters.modelSize !== 'any' ? 1 : 0) +
+		filters.licenses.length +
+		filters.baseModels.length +
+		filters.dataTypes.length +
+		filters.accessFormats.length +
+		filters.quantizations.length
+	)
+}
+
+const CONTEXT_MIN_MAP: Record<Exclude<ContextWindowPreset, 'any'>, number> = {
 	'32k': 32_000,
 	'64k': 64_000,
 	'128k': 128_000,
@@ -117,28 +176,7 @@ function contextMinTokens(preset: ContextWindowPreset): number {
 	return CONTEXT_MIN_MAP[preset]
 }
 
-let priceThresholdsCached:
-	| { lowerMax: number; midMax: number; n: number }
-	| undefined
-
-function getPriceThresholds(catalog: typeof models) {
-	if (priceThresholdsCached && priceThresholdsCached.n === catalog.length) {
-		return priceThresholdsCached
-	}
-	const inputs = catalog.map((m) => m.inputCostPer1M).sort((a, b) => a - b)
-	const n = inputs.length
-	const lowerMax =
-		inputs[Math.max(0, Math.floor(n * 0.33) - 1)] ?? inputs[0] ?? 0
-	const midMax =
-		inputs[Math.max(0, Math.floor(n * 0.66) - 1)] ?? inputs[n - 1] ?? 0
-	priceThresholdsCached = { lowerMax, midMax, n }
-	return priceThresholdsCached
-}
-
-export function modelMatchesProvider(
-	model: ModelRecord,
-	providers: string[],
-) {
+export function modelMatchesProvider(model: ModelRecord, providers: string[]) {
 	if (providers.length === 0) return true
 	return providers.some((p) =>
 		p === BOOSTER_POWERED_PROVIDER
@@ -245,16 +283,14 @@ export function visibleBaseModels(catalog: typeof models): string[] {
 
 export function visibleLicenses(catalog: typeof models): string[] {
 	const have = new Set(catalog.map((m) => getLicenseCategory(m)))
-	return (
-		['Commercial', 'Open source', 'Research'] as const
-	).filter((x) => have.has(x))
+	return (['Commercial', 'Open source', 'Research'] as const).filter((x) =>
+		have.has(x),
+	)
 }
 
 export function visibleDataTypes(catalog: typeof models): string[] {
 	const have = optionSet(catalog, getCatalogDataTypes)
-	return ['bf16', 'fp16', 'fp32', 'int8', 'int4'].filter((x) =>
-		have.has(x),
-	)
+	return ['bf16', 'fp16', 'fp32', 'int8', 'int4'].filter((x) => have.has(x))
 }
 
 export function visibleAccessFormats(catalog: typeof models): string[] {
@@ -275,9 +311,9 @@ export function isFiltersActive(filters: ModelFilterState) {
 		filters.modalities.length > 0 ||
 		filters.apiCapabilities.length > 0 ||
 		filters.features.length > 0 ||
-		filters.pricePreset !== 'any' ||
-		(filters.capabilityCategory !== '' &&
-			filters.capabilityCategoryMin !== '0') ||
+		filters.priceInputMaxPer1M != null ||
+		filters.priceOutputMaxPer1M != null ||
+		filters.capabilityCategory !== '' ||
 		filters.contextWindow !== 'any' ||
 		filters.modelSize !== 'any' ||
 		filters.minMemory !== 'any' ||
@@ -333,9 +369,9 @@ function matchesMinMemory(
 export function applyModelFilters(
 	modelList: ModelRecord[],
 	filters: ModelFilterState,
-	catalog: typeof models = models,
+	_catalog: typeof models = models,
 ) {
-	const { lowerMax, midMax } = getPriceThresholds(catalog)
+	void _catalog
 	const capMin = overallCapabilityMin(filters)
 	const ctxNeed = contextMinTokens(filters.contextWindow)
 	const catNeed = categoryMinThreshold(filters)
@@ -349,7 +385,7 @@ export function applyModelFilters(
 		if (capMin > 0 && getOverallModelScore(m) < capMin) return false
 
 		if (filters.modalities.length > 0) {
-			const have = new Set(getCatalogModalities(m))
+			const have = new Set<string>(getCatalogModalities(m))
 			const ok = filters.modalities.some((x) => have.has(x))
 			if (!ok) return false
 		}
@@ -366,23 +402,39 @@ export function applyModelFilters(
 			if (!ok) return false
 		}
 
-		if (filters.pricePreset !== 'any') {
-			const inp = m.inputCostPer1M
-			if (filters.pricePreset === 'lower' && inp > lowerMax) return false
-			if (
-				filters.pricePreset === 'mid' &&
-				(inp <= lowerMax || inp > midMax)
-			)
-				return false
-			if (filters.pricePreset === 'higher' && inp <= midMax) return false
-		}
+		if (
+			filters.priceInputMaxPer1M != null &&
+			m.inputCostPer1M > filters.priceInputMaxPer1M
+		)
+			return false
 
-		if (filters.capabilityCategory !== '' && catNeed > 0) {
+		if (
+			filters.priceOutputMaxPer1M != null &&
+			m.outputCostPer1M > filters.priceOutputMaxPer1M
+		)
+			return false
+
+		if (filters.capabilityCategory !== '') {
 			const score = getCapabilityCategoryScore(
 				m,
 				filters.capabilityCategory as CapabilityCategoryId,
 			)
-			if (score == null || score < catNeed) return false
+			if (score == null || (catNeed > 0 && score < catNeed)) return false
+		}
+
+		if (
+			filters.capabilityCategory !== '' &&
+			filters.capabilitySubcategories.length > 0
+		) {
+			const ok = filters.capabilitySubcategories.every((subcategory) => {
+				const score = getCapabilitySubcategoryScore(
+					m,
+					filters.capabilityCategory as CapabilityCategoryId,
+					subcategory,
+				)
+				return score != null && (catNeed === 0 || score >= catNeed)
+			})
+			if (!ok) return false
 		}
 
 		if (ctxNeed > 0 && m.contextLength < ctxNeed) return false
@@ -390,10 +442,7 @@ export function applyModelFilters(
 		if (filters.modelSize !== 'any' && !matchesModelSize(m, filters.modelSize))
 			return false
 
-		if (
-			filters.minMemory !== 'any' &&
-			!matchesMinMemory(m, filters.minMemory)
-		)
+		if (filters.minMemory !== 'any' && !matchesMinMemory(m, filters.minMemory))
 			return false
 
 		if (
@@ -403,19 +452,19 @@ export function applyModelFilters(
 			return false
 
 		if (filters.dataTypes.length > 0) {
-			const have = new Set(getCatalogDataTypes(m))
+			const have = new Set<string>(getCatalogDataTypes(m))
 			const ok = filters.dataTypes.some((x) => have.has(x))
 			if (!ok) return false
 		}
 
 		if (filters.accessFormats.length > 0) {
-			const have = new Set(getCatalogAccessFormats(m))
+			const have = new Set<string>(getCatalogAccessFormats(m))
 			const ok = filters.accessFormats.some((x) => have.has(x))
 			if (!ok) return false
 		}
 
 		if (filters.quantizations.length > 0) {
-			const have = new Set(getCatalogQuantizations(m))
+			const have = new Set<string>(getCatalogQuantizations(m))
 			const ok = filters.quantizations.some((x) => have.has(x))
 			if (!ok) return false
 		}

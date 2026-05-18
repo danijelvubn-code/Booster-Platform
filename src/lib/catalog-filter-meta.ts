@@ -146,6 +146,63 @@ export function getCapabilityCategoryScore(
 	}
 }
 
+const CAPABILITY_CATEGORY_MATCHERS: Record<CapabilityCategoryId, RegExp> = {
+	Agents: /efficiency|agent|batch|throughput/i,
+	Coding: /code|programming|debug/i,
+	General: /language|multilingual|knowledge|custom/i,
+	'Scientific Reasoning': /reasoning|math|logical|scientific/i,
+}
+
+function getCapabilityCategoryRecords(
+	model: ModelRecord,
+	category: CapabilityCategoryId,
+) {
+	const matcher = CAPABILITY_CATEGORY_MATCHERS[category]
+	return model.capabilities.filter((cap) => matcher.test(cap.name))
+}
+
+export function getCapabilitySubcategoryNames(
+	model: ModelRecord,
+	category: CapabilityCategoryId,
+): string[] {
+	return getCapabilityCategoryRecords(model, category).flatMap((cap) =>
+		cap.subs.map((sub) => sub.name),
+	)
+}
+
+export function getCapabilitySubcategoryScore(
+	model: ModelRecord,
+	category: CapabilityCategoryId,
+	subcategory: string,
+): number | null {
+	for (const cap of getCapabilityCategoryRecords(model, category)) {
+		const sub = cap.subs.find((item) => item.name === subcategory)
+		if (sub) return sub.score
+	}
+	return null
+}
+
+/**
+ * True when at least one catalog model has both the category score and this
+ * subcapability score at or above {@link minScore}. Used to disable impossible
+ * subcapability chips when a minimal score filter is active.
+ */
+export function capabilitySubcategoryViableAtMinScore(
+	catalog: readonly ModelRecord[],
+	category: CapabilityCategoryId,
+	subcategory: string,
+	minScore: number,
+): boolean {
+	if (minScore <= 0) return true
+	for (const m of catalog) {
+		const catScore = getCapabilityCategoryScore(m, category)
+		if (catScore == null || catScore < minScore) continue
+		const subScore = getCapabilitySubcategoryScore(m, category, subcategory)
+		if (subScore != null && subScore >= minScore) return true
+	}
+	return false
+}
+
 export type LicenseCategory = 'Commercial' | 'Open source' | 'Research'
 
 export function getLicenseCategory(model: ModelRecord): LicenseCategory {
@@ -180,16 +237,23 @@ export function getCatalogDataTypes(_model: ModelRecord): DataTypeLabel[] {
 
 export type AccessFormatLabel = 'API' | 'Managed'
 
-export function getCatalogAccessFormats(_model: ModelRecord): AccessFormatLabel[] {
+export function getCatalogAccessFormats(
+	_model: ModelRecord,
+): AccessFormatLabel[] {
 	void _model
 	return ['API', 'Managed']
 }
 
 export type QuantizationLabel = 'None' | 'int8' | 'int4'
 
-export function getCatalogQuantizations(model: ModelRecord): QuantizationLabel[] {
+export function getCatalogQuantizations(
+	model: ModelRecord,
+): QuantizationLabel[] {
 	const out: QuantizationLabel[] = ['None']
-	if (getParamBillions(model) != null && (getParamBillions(model) as number) >= 50) {
+	if (
+		getParamBillions(model) != null &&
+		(getParamBillions(model) as number) >= 50
+	) {
 		out.push('int8')
 	}
 	return out

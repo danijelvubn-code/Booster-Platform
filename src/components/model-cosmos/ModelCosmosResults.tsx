@@ -5,6 +5,7 @@ import {
 	defaultFilters,
 	type ModelFilterState,
 } from '@/components/ModelFilters'
+import { getPaginationWindow } from '@/lib/pagination-window'
 import { ModelCosmosFilterBar } from '@/components/model-cosmos/ModelCosmosFilterBar'
 import { MODEL_COSMOS_RESULTS_REGION_ID } from '@/components/model-cosmos/model-cosmos-results-region'
 import { Button } from '@/components/ui/button'
@@ -33,10 +34,16 @@ export function ModelCosmosResults({
 	setPage,
 	pageSize,
 }: ModelCosmosResultsProps) {
-	const totalPages = Math.max(1, Math.ceil(sortedFiltered.length / pageSize))
-	const safePage = Math.min(page, totalPages)
-	const pageStart = (safePage - 1) * pageSize
-	const paginatedModels = sortedFiltered.slice(pageStart, pageStart + pageSize)
+	const pagination = getPaginationWindow(
+		sortedFiltered.length,
+		page,
+		pageSize,
+	)
+	const paginatedModels = sortedFiltered.slice(
+		pagination.startIndex,
+		pagination.endIndexExclusive,
+	)
+	const { totalPages, safePage } = pagination
 
 	return (
 		<div className="flex min-w-0 flex-col gap-6">
@@ -48,10 +55,9 @@ export function ModelCosmosResults({
 				/>
 			) : null}
 
-			<div
+			<section
 				id={MODEL_COSMOS_RESULTS_REGION_ID}
 				className="min-w-0 flex-1 outline-none focus:outline-none"
-				role="region"
 				aria-label="Model search results"
 				tabIndex={-1}
 			>
@@ -113,7 +119,7 @@ export function ModelCosmosResults({
 						</Button>
 					</div>
 				) : null}
-			</div>
+			</section>
 		</div>
 	)
 }

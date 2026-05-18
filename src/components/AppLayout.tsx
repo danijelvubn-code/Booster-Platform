@@ -1,9 +1,11 @@
 import { Outlet } from '@tanstack/react-router'
 import AppHeader from '@/components/AppHeader'
+import { Toaster } from '@/components/ui/sonner'
 
 export default function AppLayout() {
 	return (
 		<div className="mvp-shell flex h-dvh flex-col overflow-hidden bg-background">
+			<Toaster />
 			<AppHeader
 				logoHref="/app/overview"
 				navPathPrefix="/app"

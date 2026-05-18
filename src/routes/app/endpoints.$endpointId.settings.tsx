@@ -1,13 +1,15 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import {
 	Bell,
+	Check,
+	Copy,
 	CreditCard,
 	Key,
 	Settings,
 	ShieldCheck,
 	Users,
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ApiKeysPanel } from '@/components/ApiKeysPanel'
 import { BackButton } from '@/components/BackButton'
 import { PageContainer } from '@/components/layout/PageContainer'
@@ -20,7 +22,13 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
+import {
+	Input,
+	InputControl,
+	InputRoot,
+	InputSegment,
+	InputSuffixAddon,
+} from '@/components/ui/input'
 import { toast } from '@/components/ui/sonner'
 import { deployments, endpoints } from '@/data/mockData'
 import { cn } from '@/lib/utils'
@@ -211,6 +219,7 @@ function DeleteEndpointDialog({
 function GeneralSettingsPreview({
 	endpoint,
 	nameDraft,
+	savedEndpointName,
 	onNameChange,
 	endpointUrl,
 	onSave,
@@ -218,12 +227,45 @@ function GeneralSettingsPreview({
 }: {
 	endpoint: EndpointRecord
 	nameDraft: string
+	savedEndpointName: string
 	onNameChange: (value: string) => void
 	endpointUrl: string
 	onSave: () => void
 	onAfterEndpointDeleted: () => void
 }) {
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+	const [urlCopied, setUrlCopied] = useState(false)
+	const copyUrlTimerRef = useRef<number | null>(null)
+
+	useEffect(() => {
+		setUrlCopied(false)
+	}, [endpointUrl])
+
+	useEffect(
+		() => () => {
+			if (copyUrlTimerRef.current !== null) {
+				window.clearTimeout(copyUrlTimerRef.current)
+			}
+		},
+		[],
+	)
+
+	const handleCopyEndpointUrl = () => {
+		void navigator.clipboard.writeText(endpointUrl).then(
+			() => {
+				toast.success('Endpoint URL copied')
+				setUrlCopied(true)
+				if (copyUrlTimerRef.current !== null) {
+					window.clearTimeout(copyUrlTimerRef.current)
+				}
+				copyUrlTimerRef.current = window.setTimeout(() => {
+					setUrlCopied(false)
+					copyUrlTimerRef.current = null
+				}, 2000)
+			},
+			() => toast.error('Could not copy endpoint URL.'),
+		)
+	}
 
 	const deploymentCount = deployments[endpoint.id]?.length ?? 0
 	const showActiveUsageWarning =
@@ -231,6 +273,8 @@ function GeneralSettingsPreview({
 		deploymentCount > 0 ||
 		endpoint.inputTokens > 0 ||
 		endpoint.monthlySpend > 0
+
+	const hasUnsavedChanges = nameDraft.trim() !== savedEndpointName.trim()
 
 	return (
 		<Card className="overflow-hidden">
@@ -256,24 +300,51 @@ function GeneralSettingsPreview({
 					<label htmlFor="endpoint-url" className="text-body-sm-strong">
 						Endpoint URL
 					</label>
-					<Input
-						id="endpoint-url"
-						value={endpointUrl}
-						readOnly
-						disabled
-						aria-readonly="true"
-					/>
+					<InputRoot
+						fieldDisabled
+						className="cursor-not-allowed bg-white"
+					>
+						<InputSegment>
+							<InputControl
+								id="endpoint-url"
+								value={endpointUrl}
+								readOnly
+								disabled
+								aria-readonly="true"
+							/>
+						</InputSegment>
+						<InputSuffixAddon className="px-2">
+							<Button
+								type="button"
+								variant="ghost"
+								size="icon-sm"
+								className={cn(
+									'-mr-1 shrink-0 text-foreground/75 hover:text-foreground',
+									urlCopied &&
+										'text-success hover:bg-transparent hover:text-success',
+								)}
+								aria-label={
+									urlCopied ? 'Endpoint URL copied' : 'Copy endpoint URL'
+								}
+								onClick={handleCopyEndpointUrl}
+							>
+								{urlCopied ? (
+									<Check className="h-4 w-4" aria-hidden />
+								) : (
+									<Copy className="h-4 w-4" aria-hidden />
+								)}
+							</Button>
+						</InputSuffixAddon>
+					</InputRoot>
 				</div>
-			</CardContent>
-			<div className="border-t border-border p-4">
-				<Button type="button" onClick={onSave}>
+				<Button type="button" onClick={onSave} disabled={!hasUnsavedChanges}>
 					Save Changes
 				</Button>
-			</div>
+			</CardContent>
 
-			<div className="space-y-3 border-t border-border bg-muted/20 p-6">
-				<h3 className="text-h3 text-foreground">Danger Zone</h3>
-				<div className="flex flex-col gap-4 rounded-lg border border-border bg-white px-4 py-3">
+			<div className="space-y-3 border-t border-border bg-destructive/4 p-6">
+				<h3 className="text-h3 text-destructive">Danger Zone</h3>
+				<div className="flex flex-col gap-4">
 					<div className="space-y-2">
 						<p className="text-body-sm-strong text-foreground">Delete endpoint</p>
 						<div className="space-y-2 text-body-sm text-hierarchy-secondary">
@@ -316,10 +387,15 @@ function RouteComponent() {
 	const [activeSection, setActiveSection] =
 		useState<SettingsSectionId>('general')
 	const [nameDraft, setNameDraft] = useState(endpoint?.name ?? '')
+	const [savedEndpointName, setSavedEndpointName] = useState(
+		endpoint?.name ?? '',
+	)
 
 	useEffect(() => {
-		if (endpoint) setNameDraft(endpoint.name)
-	}, [endpoint?.id, endpoint?.name])
+		if (!endpoint) return
+		setNameDraft(endpoint.name)
+		setSavedEndpointName(endpoint.name)
+	}, [endpoint])
 
 	if (!endpoint) {
 		return (
@@ -337,14 +413,18 @@ function RouteComponent() {
 	const handleSaveGeneral = () => {
 		const trimmed = nameDraft.trim()
 		if (!trimmed) {
-			toast.error('Inference endpoint name cannot be empty.')
+			toast.error('Could not save settings', {
+				description: 'Inference endpoint name cannot be empty.',
+			})
 			return
 		}
-		if (trimmed === endpoint.name) {
-			toast.message('No changes to save.')
+		const baseline = savedEndpointName.trim()
+		if (trimmed === baseline) {
 			return
 		}
 		endpoint.name = trimmed
+		setSavedEndpointName(trimmed)
+		setNameDraft(trimmed)
 		toast.success('Settings saved', {
 			description: 'Endpoint name has been updated.',
 		})
@@ -367,6 +447,7 @@ function RouteComponent() {
 						<GeneralSettingsPreview
 							endpoint={endpoint}
 							nameDraft={nameDraft}
+							savedEndpointName={savedEndpointName}
 							onNameChange={setNameDraft}
 							endpointUrl={endpoint.endpoint}
 							onSave={handleSaveGeneral}

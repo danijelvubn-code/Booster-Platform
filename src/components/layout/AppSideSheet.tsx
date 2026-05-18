@@ -28,6 +28,8 @@ const appSideSheetShellVariants = cva(
 				sm: 'sm:max-w-modal-sm',
 				md: 'sm:max-w-modal-md',
 				lg: 'sm:max-w-modal-lg',
+				/** 560px — same token as `max-w-modal-auth` / `--modal-size-auth` */
+				sheet: 'sm:max-w-modal-auth',
 			},
 		},
 		defaultVariants: {

@@ -128,6 +128,19 @@
       0 20px 34px -5px hsl(0 0% 0% / 0.16),
       0 12px 22px -8px hsl(0 0% 0% / 0.12);
 
+    /*
+     * Popover-layer box-shadow token (e.g. Tailwind shadow-popover). Kept in sync with elevation
+     * used for floating UI; matches --shadow-xl.
+     */
+    --shadow-popover: var(--shadow-xl);
+
+    /*
+     * Radix Popper + zoom/slide animations: box-shadow often does not paint on the content node.
+     * Mirror --shadow-xl as stacked drop-shadows (drop-shadow has no spread; blur/alpha match xl).
+     */
+    --filter-popover-elevate: drop-shadow(0 14px 24px hsl(0 0% 0% / 0.14))
+      drop-shadow(0 8px 14px hsl(0 0% 0% / 0.11));
+
     --foreground-alpha-primary: 1;
     --foreground-alpha-secondary: 0.75;
     --foreground-alpha-muted: 0.5;
@@ -338,6 +351,11 @@
       0 20px 34px -5px hsl(0 0% 0% / 0.48),
       0 12px 22px -8px hsl(0 0% 0% / 0.4);
 
+    --shadow-popover: var(--shadow-xl);
+
+    --filter-popover-elevate: drop-shadow(0 14px 24px hsl(0 0% 0% / 0.44))
+      drop-shadow(0 8px 14px hsl(0 0% 0% / 0.37));
+
     --focus-ring: var(--ring);
     --focus-ring-offset: var(--background);
 
@@ -416,6 +434,16 @@
     --warning-foreground: 1 0 0;
     --info: 0.623 0.188 259.8;
     --info-foreground: 1 0 0;
+  }
+}
+
+@layer components {
+  /*
+   * Apply elevation here (not only box-shadow on the node) so menus/popovers stay visible
+   * under Radix Popper + zoom-in animations. Tooltips use `shadow-none` and their own drop-shadow.
+   */
+  [data-radix-popper-content-wrapper] > [data-side]:not(.shadow-none) {
+    filter: var(--filter-popover-elevate);
   }
 }
 

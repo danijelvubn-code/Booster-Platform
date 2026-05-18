@@ -1,20 +1,22 @@
 import { Link } from '@tanstack/react-router'
+
 import { ModelCosmosCard } from '@/components/ModelCosmosCard'
-import ModelFilters, {
+import {
 	defaultFilters,
 	type ModelFilterState,
 } from '@/components/ModelFilters'
+import { ModelCosmosFilterBar } from '@/components/model-cosmos/ModelCosmosFilterBar'
+import { MODEL_COSMOS_RESULTS_REGION_ID } from '@/components/model-cosmos/model-cosmos-results-region'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import type { models } from '@/data/mockData'
 
 interface ModelCosmosResultsProps {
 	showFilters: boolean
+	catalog: typeof models
 	filters: ModelFilterState
 	setFilters: (filters: ModelFilterState) => void
 	filtered: typeof models
 	sortedFiltered: typeof models
-	hasActiveFilters: boolean
 	page: number
 	setPage: (page: number | ((p: number) => number)) => void
 	pageSize: number
@@ -22,11 +24,11 @@ interface ModelCosmosResultsProps {
 
 export function ModelCosmosResults({
 	showFilters,
+	catalog,
 	filters,
 	setFilters,
 	filtered,
 	sortedFiltered,
-	hasActiveFilters,
 	page,
 	setPage,
 	pageSize,
@@ -37,39 +39,22 @@ export function ModelCosmosResults({
 	const paginatedModels = sortedFiltered.slice(pageStart, pageStart + pageSize)
 
 	return (
-		<div className="flex gap-6">
-			{/* Optional filter sidebar */}
-			{showFilters && (
-				<div className="w-64 flex-shrink-0">
-					<Card className="sticky top-4">
-						<CardContent className="p-4">
-							<ModelFilters filters={filters} onChange={setFilters} />
-						</CardContent>
-					</Card>
-				</div>
-			)}
+		<div className="flex min-w-0 flex-col gap-6">
+			{showFilters ? (
+				<ModelCosmosFilterBar
+					catalog={catalog}
+					filters={filters}
+					onFiltersChange={setFilters}
+				/>
+			) : null}
 
-			{/* Main content area */}
-			<div className="flex-1 min-w-0">
-				{/* Results count */}
-				{filtered.length > 0 && (
-					<div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1">
-						<span className="text-body-sm text-muted-foreground">
-							{hasActiveFilters
-								? `${filtered.length} model${filtered.length !== 1 ? 's' : ''} found`
-								: `${filtered.length} models`}
-						</span>
-						{filtered.length > pageSize && (
-							<span className="text-caption text-muted-foreground">
-								Showing {pageStart + 1}–
-								{Math.min(pageStart + pageSize, filtered.length)} of{' '}
-								{filtered.length}
-							</span>
-						)}
-					</div>
-				)}
-
-				{/* Model grid */}
+			<div
+				id={MODEL_COSMOS_RESULTS_REGION_ID}
+				className="min-w-0 flex-1 outline-none focus:outline-none"
+				role="region"
+				aria-label="Model search results"
+				tabIndex={-1}
+			>
 				<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 					{paginatedModels.map((model) => (
 						<Link
@@ -84,7 +69,6 @@ export function ModelCosmosResults({
 					))}
 				</div>
 
-				{/* Pagination */}
 				{filtered.length > pageSize && (
 					<div className="mt-6 flex flex-wrap items-center justify-center gap-3">
 						<Button
@@ -111,21 +95,24 @@ export function ModelCosmosResults({
 					</div>
 				)}
 
-				{/* Empty state */}
-				{filtered.length === 0 && (
-					<div className="text-center py-12 text-muted-foreground">
-						<p className="text-lg font-medium">No models match your filters</p>
-						<p className="text-sm mt-1">Try adjusting your filter criteria</p>
+				{filtered.length === 0 ? (
+					<div className="py-12 text-center text-muted-foreground">
+						<p className="text-lg font-medium text-foreground">
+							No models match these filters
+						</p>
+						<p className="mt-1 text-body-sm">
+							Try removing some filters or lowering the capability score.
+						</p>
 						<Button
 							variant="outline"
 							size="sm"
-							className="mt-3"
+							className="mt-4"
 							onClick={() => setFilters({ ...defaultFilters })}
 						>
-							Reset Filters
+							Clear all filters
 						</Button>
 					</div>
-				)}
+				) : null}
 			</div>
 		</div>
 	)

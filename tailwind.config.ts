@@ -215,6 +215,7 @@ export default {
         DEFAULT: "var(--shadow)",
         md: "var(--shadow-md)",
         lg: "var(--shadow-lg)",
+        popover: "var(--shadow-popover)",
         xl: "var(--shadow-xl)",
         "2xl": "var(--shadow-2xl)",
       },

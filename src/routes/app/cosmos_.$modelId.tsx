@@ -13,7 +13,6 @@ import {
 	CircleStop,
 	Code2,
 	Cpu,
-	Database,
 	Table as FeatureTableIcon,
 	FileArchive,
 	FileText,
@@ -1251,7 +1250,7 @@ function RouteComponent() {
 											<AppSideSheetContent
 												title="Score breakdown"
 												description="Capability score breakdown by category and sub-scores for this model."
-												maxWidth="lg"
+												maxWidth="sheet"
 											>
 												<div className="rounded-lg border border-border bg-card p-4">
 													<div className="flex items-center justify-between gap-4">
@@ -1600,22 +1599,6 @@ function RouteComponent() {
 												</div>
 											</div>
 										))}
-										<div className="flex items-center gap-3 rounded-md border border-border p-3">
-											<IconBox size="xlg" shape="circle" className="bg-muted">
-												<Database
-													className="text-hierarchy-secondary"
-													aria-hidden
-												/>
-											</IconBox>
-											<div className="min-w-0">
-												<p className="text-body-sm-strong text-foreground">
-													Internal evaluation suite
-												</p>
-												<p className="text-body-sm text-muted-foreground">
-													Capability and benchmark scores used by Booster
-												</p>
-											</div>
-										</div>
 									</div>
 								</div>
 							</div>

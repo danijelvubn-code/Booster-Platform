@@ -1,12 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useMemo, useState } from 'react'
+
 import { PageContainer } from '@/components/layout/PageContainer'
 import { PageHeader } from '@/components/layout/PageHeader'
 import {
 	applyModelFilters,
 	defaultFilters,
+	defaultSort,
 	isFiltersActive,
 	type ModelFilterState,
+	type ModelSortId,
+	sortModels,
 } from '@/components/ModelFilters'
 import { ModelCosmosResults } from '@/components/model-cosmos/ModelCosmosResults'
 import { ModelCosmosSearchBar } from '@/components/model-cosmos/ModelCosmosSearchBar'
@@ -30,7 +34,8 @@ function ModelCosmosPage() {
 		...defaultFilters,
 		...(hostingParam ? { hosting: [hostingParam] } : {}),
 	}))
-	const [showFilters, setShowFilters] = useState(false)
+	const [sort, setSort] = useState<ModelSortId>(defaultSort)
+	const [showFilters, setShowFilters] = useState(true)
 	const [page, setPage] = useState(1)
 
 	const filtered = useMemo(
@@ -44,22 +49,19 @@ function ModelCosmosPage() {
 					)
 				}),
 				filters,
+				models,
 			),
 		[search, filters],
 	)
 
-	const sortedFiltered = useMemo(() => {
-		const out = [...filtered]
-		out.sort(
-			(a, b) =>
-				(modelCatalogOrder.get(a.id) ?? 0) - (modelCatalogOrder.get(b.id) ?? 0),
-		)
-		return out
-	}, [filtered])
+	const sortedFiltered = useMemo(
+		() => sortModels(filtered, sort, modelCatalogOrder),
+		[filtered, sort],
+	)
 
 	useEffect(() => {
 		setPage(1)
-	}, [])
+	}, [search, filters, sort])
 
 	const hasActiveFilters = isFiltersActive(filters)
 
@@ -79,15 +81,20 @@ function ModelCosmosPage() {
 						showFilters={showFilters}
 						setShowFilters={setShowFilters}
 						hasActiveFilters={hasActiveFilters}
+						sort={sort}
+						onSortChange={setSort}
+						totalResults={sortedFiltered.length}
+						page={page}
+						pageSize={COSMOS_PAGE_SIZE}
 					/>
 
 					<ModelCosmosResults
 						showFilters={showFilters}
+						catalog={models}
 						filters={filters}
 						setFilters={setFilters}
 						filtered={filtered}
 						sortedFiltered={sortedFiltered}
-						hasActiveFilters={hasActiveFilters}
 						page={page}
 						setPage={setPage}
 						pageSize={COSMOS_PAGE_SIZE}

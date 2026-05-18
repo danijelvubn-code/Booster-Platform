@@ -70,7 +70,7 @@ export function EndpointModelSelectSheet({
 			<AppSideSheetContent
 				title="Select Model"
 				description="Search and choose a model to attach to this inference endpoint."
-				maxWidth="lg"
+				maxWidth="sheet"
 				toolbar={
 					<div className="relative">
 						<Search

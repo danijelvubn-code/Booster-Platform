@@ -206,8 +206,9 @@
     /* Scroll area: native scrollbar track thickness (vertical width / horizontal height). */
     --scroll-area-scrollbar-thickness: 0.625rem; /* 10px */
     --components-dropdown-max-height: 520px;
-    /* Model Cosmos — basic catalog card (fixed tile height). */
-    --cosmos-card-basic-height: 112px;
+    /* Model Cosmos — catalog card (fixed tile height). */
+    --cosmos-card-height: 152px;
+    --cosmos-card-basic-height: var(--cosmos-card-height);
     /* MVP model detail — benchmark tile description (two-line body-sm block). */
     --layout-benchmark-tile-description-min-height: 63px;
 
@@ -406,7 +407,8 @@
     --modal-size-auth: 35rem; /* 560px — auth / get-started form column */
     --modal-size-benchmark-details: 64.25rem; /* 1028px — wide benchmark methodology sheet */
     --components-dropdown-max-height: 520px;
-    --cosmos-card-basic-height: 112px;
+    --cosmos-card-height: 152px;
+    --cosmos-card-basic-height: var(--cosmos-card-height);
     --layout-benchmark-tile-description-min-height: 63px;
 
     --disabled-opacity-strong: 0.5;

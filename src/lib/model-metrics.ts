@@ -32,6 +32,9 @@ export function getOverallModelScore(model: ModelRecord): number {
 
 const PARAM_RE = /(\d+(?:\.\d+)?)\s*B/i
 
+/** Shown when model name/description has no parseable parameter size (e.g. card subline). */
+export const PARAM_SIZE_MISSING_LABEL = '- -'
+
 export function getParamSizeLabel(name: string): string | null {
 	const m = name.match(PARAM_RE)
 	return m ? `${m[1]}B` : null
@@ -60,7 +63,7 @@ export function modelHasVisionCapability(model: ModelRecord): boolean {
 }
 
 export function getModelSubline(model: ModelRecord): string {
-	const param = getParamSizeLabel(model.name) ?? '—'
+	const param = getParamSizeLabel(model.name) ?? PARAM_SIZE_MISSING_LABEL
 	return `${param} · ${getModelModalityLabel(model)}`
 }
 

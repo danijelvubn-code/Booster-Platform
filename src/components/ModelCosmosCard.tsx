@@ -1,4 +1,5 @@
-import { Cpu, Eye, Zap } from 'lucide-react'
+import { BrainCircuit, Eye } from 'lucide-react'
+import { Fragment } from 'react'
 import { EnergyScorePill } from '@/components/EnergyScorePill'
 import { MetricCell, MetricsRow } from '@/components/metrics'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -11,7 +12,7 @@ import {
 } from '@/components/ui/tooltip'
 import {
 	formatContextLength,
-	formatEurPerTokenFromPer1M,
+	formatEurPer1MForDisplay,
 	getCodingScore,
 	getMathScore,
 	getModelCatalogBadge,
@@ -34,14 +35,39 @@ type ModelCosmosCardProps = {
 	model: ModelRecord
 	className?: string
 	/**
-	 * `full`: avatar, scores, sustainability, metrics (phase 2).
-	 * `basic`: name, provider, description only (phase 1).
-	 * `catalog`: card layout with avatar, model name, modalities, endpoint, and per-token in/out in metric cells.
+	 * `full` / `basic`: catalog tile (avatar, subline, scores, metrics).
+	 * `catalog`: alternate layout with modalities and endpoint badge.
 	 */
 	variant?: ModelCosmosCardVariant
 }
 
-function ModelCosmosCardFull({
+const cosmosCardSurfaceClass =
+	'hover:border-primary/40 hover:shadow-md flex h-cosmos-card min-h-cosmos-card flex-col gap-3 overflow-hidden p-4 transition duration-200 ease-standard'
+
+function CapabilityMetric({
+	label,
+	value,
+	emphasize,
+}: {
+	label: string
+	value: number
+	emphasize?: boolean
+}) {
+	return (
+		<span
+			className={cn(
+				'whitespace-nowrap',
+				emphasize
+					? 'text-body-sm-strong text-foreground/75'
+					: 'text-body-sm text-muted-foreground',
+			)}
+		>
+			{label} {value > 0 ? `${value}%` : '—'}
+		</span>
+	)
+}
+
+function ModelCosmosCardV4({
 	model,
 	className,
 }: {
@@ -52,24 +78,31 @@ function ModelCosmosCardFull({
 	const reasoning = getReasoningScore(model)
 	const math = getMathScore(model)
 	const overall = getOverallModelScore(model)
-	const subline = getModelSubline(model)
 	const scoreClass = overallScoreTextClass(overall)
 	const grade = (model.sustainability ?? 'B').toUpperCase().charAt(0)
-
+	const subline = getModelSubline(model)
 	const isDeprecated = model.status === 'Deprecated'
-	const statusSuffix = model.status === 'Active' ? '' : ` · ${model.status}`
 	const providerLogoSrc = getModelProviderLogoSrc(model.provider, model.name)
+
+	const sortedCapabilityMetrics = [
+		{ label: 'Coding' as const, value: coding },
+		{ label: 'Reasoning' as const, value: reasoning },
+		{ label: 'Math' as const, value: math },
+	].sort((a, b) => {
+		if (b.value !== a.value) return b.value - a.value
+		return a.label.localeCompare(b.label)
+	})
 
 	return (
 		<Card
 			className={cn(
-				'hover:border-primary/40 hover:shadow-md flex h-full flex-col gap-4 p-4 transition duration-200 ease-standard',
+				cosmosCardSurfaceClass,
 				isDeprecated && 'opacity-50',
 				className,
 			)}
 		>
 			<div className="flex gap-3">
-				<div className="bg-muted/50 relative h-14 w-14 shrink-0 overflow-hidden rounded-md">
+				<div className="bg-muted/50 relative h-12 w-12 shrink-0 overflow-hidden rounded-md">
 					<Avatar className="h-full w-full rounded-md">
 						{providerLogoSrc ? (
 							<AvatarImage
@@ -83,19 +116,23 @@ function ModelCosmosCardFull({
 						</AvatarFallback>
 					</Avatar>
 				</div>
-				<div className="flex min-w-0 flex-1 flex-col gap-0.75">
-					<div className="flex h-8 min-w-0 items-center gap-3">
-						<p className="min-w-0 flex-1 truncate text-lg font-semibold leading-tight text-foreground/75">
-							{model.name}
-						</p>
-						<div className="flex shrink-0 items-center gap-4">
-							<EnergyScorePill grade={grade} />
+				<div className="flex min-w-0 flex-1 flex-col gap-0.5">
+					<div className="flex min-w-0 items-start gap-3">
+						<div className="min-w-0 flex-1">
+							<p className="truncate text-lg font-semibold leading-tight text-foreground">
+								{model.name}
+							</p>
+							<p className="truncate text-body-sm text-muted-foreground">
+								{subline}
+							</p>
+						</div>
+						<div className="flex shrink-0 items-center gap-3">
 							<Tooltip delayDuration={800}>
 								<TooltipTrigger asChild>
 									<p
 										className={cn(
-											'min-w-9 shrink-0 cursor-default text-left text-lg font-semibold leading-tight',
-											scoreClass,
+											'min-w-9 shrink-0 cursor-default text-right text-lg font-semibold leading-tight tabular-nums',
+											overall > 0 ? scoreClass : 'text-muted-foreground',
 										)}
 									>
 										{overall > 0 ? `${overall}%` : '—'}
@@ -105,38 +142,40 @@ function ModelCosmosCardFull({
 									Aggregated benchmark score
 								</TooltipContent>
 							</Tooltip>
+							<EnergyScorePill grade={grade} />
 						</div>
 					</div>
-					<p className="text-body-sm text-muted-foreground">
-						{subline}
-						{statusSuffix}
-					</p>
 				</div>
 			</div>
 
 			<div className="flex gap-3">
-				<div className="w-14 shrink-0" aria-hidden />
-				<div className="text-body-sm text-muted-foreground flex min-w-0 flex-1 flex-wrap items-center gap-3">
-					<span className="text-body-sm-strong text-foreground/75 whitespace-nowrap">
-						Coding {coding}%
-					</span>
-					<span className="bg-border h-4 w-px shrink-0" aria-hidden />
-					<span className="whitespace-nowrap">Reasoning {reasoning}%</span>
-					<span className="bg-border h-4 w-px shrink-0" aria-hidden />
-					<span className="whitespace-nowrap">Math {math}%</span>
+				<div className="w-12 shrink-0" aria-hidden />
+				<div className="text-body-sm flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
+					{sortedCapabilityMetrics.map((metric, index) => (
+						<Fragment key={metric.label}>
+							{index > 0 ? (
+								<span className="bg-border h-4 w-px shrink-0" aria-hidden />
+							) : null}
+							<CapabilityMetric
+								label={metric.label}
+								value={metric.value}
+								emphasize={index === 0 && metric.value > 0}
+							/>
+						</Fragment>
+					))}
 				</div>
 			</div>
 
 			<div className="flex gap-3">
-				<div className="w-14 shrink-0" aria-hidden />
-				<MetricsRow>
-					<MetricCell icon={Zap} label={`${model.tokensPerSecond} tok/s`} />
+				<div className="w-12 shrink-0" aria-hidden />
+				<MetricsRow className="grid-cols-2">
 					<MetricCell
-						icon={Cpu}
+						icon={BrainCircuit}
 						label={formatContextLength(model.contextLength)}
 					/>
 					<MetricCell
-						label={`€${model.inputCostPer1M} → €${model.outputCostPer1M} / 1M`}
+						className="[&>span]:font-mono [&>span]:tabular-nums"
+						label={`€${formatEurPer1MForDisplay(model.inputCostPer1M)}→€${formatEurPer1MForDisplay(model.outputCostPer1M)}/1M`}
 					/>
 				</MetricsRow>
 			</div>
@@ -155,8 +194,8 @@ function ModelCosmosCardCatalog({
 	const isDeprecated = model.status === 'Deprecated'
 	const showVision = modelHasVisionCapability(model)
 	const catalogBadge = getModelCatalogBadge(model)
-	const inEur = formatEurPerTokenFromPer1M(model.inputCostPer1M)
-	const outEur = formatEurPerTokenFromPer1M(model.outputCostPer1M)
+	const inEur = formatEurPer1MForDisplay(model.inputCostPer1M)
+	const outEur = formatEurPer1MForDisplay(model.outputCostPer1M)
 
 	return (
 		<Card
@@ -241,52 +280,18 @@ function ModelCosmosCardCatalog({
 	)
 }
 
-function ModelCosmosCardBasic({
-	model,
-	className,
-}: {
-	model: ModelRecord
-	className?: string
-}) {
-	return (
-		<Card
-			className={cn(
-				'hover:border-primary/40 hover:shadow-md flex h-cosmos-card-basic min-h-cosmos-card-basic flex-col gap-3 overflow-hidden p-4 transition duration-200 ease-standard',
-				className,
-			)}
-		>
-			<div className="flex min-w-0 shrink-0 items-start justify-between gap-3">
-				<p className="min-w-0 flex-1 truncate text-lg font-semibold leading-tight text-foreground/75">
-					{model.name}
-				</p>
-				<p className="max-w-40 shrink-0 truncate text-right text-body-sm text-muted-foreground">
-					{model.provider}
-				</p>
-			</div>
-			<p className="min-h-0 flex-1 line-clamp-3 text-body-sm text-muted-foreground">
-				{model.description}
-			</p>
-		</Card>
-	)
-}
-
 export function ModelCosmosCard({
 	model,
 	className,
 	variant = 'full',
 }: ModelCosmosCardProps) {
-	if (variant === 'basic') {
-		return <ModelCosmosCardBasic model={model} className={className} />
-	}
 	if (variant === 'catalog') {
 		return <ModelCosmosCardCatalog model={model} className={className} />
 	}
-	return <ModelCosmosCardFull model={model} className={className} />
+	return <ModelCosmosCardV4 model={model} className={className} />
 }
 
-/** Phase 1 catalog card: title row + description only. */
-export { ModelCosmosCardBasic }
-/** Phase 2: full metrics, avatar, and benchmark row. */
-export { ModelCosmosCardFull }
-/** Catalog tile: avatar, name, modalities vs endpoint, pricing in metric cells. */
+/** V4 catalog card used on Model Cosmos grid and compact pickers. */
+export { ModelCosmosCardV4 as ModelCosmosCardFull }
+export { ModelCosmosCardV4 as ModelCosmosCardBasic }
 export { ModelCosmosCardCatalog }

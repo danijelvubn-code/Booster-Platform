@@ -70,7 +70,7 @@ export function ModelCosmosResults({
 							search={{ returnTo: '/app/cosmos', returnLabel: 'Cosmos' }}
 							className="block h-full min-w-0"
 						>
-							<ModelCosmosCard model={model} variant="basic" />
+							<ModelCosmosCard model={model} variant="full" />
 						</Link>
 					))}
 				</div>

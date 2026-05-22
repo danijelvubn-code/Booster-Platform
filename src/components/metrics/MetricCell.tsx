@@ -17,7 +17,7 @@ export type MetricCellProps = {
 const cellSurface =
 	'bg-background flex min-w-0 flex-1 flex-col items-center justify-center rounded-sm p-2'
 
-const valueText = 'text-body-sm text-muted-foreground whitespace-nowrap'
+const valueText = 'text-body-sm text-foreground/75 whitespace-nowrap'
 
 /**
  * A single metric cell: one surface, with or without a leading icon.
@@ -38,7 +38,7 @@ export function MetricCell({
 				<div className="flex min-w-0 items-center justify-center gap-1">
 					<div className="flex h-icon-20 w-icon-20 shrink-0 items-center justify-center rounded-md p-0.5">
 						<Icon
-							className="h-icon-16 w-icon-16 text-muted-foreground"
+							className="h-icon-16 w-icon-16 text-foreground/75"
 							aria-hidden
 						/>
 					</div>

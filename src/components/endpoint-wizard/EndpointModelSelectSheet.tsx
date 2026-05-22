@@ -6,7 +6,9 @@ import { ModelCosmosCard } from '@/components/ModelCosmosCard'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Sheet } from '@/components/ui/sheet'
+import { toast } from '@/components/ui/sonner'
 import type { Model } from '@/data/mockData'
+import { canCreateInferenceEndpoint } from '@/lib/model-lifecycle'
 import { cn } from '@/lib/utils'
 
 const PAGE_SIZE = 16
@@ -65,12 +67,19 @@ export function EndpointModelSelectSheet({
 		if (page > totalPages) setPage(totalPages)
 	}, [page, totalPages])
 
+	const pendingModel = pendingId
+		? models.find((model) => model.id === pendingId)
+		: null
+	const canConfirmSelection = Boolean(
+		pendingModel && canCreateInferenceEndpoint(pendingModel),
+	)
+
 	return (
 		<Sheet open={open} onOpenChange={onOpenChange}>
 			<AppSideSheetContent
 				title="Select Model"
 				description="Search and choose a model to attach to this inference endpoint."
-				maxWidth="sheet"
+				toolbarClassName="px-6 py-3"
 				toolbar={
 					<div className="relative">
 						<Search
@@ -121,23 +130,39 @@ export function EndpointModelSelectSheet({
 					</div>
 				}
 				footer={
-					<div className="flex justify-end gap-3">
-						<Button
-							type="button"
-							variant="outline"
-							onClick={() => onOpenChange(false)}
-						>
-							Cancel
-						</Button>
-						<Button
-							type="button"
-							disabled={!pendingId}
-							onClick={() => {
-								if (pendingId) onConfirm(pendingId)
-							}}
-						>
-							Select Model
-						</Button>
+					<div className="flex flex-col gap-3">
+						{pendingModel && !canCreateInferenceEndpoint(pendingModel) ? (
+							<p className="text-body-sm text-muted-foreground">
+								{pendingModel.name} is deprecated and cannot be attached to a
+								new inference endpoint. Choose an active model instead.
+							</p>
+						) : null}
+						<div className="flex justify-end gap-3">
+							<Button
+								type="button"
+								variant="outline"
+								onClick={() => onOpenChange(false)}
+							>
+								Cancel
+							</Button>
+							<Button
+								type="button"
+								disabled={!canConfirmSelection}
+								onClick={() => {
+									if (!pendingId || !pendingModel) return
+									if (!canCreateInferenceEndpoint(pendingModel)) {
+										toast.error('Deprecated model cannot be deployed', {
+											description:
+												'Choose an active or sunsetting model for new inference endpoints.',
+										})
+										return
+									}
+									onConfirm(pendingId)
+								}}
+							>
+								Select Model
+							</Button>
+						</div>
 					</div>
 				}
 				bodyClassName="gap-3 py-4 pr-4 pl-6"

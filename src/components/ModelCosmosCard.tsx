@@ -2,6 +2,7 @@ import { BrainCircuit, Eye } from 'lucide-react'
 import { Fragment } from 'react'
 import { EnergyScorePill } from '@/components/EnergyScorePill'
 import { MetricCell, MetricsRow } from '@/components/metrics'
+import { ModelStatusDot } from '@/components/model-detail/ModelStatusDot'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
@@ -42,7 +43,37 @@ type ModelCosmosCardProps = {
 }
 
 const cosmosCardSurfaceClass =
-	'hover:border-primary/40 hover:shadow-md flex h-cosmos-card min-h-cosmos-card flex-col gap-3 overflow-hidden p-4 transition duration-200 ease-standard'
+	'hover:border-primary/40 hover:shadow-md flex min-h-cosmos-card flex-col gap-3 overflow-hidden p-4 transition duration-200 ease-standard'
+
+function ModelCosmosCardAvatar({
+	model,
+	className,
+}: {
+	model: ModelRecord
+	className?: string
+}) {
+	const providerLogoSrc = getModelProviderLogoSrc(model.provider, model.name)
+
+	return (
+		<div className={cn('relative shrink-0', className)}>
+			<div className="bg-muted/50 h-full w-full overflow-hidden rounded-md">
+				<Avatar className="h-full w-full rounded-md">
+					{providerLogoSrc ? (
+						<AvatarImage
+							src={providerLogoSrc}
+							alt=""
+							className="h-full w-full object-contain"
+						/>
+					) : null}
+					<AvatarFallback className="rounded-md text-label">
+						{getProviderInitials(model.provider)}
+					</AvatarFallback>
+				</Avatar>
+			</div>
+			<ModelStatusDot status={model.status} variant="avatar" />
+		</div>
+	)
+}
 
 function CapabilityMetric({
 	label,
@@ -56,10 +87,8 @@ function CapabilityMetric({
 	return (
 		<span
 			className={cn(
-				'whitespace-nowrap',
-				emphasize
-					? 'text-body-sm-strong text-foreground/75'
-					: 'text-body-sm text-muted-foreground',
+				'whitespace-nowrap text-foreground/75',
+				emphasize ? 'text-body-sm-strong' : 'text-body-sm',
 			)}
 		>
 			{label} {value > 0 ? `${value}%` : '—'}
@@ -82,7 +111,6 @@ function ModelCosmosCardV4({
 	const grade = (model.sustainability ?? 'B').toUpperCase().charAt(0)
 	const subline = getModelSubline(model)
 	const isDeprecated = model.status === 'Deprecated'
-	const providerLogoSrc = getModelProviderLogoSrc(model.provider, model.name)
 
 	const sortedCapabilityMetrics = [
 		{ label: 'Coding' as const, value: coding },
@@ -102,27 +130,14 @@ function ModelCosmosCardV4({
 			)}
 		>
 			<div className="flex gap-3">
-				<div className="bg-muted/50 relative h-12 w-12 shrink-0 overflow-hidden rounded-md">
-					<Avatar className="h-full w-full rounded-md">
-						{providerLogoSrc ? (
-							<AvatarImage
-								src={providerLogoSrc}
-								alt=""
-								className="h-full w-full object-contain"
-							/>
-						) : null}
-						<AvatarFallback className="rounded-md text-label">
-							{getProviderInitials(model.provider)}
-						</AvatarFallback>
-					</Avatar>
-				</div>
+				<ModelCosmosCardAvatar model={model} className="h-12 w-12" />
 				<div className="flex min-w-0 flex-1 flex-col gap-0.5">
 					<div className="flex min-w-0 items-start gap-3">
 						<div className="min-w-0 flex-1">
 							<p className="truncate text-lg font-semibold leading-tight text-foreground">
 								{model.name}
 							</p>
-							<p className="truncate text-body-sm text-muted-foreground">
+							<p className="truncate text-body-sm text-foreground/75">
 								{subline}
 							</p>
 						</div>
@@ -150,19 +165,24 @@ function ModelCosmosCardV4({
 
 			<div className="flex gap-3">
 				<div className="w-12 shrink-0" aria-hidden />
-				<div className="text-body-sm flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
-					{sortedCapabilityMetrics.map((metric, index) => (
-						<Fragment key={metric.label}>
-							{index > 0 ? (
-								<span className="bg-border h-4 w-px shrink-0" aria-hidden />
-							) : null}
-							<CapabilityMetric
-								label={metric.label}
-								value={metric.value}
-								emphasize={index === 0 && metric.value > 0}
-							/>
-						</Fragment>
-					))}
+				<div className="flex min-w-0 flex-1 flex-col gap-2">
+					<div className="text-body-sm flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
+						{sortedCapabilityMetrics.map((metric, index) => (
+							<Fragment key={metric.label}>
+								{index > 0 ? (
+									<span className="bg-border h-4 w-px shrink-0" aria-hidden />
+								) : null}
+								<CapabilityMetric
+									label={metric.label}
+									value={metric.value}
+									emphasize={index === 0 && metric.value > 0}
+								/>
+							</Fragment>
+						))}
+					</div>
+					<p className="line-clamp-2 h-[42px] min-h-[42px] text-body-sm text-foreground/75">
+						{model.description}
+					</p>
 				</div>
 			</div>
 
@@ -190,7 +210,6 @@ function ModelCosmosCardCatalog({
 	model: ModelRecord
 	className?: string
 }) {
-	const providerLogoSrc = getModelProviderLogoSrc(model.provider, model.name)
 	const isDeprecated = model.status === 'Deprecated'
 	const showVision = modelHasVisionCapability(model)
 	const catalogBadge = getModelCatalogBadge(model)
@@ -206,20 +225,7 @@ function ModelCosmosCardCatalog({
 			)}
 		>
 			<div className="flex min-w-0 flex-1 items-start gap-3">
-				<div className="bg-muted/50 relative h-14 w-14 shrink-0 overflow-hidden rounded-md">
-					<Avatar className="h-full w-full rounded-md">
-						{providerLogoSrc ? (
-							<AvatarImage
-								src={providerLogoSrc}
-								alt=""
-								className="h-full w-full object-contain"
-							/>
-						) : null}
-						<AvatarFallback className="rounded-md text-label">
-							{getProviderInitials(model.provider)}
-						</AvatarFallback>
-					</Avatar>
-				</div>
+				<ModelCosmosCardAvatar model={model} className="h-14 w-14" />
 				<p className="min-w-0 flex-1 truncate text-lg font-semibold leading-tight text-foreground">
 					{model.name}
 				</p>

@@ -1,0 +1,1 @@
+import{c as m,j as x}from"./index-DOwHLRfg.js";function t({children:s,cols:r={xs:1,sm:2},gap:d="gap-4",className:i}){const g=m("grid",d,r.xs&&`grid-cols-${r.xs}`,r.sm&&`sm:grid-cols-${r.sm}`,r.md&&`md:grid-cols-${r.md}`,r.lg&&`lg:grid-cols-${r.lg}`,r.xl&&`xl:grid-cols-${r.xl}`,i);return x.jsx("div",{className:g,children:s})}export{t as C};

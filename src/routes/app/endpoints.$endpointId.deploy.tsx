@@ -8,7 +8,9 @@ import { Label } from '@/components/ui/label'
 import { toast } from '@/components/ui/sonner'
 import { Switch } from '@/components/ui/switch'
 import { PageContainer } from '@/components/layout/PageContainer'
+import { ModelLifecycleAlert } from '@/components/model-detail/ModelLifecycleAlert'
 import { deployments, endpoints, models } from '@/data/mockData'
+import { canCreateInferenceEndpoint } from '@/lib/model-lifecycle'
 
 export const Route = createFileRoute('/app/endpoints/$endpointId/deploy')({
 	validateSearch: (search: Record<string, unknown>) => ({
@@ -84,7 +86,8 @@ function RouteComponent() {
 	}
 
 	const handleDeploy = () => {
-		if (!selectedModel || !endpoint) return
+		if (!selectedModel || !endpoint || !canCreateInferenceEndpoint(selectedModel))
+			return
 
 		const regionLabel =
 			endpoint.performanceProfile === 'best-effort'
@@ -134,6 +137,8 @@ function RouteComponent() {
 	// TypeScript assertion: selectedModel is guaranteed to exist after early returns
 	if (!selectedModel) return null
 
+	const deployAllowed = canCreateInferenceEndpoint(selectedModel)
+
 	return (
 		<PageContainer gap="space-y-6" className="py-8">
 			<Button
@@ -162,6 +167,8 @@ function RouteComponent() {
 					{selectedModel.provider} • v{selectedModel.version}
 				</p>
 			</div>
+
+			<ModelLifecycleAlert model={selectedModel} />
 
 			<div className="grid gap-6 md:grid-cols-2">
 				<Card>
@@ -236,7 +243,7 @@ function RouteComponent() {
 			</Card>
 
 			<div className="flex justify-end">
-				<Button onClick={handleDeploy} size="lg">
+				<Button onClick={handleDeploy} size="lg" disabled={!deployAllowed}>
 					Add to Endpoint <Check className="ml-2 h-4 w-4" />
 				</Button>
 			</div>

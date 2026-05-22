@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import { sheetWidthClasses } from '@/components/layout/AppSideSheet'
 import {
 	Sheet,
 	SheetContent,
@@ -155,7 +156,10 @@ function BenchmarksDetailSheet({
 			<SheetTrigger asChild>{children}</SheetTrigger>
 			<SheetContent
 				side="right"
-				className="inset-y-4 left-4 right-4 flex h-auto w-auto flex-col gap-0 overflow-hidden rounded-xl border border-border p-0 shadow-xl lg:left-auto lg:w-[860px] lg:max-w-[860px]"
+				className={cn(
+					'inset-y-4 left-4 right-4 flex h-auto flex-col gap-0 overflow-hidden rounded-xl border border-border p-0 shadow-xl sm:left-auto',
+					sheetWidthClasses.md,
+				)}
 				aria-describedby={undefined}
 			>
 				<SheetHeader className="h-[60px] flex-row items-center justify-start border-b border-border px-5 py-0 space-y-0">

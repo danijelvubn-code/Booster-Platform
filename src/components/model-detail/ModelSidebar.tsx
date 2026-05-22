@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { ModelLifecycleAlert } from '@/components/model-detail/ModelLifecycleAlert'
 import { StatDisplay } from '@/components/StatDisplay'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -6,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import {
 	getOverallModelScore,
-	getParamSizeLabel,
+	getModelParameterSizeLabel,
 	type ModelRecord,
 	modelHasVisionCapability,
 	overallScoreTextClass,
@@ -15,6 +16,10 @@ import {
 	getModelProviderLogoSrc,
 	getProviderInitials,
 } from '@/lib/model-provider-logos'
+import {
+	canCreateInferenceEndpoint,
+	getModelStatusBadgeVariant,
+} from '@/lib/model-lifecycle'
 import { cn } from '@/lib/utils'
 
 interface ModelSidebarProps {
@@ -24,8 +29,7 @@ interface ModelSidebarProps {
 export function ModelSidebar({ model }: ModelSidebarProps) {
 	const providerLogoSrc = getModelProviderLogoSrc(model.provider, model.name)
 	const qualityScore = getOverallModelScore(model)
-	const paramLabel =
-		getParamSizeLabel(model.name) ?? getParamSizeLabel(model.description)
+	const paramLabel = getModelParameterSizeLabel(model)
 	const isMultimodal = modelHasVisionCapability(model)
 
 	const heroTags = [
@@ -37,20 +41,16 @@ export function ModelSidebar({ model }: ModelSidebarProps) {
 			: (model.hosting as string | undefined)?.toUpperCase(),
 	].filter((t): t is string => Boolean(t))
 
-	const statusBadge =
-		model.status === 'Active' ? (
-			<Badge variant="success" size="20" className="font-normal">
-				Active
-			</Badge>
-		) : (
-			<Badge
-				variant={model.status === 'Deprecated' ? 'destructive' : 'warning'}
-				size="20"
-				className="font-normal"
-			>
-				{model.status}
-			</Badge>
-		)
+	const statusBadge = (
+		<Badge
+			variant={getModelStatusBadgeVariant(model.status)}
+			size="20"
+			className="font-normal"
+		>
+			{model.status}
+		</Badge>
+	)
+	const deployAllowed = canCreateInferenceEndpoint(model)
 
 	return (
 		<aside className="lg:sticky lg:top-4 lg:z-10 lg:self-start">
@@ -142,15 +142,28 @@ export function ModelSidebar({ model }: ModelSidebarProps) {
 					</div>
 				) : null}
 
-				<div className="border-t border-border p-3">
-					<Button asChild variant="default" size="default" className="w-full">
-						<Link
-							to="/app/endpoints/deploy_endpoint"
-							search={{ model: model.id }}
+				<div className="space-y-3 border-t border-border p-3">
+					<ModelLifecycleAlert model={model} />
+					{deployAllowed ? (
+						<Button asChild variant="default" size="default" className="w-full">
+							<Link
+								to="/app/endpoints/deploy_endpoint"
+								search={{ model: model.id }}
+							>
+								Add to Endpoint
+							</Link>
+						</Button>
+					) : (
+						<Button
+							type="button"
+							variant="default"
+							size="default"
+							className="w-full"
+							disabled
 						>
 							Add to Endpoint
-						</Link>
-					</Button>
+						</Button>
+					)}
 				</div>
 			</Card>
 		</aside>

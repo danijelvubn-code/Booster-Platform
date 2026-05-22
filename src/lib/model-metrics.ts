@@ -40,6 +40,21 @@ export function getParamSizeLabel(name: string): string | null {
 	return m ? `${m[1]}B` : null
 }
 
+/** Canonical parameter size label from catalog data (e.g. `72B`). */
+export function getModelParameterSizeLabel(model: ModelRecord): string {
+	return model.parameterSize
+}
+
+export function parseParameterSizeToCount(label: string): number {
+	const m = label.match(/^(\d+(?:\.\d+)?)B$/i)
+	if (!m) return 0
+	return Number.parseFloat(m[1]) * 1_000_000_000
+}
+
+export function getModelParameterCount(model: ModelRecord): number {
+	return parseParameterSizeToCount(getModelParameterSizeLabel(model))
+}
+
 export function getModelModalityLabel(model: ModelRecord): string {
 	if (model.category === 'Code') return 'Code LLM'
 	if (model.category === 'Enterprise') return 'Enterprise LLM'
@@ -63,8 +78,10 @@ export function modelHasVisionCapability(model: ModelRecord): boolean {
 }
 
 export function getModelSubline(model: ModelRecord): string {
-	const param = getParamSizeLabel(model.name) ?? PARAM_SIZE_MISSING_LABEL
-	return `${param} · ${getModelModalityLabel(model)}`
+	const param = getModelParameterSizeLabel(model)
+	const version = `v${model.version}`
+	const type = getModelModalityLabel(model)
+	return `${version} · ${param} · ${type}`
 }
 
 /** Per-token price in EUR when `inputCostPer1M` is EUR per 1M tokens. */

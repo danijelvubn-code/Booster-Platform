@@ -11,17 +11,19 @@ import {
 	Brain,
 	BrainCircuit,
 	CheckCircle2,
+	ChevronDown,
 	CircleStop,
 	Code2,
-	Cpu,
+	Eye,
 	Table as FeatureTableIcon,
 	FileArchive,
 	FileText,
 	FileVolume,
-	FlaskConical,
 	GitBranchPlus,
 	Hammer,
 	Image,
+	Languages,
+	Layers,
 	Info,
 	ListTree,
 	type LucideIcon,
@@ -33,12 +35,21 @@ import {
 	Mic,
 	Plus,
 	Scale,
+	ShieldCheck,
 	Share2,
 	Type,
 	Video,
 	Weight,
 } from 'lucide-react'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import {
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	type KeyboardEvent,
+	type MouseEvent,
+	type ReactNode,
+} from 'react'
 import { AppSideSheetContent } from '@/components/layout/AppSideSheet'
 import {
 	Accordion,
@@ -67,13 +78,25 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { ModelLifecycleAlert } from '@/components/model-detail/ModelLifecycleAlert'
 import { getProviderOptions, models } from '@/data/mockData'
 import {
 	getModelModalityLabel,
 	getOverallModelScore,
-	getParamSizeLabel,
+	getModelParameterCount,
 	type ModelRecord,
 } from '@/lib/model-metrics'
+import {
+	canCreateInferenceEndpoint,
+	getModelStatusBadgeVariant,
+} from '@/lib/model-lifecycle'
+import {
+	formatCapabilityWeight,
+	getAiIndexCapabilityScores,
+	getAiIndexScore,
+	getModelCapabilityScores,
+	type ScoredSubcapability,
+} from '@/lib/capability-scoring'
 import { getModelProviderLogoSrc } from '@/lib/model-provider-logos'
 import { cn } from '@/lib/utils'
 
@@ -189,16 +212,23 @@ type ModelYaml = {
 	}
 	capabilities: {
 		inteligence_index: number
+		ai_index: number
 		categories: Array<{
+			id: string
 			name: string
-			score: number
-			subcategogies?: Array<{
+			description: string
+			score: number | null
+			subcapabilities: Array<{
+				id: string
 				name: string
-				score: number
-				benchmarks?: Array<{
+				description: string
+				score: number | null
+				weight: number
+				benchmarks: Array<{
 					id: string
+					name: string
 					weight: number
-					score: number
+					score: number | null
 				}>
 			}>
 		}>
@@ -415,131 +445,301 @@ function formatEurPer1M(value: number): string {
 	return `€${value.toFixed(2)}`
 }
 
-const CAPABILITY_ROW_DEFS = [
-	{ label: 'Agents', match: /efficiency|agent|batch|throughput/i, icon: Cpu },
-	{ label: 'Coding', match: /code|programming|debug/i, icon: Code2 },
-	{ label: 'General', match: /language|multilingual|custom/i, icon: Brain },
-	{
-		label: 'Scientific Reasoning',
-		match: /reasoning|math|logical|rag|scientific/i,
-		icon: FlaskConical,
-	},
-] as const
-
-function capabilityRowsFromYaml(model: ModelYaml) {
-	const categories = model.capabilities.categories
-	return CAPABILITY_ROW_DEFS.map((def) => {
-		const match = categories.find((cat) => def.match.test(cat.name))
-		const fallbackScore =
-			categories.length > 0
-				? Math.round(
-						categories.reduce(
-							(sum, cat) => sum + scoreToPercent(cat.score),
-							0,
-						) / categories.length,
-					)
-				: 0
-		return {
-			label: def.label,
-			score: match ? scoreToPercent(match.score) : fallbackScore,
-			icon: def.icon,
-		}
-	})
+function isScoreMissing(score: number | null | undefined): boolean {
+	return score == null || !Number.isFinite(score)
 }
 
-function capabilityAccordionBucketsFromYaml(model: ModelYaml) {
-	const summaryRows = capabilityRowsFromYaml(model)
-	const categories = model.capabilities.categories
-	return CAPABILITY_ROW_DEFS.map((def, index) => ({
-		label: def.label,
-		icon: def.icon,
-		scorePercent: summaryRows[index].score,
-		sourceCategories: categories.filter((cat) => def.match.test(cat.name)),
+function formatScoreOrMissing(score: number | null | undefined): string {
+	if (isScoreMissing(score)) return '- -'
+	return formatScore(score)
+}
+
+function ScoreOrMissing({
+	score,
+	className,
+}: {
+	score: number | null | undefined
+	className?: string
+}) {
+	return (
+		<span
+			className={cn(
+				className,
+				isScoreMissing(score) && 'text-muted-foreground',
+			)}
+		>
+			{formatScoreOrMissing(score)}
+		</span>
+	)
+}
+
+const CAPABILITY_ICONS: Record<string, LucideIcon> = {
+	reasoning: BrainCircuit,
+	knowledge: Brain,
+	structured_output: Braces,
+	tool_use: Hammer,
+	coding: Code2,
+	safety: ShieldCheck,
+	summarization: FileText,
+	classification: ListTree,
+	document_understanding: FileText,
+	visual_intelligence: Eye,
+	audio_understanding: AudioWaveform,
+	multimodal_understanding: Layers,
+	multilingualism: Languages,
+	embedding: Braces,
+	reranking: ArrowUpNarrowWide,
+}
+
+function capabilityRowsFromModel(model: ModelRecord) {
+	return getAiIndexCapabilityScores(model).map((capability) => ({
+		id: capability.id,
+		label: capability.displayName,
+		score:
+			capability.hasBenchmarkResults && capability.score != null
+				? scoreToPercent(capability.score)
+				: 0,
+		icon: CAPABILITY_ICONS[capability.id] ?? Brain,
 	}))
 }
 
-function CapabilityCategoryDetailBody({
-	category,
-}: {
-	category: ModelYaml['capabilities']['categories'][number]
-}) {
-	if (!category.subcategogies || category.subcategogies.length === 0) {
-		return (
-			<p className="text-caption text-muted-foreground">
-				No subcategories yet.
-			</p>
-		)
-	}
+function capabilityAccordionFromModel(model: ModelRecord) {
+	return getModelCapabilityScores(model).map((capability) => ({
+		id: capability.id,
+		label: capability.displayName,
+		description: capability.description,
+		icon: CAPABILITY_ICONS[capability.id] ?? Brain,
+		score: capability.score,
+		hasBenchmarkResults: capability.hasBenchmarkResults,
+		subcapabilities: capability.subcapabilities,
+	}))
+}
+
+const CAPABILITY_BENCHMARK_UNAVAILABLE_MESSAGE =
+	'Benchmarking has not been completed for this capability. No results are available yet.'
+
+function CapabilityBenchmarkUnavailableBody() {
 	return (
-		<div className="space-y-3">
-			{category.subcategogies.map((sub) => (
-				<div
-					key={sub.name}
-					className="overflow-hidden rounded-md border border-border bg-card"
+		<div className="flex h-16 items-center pl-[76px]">
+			<p className="text-caption text-hierarchy-secondary">
+				{CAPABILITY_BENCHMARK_UNAVAILABLE_MESSAGE}
+			</p>
+		</div>
+	)
+}
+
+/** Shared column template: benchmark | weight | score */
+const SCORE_BREAKDOWN_COLS = 'grid-cols-[minmax(0,1fr)_4.5rem_3.5rem]' as const
+
+/** Top-level capability row: white at rest, muted gray on bar hover only. */
+const capabilityLevelBarClass =
+	'!bg-white group-hover:!bg-white hover:!bg-muted/40'
+
+const scoreBreakdownSurfaceClass =
+	'!bg-white hover:!bg-white group-hover:!bg-white'
+const scoreBreakdownBenchmarkCellClass =
+	'!p-0 !py-3 !pl-[92px] !pr-4 align-middle text-left text-body-sm text-muted-foreground'
+const scoreBreakdownMetricCellClass =
+	'!p-0 !py-3 !px-3 align-middle text-right text-body-sm tabular-nums text-muted-foreground'
+const scoreBreakdownBenchmarkHeadClass =
+	'!h-10 !p-0 !pl-[92px] !pr-4 align-middle text-left text-label font-medium text-muted-foreground'
+const scoreBreakdownMetricHeadClass =
+	'!h-10 !p-0 !px-3 align-middle text-right text-label font-medium text-muted-foreground'
+
+const SCORE_BREAKDOWN_INTRO = {
+	title: 'Capabilities',
+	body: 'Benchmark-derived scores for each evaluated capability area. Expand a capability to see sub-capability weights and scores; expand a sub-capability to see how individual benchmarks contribute. Weights at each level sum to 100%.',
+} as const
+
+const SCORE_BREAKDOWN_TOOLTIPS = {
+	capabilityScore:
+		'Weighted average of the sub-capability scores below, using each sub-capability’s weight.',
+	subcapabilityWeight:
+		'Share of the parent capability score attributed to this sub-capability. Weights in this section sum to 100%.',
+	subcapabilityScore:
+		'Weighted average of the benchmark scores below, using each benchmark’s weight.',
+	benchmarkWeight:
+		'Share of the sub-capability score attributed to this benchmark. Weights in this section sum to 100%.',
+	benchmarkScore: 'Model result on this benchmark evaluation, shown as a percentage.',
+} as const
+
+function stopAccordionTogglePropagation(event: MouseEvent | KeyboardEvent) {
+	event.stopPropagation()
+}
+
+function ScoreBreakdownMetricHint({
+	label,
+	className,
+	children,
+}: {
+	label: string
+	className?: string
+	children: ReactNode
+}) {
+	return (
+		<Tooltip>
+			<TooltipTrigger asChild>
+				<span
+					className={cn('cursor-help', className)}
+					tabIndex={0}
+					onClick={stopAccordionTogglePropagation}
+					onKeyDown={stopAccordionTogglePropagation}
 				>
-					<div className="flex h-12 items-center justify-between gap-3 px-3">
-						<p className="text-body-sm text-foreground">{sub.name}</p>
-						<span className="text-body-sm tabular-nums text-muted-foreground">
-							{formatScore(sub.score)}
-						</span>
-					</div>
-					{sub.benchmarks && sub.benchmarks.length > 0 ? (
+					{children}
+				</span>
+			</TooltipTrigger>
+			<TooltipContent side="top" className="max-w-xs">
+				{label}
+			</TooltipContent>
+		</Tooltip>
+	)
+}
+
+function CapabilityCategoryDetailBody({
+	subcapabilities,
+}: {
+	subcapabilities: ScoredSubcapability[]
+}) {
+	return (
+		<Accordion type="multiple" className="divide-y divide-border">
+			{subcapabilities.map((sub) => (
+				<AccordionItem
+					key={sub.id}
+					value={sub.id}
+					className={cn('border-0', scoreBreakdownSurfaceClass)}
+				>
+					<AccordionTrigger
+						className={cn(
+							scoreBreakdownSurfaceClass,
+							'!grid h-16 w-full items-center gap-0 !p-0 !pr-3 py-0 text-left text-body-sm hover:no-underline [&>svg:last-child]:hidden [&[data-state=open]>svg:first-child]:rotate-180',
+							SCORE_BREAKDOWN_COLS,
+						)}
+					>
+						<div className="flex min-w-0 items-center gap-3 pl-[48px]">
+							<ChevronDown className="h-icon-16 w-icon-16 shrink-0 text-muted-foreground transition-transform duration-200 ease-standard" />
+							<div className="min-w-0 flex-1 text-left">
+								<p className="text-body-sm text-foreground">{sub.displayName}</p>
+								<p className="text-caption text-muted-foreground">
+									{sub.description}
+								</p>
+							</div>
+						</div>
+						<ScoreBreakdownMetricHint
+							label={SCORE_BREAKDOWN_TOOLTIPS.subcapabilityWeight}
+							className="text-right text-body-sm tabular-nums text-muted-foreground"
+						>
+							{formatCapabilityWeight(sub.weight)}
+						</ScoreBreakdownMetricHint>
+						<ScoreBreakdownMetricHint
+							label={SCORE_BREAKDOWN_TOOLTIPS.subcapabilityScore}
+							className="text-right text-body-sm tabular-nums text-foreground"
+						>
+							<ScoreOrMissing score={sub.score} />
+						</ScoreBreakdownMetricHint>
+					</AccordionTrigger>
+					<AccordionContent
+						className={cn(
+							scoreBreakdownSurfaceClass,
+							'px-0 pb-0 pt-0 text-foreground',
+						)}
+					>
 						<div className="border-t border-border">
-							<Table containerClassName="overflow-x-auto overflow-y-hidden">
+							<Table
+								className="table-fixed"
+								containerClassName="overflow-x-auto overflow-y-hidden"
+							>
+								<colgroup>
+									<col />
+									<col className="w-[4.5rem]" />
+									<col className="w-[3.5rem]" />
+								</colgroup>
 								<TableHeader>
-									<TableRow className="hover:bg-transparent">
-										<TableHead className="h-10">Benchmark</TableHead>
-										<TableHead className="h-10 text-right">Weight</TableHead>
-										<TableHead className="h-10 text-right">Score</TableHead>
+									<TableRow
+										className={cn(scoreBreakdownSurfaceClass, '!h-10')}
+									>
+										<TableHead
+											className={cn(
+												scoreBreakdownSurfaceClass,
+												scoreBreakdownBenchmarkHeadClass,
+											)}
+										>
+											Benchmark
+										</TableHead>
+										<TableHead
+											className={cn(
+												scoreBreakdownSurfaceClass,
+												scoreBreakdownMetricHeadClass,
+											)}
+										>
+											Weight
+										</TableHead>
+										<TableHead
+											className={cn(
+												scoreBreakdownSurfaceClass,
+												scoreBreakdownMetricHeadClass,
+											)}
+										>
+											Score
+										</TableHead>
 									</TableRow>
 								</TableHeader>
 								<TableBody>
-									{sub.benchmarks.map((b) => (
-										<TableRow key={b.id} className="hover:bg-transparent">
-											<TableCell className="font-mono text-body-sm">
-												{b.id}
+									{sub.benchmarks.map((benchmark) => (
+										<TableRow
+											key={`${sub.id}-${benchmark.id}`}
+											className={scoreBreakdownSurfaceClass}
+										>
+											<TableCell
+												className={cn(
+													scoreBreakdownSurfaceClass,
+													scoreBreakdownBenchmarkCellClass,
+												)}
+											>
+												{benchmark.displayName}
 											</TableCell>
-											<TableCell className="text-right text-body-sm tabular-nums">
-												{b.weight}
+											<TableCell
+												className={cn(
+													scoreBreakdownSurfaceClass,
+													scoreBreakdownMetricCellClass,
+												)}
+											>
+												<ScoreBreakdownMetricHint
+													label={SCORE_BREAKDOWN_TOOLTIPS.benchmarkWeight}
+													className="block text-right text-body-sm tabular-nums text-muted-foreground"
+												>
+													{formatCapabilityWeight(benchmark.weight)}
+												</ScoreBreakdownMetricHint>
 											</TableCell>
-											<TableCell className="text-right text-body-sm tabular-nums">
-												{formatScore(b.score)}
+											<TableCell
+												className={cn(
+													scoreBreakdownSurfaceClass,
+													scoreBreakdownMetricCellClass,
+												)}
+											>
+												<ScoreBreakdownMetricHint
+													label={SCORE_BREAKDOWN_TOOLTIPS.benchmarkScore}
+													className="block text-right text-body-sm tabular-nums text-foreground"
+												>
+													<ScoreOrMissing
+														score={benchmark.score}
+														className="text-foreground"
+													/>
+												</ScoreBreakdownMetricHint>
 											</TableCell>
 										</TableRow>
 									))}
 								</TableBody>
 							</Table>
 						</div>
-					) : (
-						<div className="border-t border-border px-3 py-2">
-							<p className="text-caption text-muted-foreground">
-								No benchmarks yet.
-							</p>
-						</div>
-					)}
-				</div>
+					</AccordionContent>
+				</AccordionItem>
 			))}
-		</div>
+		</Accordion>
 	)
 }
 
 function getMockParameterCount(model: ModelRecord): number {
-	const explicitParam =
-		getParamSizeLabel(model.name) ?? getParamSizeLabel(model.description)
-	if (explicitParam) {
-		return Number.parseFloat(explicitParam.replace('B', '')) * 1_000_000_000
-	}
-
-	const haystack =
-		`${model.name} ${model.domain} ${model.category}`.toLowerCase()
-	if (haystack.includes('mistral large')) return 123_000_000_000
-	if (haystack.includes('codestral')) return 22_000_000_000
-	if (haystack.includes('deepseek')) return 671_000_000_000
-	if (haystack.includes('qwen')) return 72_000_000_000
-	if (haystack.includes('llama')) return 70_000_000_000
-	if (haystack.includes('code')) return 22_000_000_000
-	if (haystack.includes('enterprise')) return 72_000_000_000
-	return 32_000_000_000
+	return getModelParameterCount(model)
 }
 
 function normalizeModel(model: ModelRecord): ModelYaml {
@@ -599,20 +799,25 @@ function normalizeModel(model: ModelRecord): ModelYaml {
 			stream_cancellation: true,
 		},
 		capabilities: {
-			inteligence_index: score / 100,
-			categories: model.capabilities.map((cap) => ({
-				name: cap.name,
-				score: cap.score,
-				subcategogies: cap.subs.map((sub) => ({
-					name: sub.name,
-					score: sub.score,
-					benchmarks: model.benchmarks
-						.filter((benchmark) => benchmark.category === cap.name)
-						.map((benchmark) => ({
-							id: benchmark.name,
-							weight: 1,
-							score: benchmark.score,
-						})),
+			inteligence_index: (getAiIndexScore(model) ?? score) / 100,
+			ai_index: (getAiIndexScore(model) ?? score) / 100,
+			categories: getModelCapabilityScores(model).map((capability) => ({
+				id: capability.id,
+				name: capability.displayName,
+				description: capability.description,
+				score: capability.score,
+				subcapabilities: capability.subcapabilities.map((subcapability) => ({
+					id: subcapability.id,
+					name: subcapability.displayName,
+					description: subcapability.description,
+					score: subcapability.score,
+					weight: subcapability.weight,
+					benchmarks: subcapability.benchmarks.map((benchmark) => ({
+						id: benchmark.id,
+						name: benchmark.displayName,
+						weight: benchmark.weight,
+						score: benchmark.score,
+					})),
 				})),
 			})),
 		},
@@ -872,12 +1077,12 @@ function RouteComponent() {
 		[model],
 	)
 	const capabilityRows = useMemo(
-		() => (modelYaml ? capabilityRowsFromYaml(modelYaml) : []),
-		[modelYaml],
+		() => (model ? capabilityRowsFromModel(model) : []),
+		[model],
 	)
-	const capabilityAccordionBuckets = useMemo(
-		() => (modelYaml ? capabilityAccordionBucketsFromYaml(modelYaml) : []),
-		[modelYaml],
+	const capabilityAccordionItems = useMemo(
+		() => (model ? capabilityAccordionFromModel(model) : []),
+		[model],
 	)
 	const modalityRows = useMemo(
 		() => (modelYaml ? modalityRowsFromYaml(modelYaml) : []),
@@ -951,6 +1156,7 @@ function RouteComponent() {
 		'AI'
 	const capabilityScore = `${Math.round(modelYaml.capabilities.inteligence_index * 1000) / 10}`
 	const endpointsNewPath = '/app/endpoints/create_endpoint'
+	const deployAllowed = canCreateInferenceEndpoint(model)
 	const paramLabel = formatParameters(modelYaml.parameters)
 	const ctxShort = formatContextWindow(modelYaml.max_context_length)
 	const { memoryValue, memoryNumber, memoryUnit } = formatMemoryKpi(
@@ -978,6 +1184,8 @@ function RouteComponent() {
 						<NavRail active={activeNav} onSelect={scrollToSection} />
 
 						<div className="flex min-w-0 flex-1 flex-col gap-4">
+							<ModelLifecycleAlert model={model} />
+
 							<div
 								ref={assignRef('overview')}
 								data-section="overview"
@@ -991,8 +1199,8 @@ function RouteComponent() {
 
 								<div className="relative flex flex-col gap-4">
 									<div className="flex flex-wrap items-start gap-3">
-										<div className="flex size-icon-72 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted/50">
-											<Avatar className="!h-[44px] !w-[44px] rounded-lg">
+										<div className="size-icon-72 shrink-0 overflow-hidden rounded-lg bg-muted/50">
+											<Avatar className="h-full w-full rounded-lg">
 												{providerLogoSrc ? (
 													<AvatarImage
 														src={providerLogoSrc}
@@ -1022,18 +1230,12 @@ function RouteComponent() {
 															{modelYaml.type.toUpperCase()}
 														</Badge>
 														<Badge
-															variant={
-																modelYaml.status === 'active'
-																	? 'success'
-																	: 'muted'
-															}
+															variant={getModelStatusBadgeVariant(model.status)}
 															appearance="pill"
 															size="28"
 															className="font-normal"
 														>
-															{modelYaml.status === 'active'
-																? 'Active'
-																: modelYaml.status}
+															{model.status}
 														</Badge>
 													</div>
 
@@ -1091,20 +1293,33 @@ function RouteComponent() {
 													</OverviewMetaChip>
 												</div>
 
-												<Button
-													asChild
-													variant="default"
-													size="default"
-													className="shadow-xs"
-												>
-													<Link
-														to={endpointsNewPath}
-														search={{ model: modelYaml.id }}
+												{deployAllowed ? (
+													<Button
+														asChild
+														variant="default"
+														size="default"
+														className="shadow-xs"
+													>
+														<Link
+															to={endpointsNewPath}
+															search={{ model: modelYaml.id }}
+														>
+															<Plus className="size-icon-16" aria-hidden />
+															Inference Endpoint
+														</Link>
+													</Button>
+												) : (
+													<Button
+														type="button"
+														variant="default"
+														size="default"
+														className="shadow-xs"
+														disabled
 													>
 														<Plus className="size-icon-16" aria-hidden />
 														Inference Endpoint
-													</Link>
-												</Button>
+													</Button>
+												)}
 											</div>
 										</div>
 									</div>
@@ -1250,7 +1465,7 @@ function RouteComponent() {
 											<div className="flex min-w-0 flex-nowrap items-center justify-between gap-4 pt-3">
 												<p className="max-w-page-intro min-w-0 text-body-sm text-hierarchy-secondary">
 													Capability scores show aggregated performance by task
-													category. Score Breakdown includes subcategories,
+													category. Score Breakdown includes subcapabilities,
 													benchmarks, and weights.
 												</p>
 												<SheetTrigger asChild>
@@ -1266,10 +1481,12 @@ function RouteComponent() {
 											<AppSideSheetContent
 												title="Score breakdown"
 												description="Capability score breakdown by category and sub-scores for this model."
-												maxWidth="sheet"
-											>
-												<div className="rounded-lg border border-border bg-card p-4">
-													<div className="flex items-center justify-between gap-4">
+												maxWidth="xl"
+												chromeClassName="bg-white"
+												headerClassName="bg-white"
+												toolbarClassName="bg-white px-6 py-4"
+												toolbar={
+													<div className="flex w-full items-center justify-between gap-4">
 														<div className="flex min-w-0 flex-1 items-center gap-3">
 															<Avatar className="h-icon-40 w-icon-40 shrink-0 rounded-md">
 																{providerLogoSrc ? (
@@ -1288,78 +1505,107 @@ function RouteComponent() {
 															</p>
 														</div>
 														<div className="flex shrink-0 flex-col items-end gap-1 text-right">
-															<p className="text-[20px] font-semibold tabular-nums leading-none text-foreground">
-																{formatScore(
-																	modelYaml.capabilities.inteligence_index,
-																)}
-															</p>
+															<ScoreOrMissing
+																score={
+																	modelYaml.capabilities.ai_index == null
+																		? null
+																		: modelYaml.capabilities.ai_index * 100
+																}
+																className="text-[20px] font-semibold tabular-nums leading-none text-foreground"
+															/>
 															<p className="text-caption text-muted-foreground">
-																Intelligence index
+																AI Index
 															</p>
 														</div>
 													</div>
+												}
+												bodyClassName="gap-4 pb-6 pl-6 pr-4"
+											>
+												<div className="space-y-1">
+													<h3 className="text-body-sm-strong text-foreground">
+														{SCORE_BREAKDOWN_INTRO.title}
+													</h3>
+													<p className="text-body-sm text-hierarchy-secondary">
+														{SCORE_BREAKDOWN_INTRO.body}
+													</p>
 												</div>
-
 												<Accordion
 													type="multiple"
-													className="w-full rounded-lg border border-border"
+													className="w-full shrink-0 rounded-lg border border-border bg-white"
 												>
-													{capabilityAccordionBuckets.map((bucket) => {
-														const Icon = bucket.icon
+													{capabilityAccordionItems.map((capability, index) => {
+														const Icon = capability.icon
+														const isFirst = index === 0
+														const isLast =
+															index === capabilityAccordionItems.length - 1
+														const capabilityUnavailable =
+															!capability.hasBenchmarkResults
 														return (
 															<AccordionItem
-																key={bucket.label}
-																value={bucket.label}
+																key={capability.id}
+																value={capability.id}
 																className="border-border"
 															>
-																<AccordionTrigger className="h-16 px-4 py-0 text-left text-body-sm [&>svg]:ml-3">
-																	<div className="flex w-full min-w-0 flex-1 items-center justify-between gap-4 text-left">
-																		<span className="flex min-w-0 flex-1 items-center gap-2 truncate text-left text-foreground">
-																			<IconBox size="lg" shape="circle">
-																				<Icon
-																					className="text-hierarchy-secondary"
-																					aria-hidden
-																				/>
-																			</IconBox>
-																			<span className="min-w-0 flex-1 truncate text-left text-body-sm-strong">
-																				{bucket.label}
-																			</span>
+																<AccordionTrigger
+																	className={cn(
+																		capabilityLevelBarClass,
+																		'h-20 items-center gap-3 px-4 py-0 text-left text-body-sm hover:no-underline [&>svg:last-child]:hidden [&[data-state=open]>svg:first-child]:rotate-180',
+																		isFirst && 'rounded-t-lg',
+																		isLast && 'rounded-b-lg',
+																	)}
+																>
+																	<ChevronDown className="h-icon-16 w-icon-16 shrink-0 text-muted-foreground transition-transform duration-200 ease-standard" />
+																	<span
+																		className={cn(
+																			'flex min-w-0 flex-1 items-center gap-2 truncate text-left text-body-sm-strong',
+																			capabilityUnavailable
+																				? 'text-muted-foreground'
+																				: 'text-foreground',
+																		)}
+																	>
+																		<IconBox size="lg" shape="circle">
+																			<Icon
+																				className={
+																					capabilityUnavailable
+																						? 'text-muted-foreground'
+																						: 'text-hierarchy-secondary'
+																				}
+																				aria-hidden
+																			/>
+																		</IconBox>
+																		<span className="min-w-0 flex-1 truncate text-left">
+																			{capability.label}
 																		</span>
-																		<span className="shrink-0 tabular-nums text-foreground">
-																			{formatScore(bucket.scorePercent)}
-																		</span>
-																	</div>
+																	</span>
+																	<ScoreBreakdownMetricHint
+																		label={
+																			SCORE_BREAKDOWN_TOOLTIPS.capabilityScore
+																		}
+																		className="shrink-0 text-body-sm-strong tabular-nums text-foreground"
+																	>
+																		<ScoreOrMissing
+																			score={
+																				capability.hasBenchmarkResults
+																					? capability.score
+																					: null
+																			}
+																		/>
+																	</ScoreBreakdownMetricHint>
 																</AccordionTrigger>
-																<AccordionContent className="px-4 pb-4 pt-0 text-foreground">
-																	{bucket.sourceCategories.length === 0 ? (
-																		<p className="text-caption text-muted-foreground">
-																			No source categories mapped to this group
-																			yet.
-																		</p>
+																<AccordionContent
+																	className={cn(
+																		scoreBreakdownSurfaceClass,
+																		'px-0 pb-0 pt-0 text-foreground',
+																	)}
+																>
+																	{capability.hasBenchmarkResults ? (
+																		<CapabilityCategoryDetailBody
+																			subcapabilities={
+																				capability.subcapabilities
+																			}
+																		/>
 																	) : (
-																		<div className="space-y-6">
-																			{bucket.sourceCategories.map((cat) => (
-																				<div
-																					key={cat.name}
-																					className="space-y-3"
-																				>
-																					{bucket.sourceCategories.length >
-																					1 ? (
-																						<div className="flex items-center justify-between gap-3 border-b border-border pb-2">
-																							<p className="text-body-sm-strong text-foreground">
-																								{cat.name}
-																							</p>
-																							<span className="text-body-sm tabular-nums text-muted-foreground">
-																								{formatScore(cat.score)}
-																							</span>
-																						</div>
-																					) : null}
-																					<CapabilityCategoryDetailBody
-																						category={cat}
-																					/>
-																				</div>
-																			))}
-																		</div>
+																		<CapabilityBenchmarkUnavailableBody />
 																	)}
 																</AccordionContent>
 															</AccordionItem>
@@ -1379,7 +1625,7 @@ function RouteComponent() {
 												const Icon = row.icon
 												return (
 													<div
-														key={row.label}
+														key={row.id}
 														className="grid h-control-md min-w-0 w-full max-w-full grid-cols-[minmax(0,14rem)_minmax(0,1fr)_auto] items-center gap-x-5"
 													>
 														<div className="flex min-w-0 items-center gap-1">
@@ -1563,7 +1809,7 @@ function RouteComponent() {
 									id="model-detail-specifications"
 									className="mb-6 flex flex-wrap items-start gap-16 px-6 max-lg:flex-col max-lg:gap-6"
 								>
-									<SectionTitle className="w-auto shrink-0">
+									<SectionTitle className="w-[124px] min-w-[124px] basis-[124px]">
 										Specifications
 									</SectionTitle>
 									<div
@@ -1591,7 +1837,9 @@ function RouteComponent() {
 								id="model-detail-sources"
 								className="flex min-w-0 gap-16 rounded-lg border border-border bg-card px-6 py-6 shadow-sm max-lg:flex-col max-lg:gap-6"
 							>
-								<SectionTitle>Sources</SectionTitle>
+								<SectionTitle className="w-[124px] min-w-[124px] basis-[124px]">
+									Sources
+								</SectionTitle>
 								<div className="flex min-w-0 flex-1 flex-col gap-3">
 									{modelYaml.sources.map((source) => (
 										<div

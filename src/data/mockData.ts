@@ -508,6 +508,7 @@ export const models = [
 		name: 'Mistral Large',
 		provider: 'Mistral AI',
 		version: '2024-11',
+		parameterSize: '123B' as const,
 		description:
 			"Mistral's flagship model delivering strong multilingual performance at competitive pricing, optimized for speed and efficiency.",
 		domain: 'General Purpose',
@@ -581,6 +582,7 @@ export const models = [
 		name: 'Codestral',
 		provider: 'Mistral AI',
 		version: '2024-05',
+		parameterSize: '22B' as const,
 		description:
 			'Purpose-built for software engineering tasks — code generation, debugging, refactoring, and technical documentation.',
 		domain: 'Code & Engineering',
@@ -654,6 +656,7 @@ export const models = [
 		name: 'Llama 3.1 405B',
 		provider: 'Meta',
 		version: '2024-07',
+		parameterSize: '405B' as const,
 		description:
 			"Meta's largest open-source model offering near-frontier performance with full customizability and self-hosting options.",
 		domain: 'General Purpose',
@@ -727,6 +730,7 @@ export const models = [
 		name: 'Mistral Nemo',
 		provider: 'Mistral AI',
 		version: '2024-07',
+		parameterSize: '12B' as const,
 		description:
 			'A compact 12B parameter model co-developed with NVIDIA, offering strong performance for its size with excellent efficiency.',
 		domain: 'General Purpose',
@@ -800,6 +804,7 @@ export const models = [
 		name: 'Llama 3.1 70B',
 		provider: 'Meta',
 		version: '2024-07',
+		parameterSize: '70B' as const,
 		description:
 			"Meta's mid-size open-source model balancing strong reasoning with fast inference, ideal for production workloads.",
 		domain: 'General Purpose',
@@ -873,6 +878,7 @@ export const models = [
 		name: 'Qwen 2.5 72B',
 		provider: 'Alibaba',
 		version: '2024-09',
+		parameterSize: '72B' as const,
 		description:
 			"Alibaba's powerful open-source model with exceptional multilingual and mathematical capabilities across 29+ languages.",
 		domain: 'General Purpose',
@@ -946,6 +952,7 @@ export const models = [
 		name: 'DeepSeek V3',
 		provider: 'DeepSeek',
 		version: '2024-12',
+		parameterSize: '671B' as const,
 		description:
 			'A highly efficient open-source model with mixture-of-experts architecture, delivering frontier-level reasoning at low cost.',
 		domain: 'General Purpose',
@@ -1019,6 +1026,7 @@ export const models = [
 		name: 'Mixtral 8x22B',
 		provider: 'Mistral AI',
 		version: '2024-04',
+		parameterSize: '141B' as const,
 		description:
 			"Mistral's sparse mixture-of-experts model offering excellent throughput and quality, ideal for high-volume enterprise workloads.",
 		domain: 'Enterprise & RAG',
@@ -1092,6 +1100,7 @@ export const models = [
 		name: 'GPT-4o',
 		provider: 'OpenAI',
 		version: '2024-08',
+		parameterSize: '200B' as const,
 		description:
 			'Flagship multimodal model with strong reasoning, vision, and tool use for production assistants.',
 		domain: 'General Purpose',
@@ -1165,6 +1174,7 @@ export const models = [
 		name: 'GPT-4 Turbo',
 		provider: 'OpenAI',
 		version: '2024-04',
+		parameterSize: '175B' as const,
 		description:
 			'Large-context workhorse for agents, retrieval, and long document workflows.',
 		domain: 'General Purpose',
@@ -1238,6 +1248,7 @@ export const models = [
 		name: 'Gemini 1.5 Pro',
 		provider: 'Google',
 		version: '2024-05',
+		parameterSize: '175B' as const,
 		description:
 			'Long-context Gemini variant tuned for research, summarization, and multimodal understanding.',
 		domain: 'General Purpose',
@@ -1311,6 +1322,7 @@ export const models = [
 		name: 'Gemini 1.5 Flash',
 		provider: 'Google',
 		version: '2024-06',
+		parameterSize: '8B' as const,
 		description:
 			'Fast, cost-efficient Gemini for high-volume chat, classification, and extraction.',
 		domain: 'General Purpose',
@@ -1384,6 +1396,7 @@ export const models = [
 		name: 'Gemma 2 27B',
 		provider: 'Google',
 		version: '2024-06',
+		parameterSize: '27B' as const,
 		description:
 			'Open-weights Gemma family model balancing quality and deployability on modest hardware.',
 		domain: 'General Purpose',
@@ -1457,6 +1470,7 @@ export const models = [
 		name: 'EuroLLM 9B',
 		provider: 'EuroLLM',
 		version: '2024-10',
+		parameterSize: '9B' as const,
 		description:
 			'EU-centric open model emphasizing multilingual coverage across official EU languages.',
 		domain: 'General Purpose',
@@ -1530,6 +1544,7 @@ export const models = [
 		name: 'EuroLLM 70B',
 		provider: 'EuroLLM',
 		version: '2024-10',
+		parameterSize: '70B' as const,
 		description:
 			'Larger EuroLLM variant for enterprise assistants requiring stronger reasoning and grounding.',
 		domain: 'Enterprise & RAG',
@@ -1603,6 +1618,7 @@ export const models = [
 		name: 'Multiverse Core',
 		provider: 'Multiverse',
 		version: '2024-09',
+		parameterSize: '72B' as const,
 		description:
 			'General frontier-class model from Multiverse AI for balanced quality and latency.',
 		domain: 'General Purpose',
@@ -1676,6 +1692,7 @@ export const models = [
 		name: 'Multiverse Edge',
 		provider: 'Multiverse',
 		version: '2024-11',
+		parameterSize: '7B' as const,
 		description:
 			'Edge-optimized Multiverse model for low-latency assistants and mobile backends.',
 		domain: 'General Purpose',
@@ -1749,6 +1766,7 @@ export const models = [
 		name: 'Mistral Small',
 		provider: 'Mistral AI',
 		version: '2024-11',
+		parameterSize: '22B' as const,
 		description:
 			'Compact Mistral model for cost-sensitive workloads with solid multilingual coverage.',
 		domain: 'General Purpose',
@@ -1822,6 +1840,7 @@ export const models = [
 		name: 'Mixtral 8x7B',
 		provider: 'Mistral AI',
 		version: '2023-12',
+		parameterSize: '47B' as const,
 		description:
 			'Classic sparse MoE model — strong quality per euro for batch and offline workloads.',
 		domain: 'General Purpose',
@@ -1895,6 +1914,7 @@ export const models = [
 		name: 'Llama 3.2 3B',
 		provider: 'Meta',
 		version: '2024-09',
+		parameterSize: '3B' as const,
 		description:
 			'Tiny Llama 3.2 for on-device and ultra-low-latency inference.',
 		domain: 'General Purpose',
@@ -1968,6 +1988,7 @@ export const models = [
 		name: 'Llama 3.2 90B Vision',
 		provider: 'Meta',
 		version: '2024-09',
+		parameterSize: '90B' as const,
 		description:
 			'Vision-capable Llama 3.2 for image+text assistants and document understanding.',
 		domain: 'General Purpose',
@@ -2041,6 +2062,7 @@ export const models = [
 		name: 'Qwen 2 7B',
 		provider: 'Alibaba',
 		version: '2024-06',
+		parameterSize: '7B' as const,
 		description:
 			'Efficient Qwen 2 checkpoint for extraction, chat, and edge deployment.',
 		domain: 'General Purpose',
@@ -2114,6 +2136,7 @@ export const models = [
 		name: 'Qwen 2.5 32B',
 		provider: 'Alibaba',
 		version: '2024-09',
+		parameterSize: '32B' as const,
 		description:
 			'Mid-size Qwen 2.5 with strong math and code for agentic workflows.',
 		domain: 'General Purpose',
@@ -2187,6 +2210,7 @@ export const models = [
 		name: 'DeepSeek Coder V2',
 		provider: 'DeepSeek',
 		version: '2024-06',
+		parameterSize: '236B' as const,
 		description:
 			'Code-specialized DeepSeek model for IDE copilots and repo-scale assistance.',
 		domain: 'Code & Engineering',
@@ -2260,6 +2284,7 @@ export const models = [
 		name: 'DeepSeek Chat',
 		provider: 'DeepSeek',
 		version: '2024-12',
+		parameterSize: '671B' as const,
 		description:
 			'General chat-optimized DeepSeek variant with strong reasoning and low API cost.',
 		domain: 'General Purpose',
@@ -2333,6 +2358,7 @@ export const models = [
 		name: 'Mistral 7B Instruct',
 		provider: 'Mistral AI',
 		version: '2023-09',
+		parameterSize: '7B' as const,
 		description:
 			'Foundational Mistral 7B instruct model — lightweight baseline for fine-tuning.',
 		domain: 'General Purpose',
@@ -2406,6 +2432,7 @@ export const models = [
 		name: 'o1-preview',
 		provider: 'OpenAI',
 		version: '2024-12',
+		parameterSize: '200B' as const,
 		description:
 			'Reasoning-focused OpenAI model with extended chain-of-thought for hard math and planning.',
 		domain: 'General Purpose',

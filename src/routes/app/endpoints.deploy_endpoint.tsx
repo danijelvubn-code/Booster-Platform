@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { BasicSetupStep } from '@/components/endpoint-wizard/BasicSetupStep'
+import { ModelLifecycleAlert } from '@/components/model-detail/ModelLifecycleAlert'
 import { ProviderSelectionStep } from '@/components/endpoint-wizard/ProviderSelectionStep'
 import { ReviewStep } from '@/components/endpoint-wizard/ReviewStep'
 import { PageHeader } from '@/components/layout/PageHeader'
@@ -25,9 +26,13 @@ import {
 import {
 	formatContextWindowShort,
 	getOverallModelScore,
-	getParamSizeLabel,
+	getModelParameterSizeLabel,
 	modelHasVisionCapability,
 } from '@/lib/model-metrics'
+import {
+	canCreateInferenceEndpoint,
+	getModelStatusBadgeVariant,
+} from '@/lib/model-lifecycle'
 
 type StepId = 0 | 1 | 2
 type Environment = 'Production' | 'Staging' | 'Development'
@@ -218,7 +223,7 @@ function RouteComponent() {
 		if (step === 1) {
 			return Boolean(selectedModel) && Boolean(selectedProvider)
 		}
-		return true
+		return canCreateInferenceEndpoint(selectedModel)
 	}, [endpointName, selectedModel, selectedProvider, step, useCase])
 
 	const estimatedMonthlyCost = useMemo(() => {
@@ -228,7 +233,7 @@ function RouteComponent() {
 	}, [selectedProvider.inputPer1M, selectedProvider.outputPer1M])
 
 	const selectedModelScore = Math.round(getOverallModelScore(selectedModel))
-	const modelSizeTag = getParamSizeLabel(selectedModel.name) ?? 'Model'
+	const modelSizeTag = getModelParameterSizeLabel(selectedModel)
 	const modelTags = [
 		modelSizeTag,
 		modelHasVisionCapability(selectedModel) ? 'MULTIMODAL' : 'TEXT',
@@ -251,7 +256,12 @@ function RouteComponent() {
 	}
 
 	const handleDeploy = () => {
-		if (!canProceed || isDeploying) return
+		if (
+			!canProceed ||
+			isDeploying ||
+			!canCreateInferenceEndpoint(selectedModel)
+		)
+			return
 		setIsDeploying(true)
 
 		window.setTimeout(() => {
@@ -323,6 +333,8 @@ function RouteComponent() {
 				description="Configure and deploy a model inference endpoint with safety and budget controls."
 			/>
 
+			<ModelLifecycleAlert model={selectedModel} className="shrink-0" />
+
 			<div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-endpoint-deploy-wizard">
 				<aside className="h-full min-w-0 lg:col-span-1">
 					<Card className="flex h-full flex-col overflow-hidden p-0">
@@ -356,8 +368,11 @@ function RouteComponent() {
 								<span className="text-body-sm text-muted-foreground">
 									Status
 								</span>
-								<Badge variant="success" size="20">
-									Active
+								<Badge
+									variant={getModelStatusBadgeVariant(selectedModel.status)}
+									size="20"
+								>
+									{selectedModel.status}
 								</Badge>
 							</div>
 							<div className="flex items-center justify-between px-4 py-3">

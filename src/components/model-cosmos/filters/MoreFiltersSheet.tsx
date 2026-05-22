@@ -75,7 +75,6 @@ export function MoreFiltersSheet({
 			<AppSideSheetContent
 				title="More filters"
 				description="Additional filters for performance, cost, licensing, and technical options in Model Cosmos."
-				maxWidth="sheet"
 				bottomAccessory={
 					<div className="flex items-center justify-between gap-3">
 						<Button

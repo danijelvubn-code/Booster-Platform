@@ -321,7 +321,7 @@ export {
   Overlay as O,
   Portal as P,
   Root as R,
-  Title as T,
+  Trigger as T,
   Close as a,
-  Trigger as b
+  Title as b
 };

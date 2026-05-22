@@ -8,32 +8,36 @@ import {
 } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 
+/** Right-docked sheet widths (`sm+`). Default product size is `md` (560px). */
+export const sheetWidthClasses = {
+	sm: 'max-sm:w-3/4 sm:w-sheet-sm',
+	md: 'max-sm:w-3/4 sm:w-sheet-md',
+	lg: 'max-sm:w-3/4 sm:w-sheet-lg',
+	xl: 'max-sm:w-3/4 sm:w-sheet-xl',
+} as const
+
+export type SheetWidth = keyof typeof sheetWidthClasses
+
 /**
  * Shared shell for right-docked product sheets: fixed width token, inset rounded
  * panel on `sm+`, header strip, scrollable body, optional footer.
  *
  * Use with `Sheet` + `SheetTrigger` from `@/components/ui/sheet`; pass arbitrary
- * content as `children`.
+ * content as `children`. Omit `maxWidth` to use the default `md` (560px).
  */
 const appSideSheetShellVariants = cva(
 	[
-		'flex flex-col overflow-hidden p-0',
-		'[&>button]:left-auto [&>button]:right-4 [&>button]:top-7 [&>button]:-translate-y-1/2',
+		'flex flex-col gap-0 overflow-hidden p-0',
+		'[&>button]:left-auto [&>button]:right-4 [&>button]:top-7 [&>button]:z-20 [&>button]:-translate-y-1/2',
 		'[&>button>svg]:h-icon-20 [&>button>svg]:w-icon-20',
 		'sm:top-6 sm:bottom-6 sm:right-6 sm:h-auto sm:rounded-2xl sm:shadow-lg',
 	].join(' '),
 	{
 		variants: {
-			maxWidth: {
-				sm: 'sm:max-w-modal-sm',
-				md: 'sm:max-w-modal-md',
-				lg: 'sm:max-w-modal-lg',
-				/** 560px — same token as `max-w-modal-auth` / `--modal-size-auth` */
-				sheet: 'sm:max-w-modal-auth',
-			},
+			maxWidth: sheetWidthClasses,
 		},
 		defaultVariants: {
-			maxWidth: 'lg',
+			maxWidth: 'md',
 		},
 	},
 )
@@ -47,6 +51,8 @@ export type AppSideSheetContentProps = React.ComponentPropsWithoutRef<
 		description?: React.ReactNode
 		descriptionClassName?: string
 		headerClassName?: string
+		/** Sticky header + toolbar shell (e.g. `bg-white` when the chrome should match the title bar). */
+		chromeClassName?: string
 		/** Fixed region below the title (e.g. search). Does not scroll with `children`. */
 		toolbar?: React.ReactNode
 		toolbarClassName?: string
@@ -69,6 +75,7 @@ export const AppSideSheetContent = React.forwardRef<
 			description,
 			descriptionClassName,
 			headerClassName,
+			chromeClassName,
 			toolbar,
 			toolbarClassName,
 			bodyClassName,
@@ -92,31 +99,33 @@ export const AppSideSheetContent = React.forwardRef<
 			>
 				<div
 					className={cn(
-						'flex h-14 shrink-0 items-center border-b border-border px-6 pr-14',
-						headerClassName,
+						'sticky top-0 z-10 shrink-0 bg-background shadow-sm',
+						chromeClassName,
 					)}
 				>
-					<SheetTitle className="min-w-0 flex-1 truncate">{title}</SheetTitle>
-				</div>
-				{description ? (
-					<SheetDescription className={cn('sr-only', descriptionClassName)}>
-						{description}
-					</SheetDescription>
-				) : null}
-				{toolbar != null ? (
 					<div
 						className={cn(
-							'shrink-0 border-b border-border px-6 py-3',
-							toolbarClassName,
+							'flex h-14 items-center border-b border-border px-6 pr-14',
+							headerClassName,
 						)}
 					>
-						{toolbar}
+						<SheetTitle className="min-w-0 flex-1 truncate">{title}</SheetTitle>
 					</div>
-				) : null}
+					{description ? (
+						<SheetDescription className={cn('sr-only', descriptionClassName)}>
+							{description}
+						</SheetDescription>
+					) : null}
+					{toolbar != null ? (
+						<div className={cn('w-full border-b border-border', toolbarClassName)}>
+							{toolbar}
+						</div>
+					) : null}
+				</div>
 				<div className="flex min-h-0 flex-1 flex-col overflow-hidden">
 					<div
 						className={cn(
-							'flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto py-6 pl-6 pr-4',
+							'flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-6 pl-6 pr-4 pt-6 [&>*]:shrink-0',
 							bodyClassName,
 						)}
 						style={{ scrollbarGutter: 'stable' }}

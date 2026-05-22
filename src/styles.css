@@ -199,6 +199,10 @@
     --modal-size-lg: 40rem; /* 640px */
     --modal-size-auth: 35rem; /* 560px — auth / get-started form column */
     --modal-size-benchmark-details: 64.25rem; /* 1028px — wide benchmark methodology sheet */
+    --sheet-size-sm: 30rem; /* 480px — right-docked product sheets */
+    --sheet-size-md: 35rem; /* 560px */
+    --sheet-size-lg: 40rem; /* 640px */
+    --sheet-size-xl: 45rem; /* 720px */
     --chart-height-sm: 15rem; /* 240px */
     --chart-height-md: 18.75rem; /* 300px */
     /* Control Panel — illustrated cards (First Time User, Login; object-contain preserves aspect ratio). */
@@ -406,6 +410,10 @@
     --modal-size-lg: 40rem; /* 640px */
     --modal-size-auth: 35rem; /* 560px — auth / get-started form column */
     --modal-size-benchmark-details: 64.25rem; /* 1028px — wide benchmark methodology sheet */
+    --sheet-size-sm: 30rem; /* 480px — right-docked product sheets */
+    --sheet-size-md: 35rem; /* 560px */
+    --sheet-size-lg: 40rem; /* 640px */
+    --sheet-size-xl: 45rem; /* 720px */
     --components-dropdown-max-height: 520px;
     --cosmos-card-height: 152px;
     --cosmos-card-basic-height: var(--cosmos-card-height);
@@ -648,5 +656,31 @@
 
   input[type="search"]::-moz-search-clear-button {
     display: none;
+  }
+}
+
+/**
+ * Right-docked sheet widths (always emitted — not subject to Tailwind content purge).
+ * Used by AppSideSheet and sheetWidthClasses (`sm:w-sheet-*`).
+ */
+@media (min-width: 640px) {
+  .sm\:w-sheet-sm {
+    width: var(--sheet-size-sm);
+    max-width: var(--sheet-size-sm);
+  }
+
+  .sm\:w-sheet-md {
+    width: var(--sheet-size-md);
+    max-width: var(--sheet-size-md);
+  }
+
+  .sm\:w-sheet-lg {
+    width: var(--sheet-size-lg);
+    max-width: var(--sheet-size-lg);
+  }
+
+  .sm\:w-sheet-xl {
+    width: var(--sheet-size-xl);
+    max-width: var(--sheet-size-xl);
   }
 }

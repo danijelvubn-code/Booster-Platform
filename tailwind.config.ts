@@ -4,6 +4,14 @@ import tailwindcssAnimate from "tailwindcss-animate";
 export default {
   darkMode: ["class"],
   content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  safelist: [
+    "sm:w-sheet-sm",
+    "sm:w-sheet-md",
+    "sm:w-sheet-lg",
+    "sm:max-w-sheet-sm",
+    "sm:max-w-sheet-md",
+    "sm:max-w-sheet-lg",
+  ],
   prefix: "",
   theme: {
     container: {
@@ -133,6 +141,10 @@ export default {
       width: {
         "modal-auth": "var(--modal-size-auth)",
         "modal-benchmark-details": "var(--modal-size-benchmark-details)",
+        "sheet-sm": "var(--sheet-size-sm)",
+        "sheet-md": "var(--sheet-size-md)",
+        "sheet-lg": "var(--sheet-size-lg)",
+        "sheet-xl": "var(--sheet-size-xl)",
         "icon-16": "var(--icon-size-16)",
         "icon-20": "var(--icon-size-20)",
         "icon-24": "var(--icon-size-24)",
@@ -179,6 +191,10 @@ export default {
         "modal-lg": "var(--modal-size-lg)",
         "modal-auth": "var(--modal-size-auth)",
         "modal-benchmark-details": "var(--modal-size-benchmark-details)",
+        "sheet-sm": "var(--sheet-size-sm)",
+        "sheet-md": "var(--sheet-size-md)",
+        "sheet-lg": "var(--sheet-size-lg)",
+        "sheet-xl": "var(--sheet-size-xl)",
         "component-labs": "var(--layout-component-labs-max)",
         "component-labs-row": "var(--layout-component-labs-row-max)",
         "page-intro": "var(--layout-page-intro-max)",

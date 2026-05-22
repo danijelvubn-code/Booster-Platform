@@ -10,6 +10,7 @@ import {
 import { useMemo, useEffect, useState } from 'react'
 import { EndpointModelSelectSheet } from '@/components/endpoint-wizard/EndpointModelSelectSheet'
 import { BasicSetupStep } from '@/components/endpoint-wizard/BasicSetupStep'
+import { ModelLifecycleAlert } from '@/components/model-detail/ModelLifecycleAlert'
 import { ProviderSelectionStep } from '@/components/endpoint-wizard/ProviderSelectionStep'
 import { ReviewStep } from '@/components/endpoint-wizard/ReviewStep'
 import { PageHeader } from '@/components/layout/PageHeader'
@@ -35,9 +36,13 @@ import {
 import {
 	getModelModalityLabel,
 	getOverallModelScore,
-	getParamSizeLabel,
+	getModelParameterCount,
 	overallScoreTextClass,
 } from '@/lib/model-metrics'
+import {
+	canCreateInferenceEndpoint,
+	getModelStatusBadgeVariant,
+} from '@/lib/model-lifecycle'
 import {
 	getModelProviderLogoSrc,
 	getProviderInitials,
@@ -88,22 +93,7 @@ function pickCheapestProviderOption(
 const MISSING_VALUE_PLACEHOLDER = '- -'
 
 function getModelDetailParameterCount(model: Model): number {
-	const explicitParam =
-		getParamSizeLabel(model.name) ?? getParamSizeLabel(model.description)
-	if (explicitParam) {
-		return Number.parseFloat(explicitParam.replace('B', '')) * 1_000_000_000
-	}
-
-	const haystack =
-		`${model.name} ${model.domain} ${model.category}`.toLowerCase()
-	if (haystack.includes('mistral large')) return 123_000_000_000
-	if (haystack.includes('codestral')) return 22_000_000_000
-	if (haystack.includes('deepseek')) return 671_000_000_000
-	if (haystack.includes('qwen')) return 72_000_000_000
-	if (haystack.includes('llama')) return 70_000_000_000
-	if (haystack.includes('code')) return 22_000_000_000
-	if (haystack.includes('enterprise')) return 72_000_000_000
-	return 32_000_000_000
+	return getModelParameterCount(model)
 }
 
 function formatDetailParameters(parameters: number | null | undefined): string {
@@ -223,7 +213,11 @@ function ModelSummarySidebar({
 					</p>
 
 					<div className="flex flex-wrap gap-2">
-						<Badge variant="success" appearance="pill" size="24">
+						<Badge
+							variant={getModelStatusBadgeVariant(model.status)}
+							appearance="pill"
+							size="24"
+						>
 							{model.status}
 						</Badge>
 						<Badge variant="outline" appearance="ghost" size="24">
@@ -398,7 +392,7 @@ function RouteComponent() {
 		if (step === 1) {
 			return Boolean(selectedProvider)
 		}
-		return true
+		return canCreateInferenceEndpoint(selectedModel)
 	}, [endpointName, selectedModel, selectedProvider, step, useCase])
 
 	const estimatedMonthlyCost = useMemo(() => {
@@ -431,7 +425,13 @@ function RouteComponent() {
 	}
 
 	const handleCreate = () => {
-		if (!selectedModel || !selectedProvider || !canProceed || isDeploying)
+		if (
+			!selectedModel ||
+			!selectedProvider ||
+			!canProceed ||
+			isDeploying ||
+			!canCreateInferenceEndpoint(selectedModel)
+		)
 			return
 		setIsDeploying(true)
 
@@ -500,6 +500,10 @@ function RouteComponent() {
 				title="Create Inference Endpoint"
 				description="Configure and deploy a model inference endpoint with safety and budget controls."
 			/>
+
+			{selectedModel ? (
+				<ModelLifecycleAlert model={selectedModel} className="shrink-0" />
+			) : null}
 
 			<div className="grid min-h-0 flex-1 basis-0 grid-cols-1 gap-4 overflow-hidden lg:grid-cols-endpoint-deploy-wizard">
 				{selectedModel ? (

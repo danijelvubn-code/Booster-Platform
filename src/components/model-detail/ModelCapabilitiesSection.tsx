@@ -21,6 +21,7 @@ import {
 	SheetTitle,
 	SheetTrigger,
 } from '@/components/ui/sheet'
+import { sheetWidthClasses } from '@/components/layout/AppSideSheet'
 import { type ModelRecord, overallScoreTextClass } from '@/lib/model-metrics'
 import { cn } from '@/lib/utils'
 
@@ -94,7 +95,10 @@ function CapabilitiesDetailDialog({ model }: { model: ModelRecord }) {
 			</SheetTrigger>
 			<SheetContent
 				side="right"
-				className="inset-y-4 right-4 flex h-auto w-[520px] flex-col gap-0 overflow-hidden rounded-xl border border-border p-0 shadow-xl sm:max-w-[520px]"
+				className={cn(
+					'inset-y-4 right-4 flex h-auto flex-col gap-0 overflow-hidden rounded-xl border border-border p-0 shadow-xl',
+					sheetWidthClasses.md,
+				)}
 				aria-describedby={undefined}
 			>
 				<SheetHeader className="h-[60px] flex-row items-center justify-start border-b border-border px-5 py-0 space-y-0">

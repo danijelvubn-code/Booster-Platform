@@ -9,8 +9,8 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table'
+import { getModelCatalogProviderRows } from '@/data/model-hosting-providers'
 import {
-	formatContextWindowShort,
 	formatEurPer1MForDisplay,
 	type ModelRecord,
 } from '@/lib/model-metrics'
@@ -29,56 +29,7 @@ interface ModelProvidersSectionProps {
 }
 
 export function ModelProvidersSection({ model }: ModelProvidersSectionProps) {
-	const ctxShort = formatContextWindowShort(model.contextLength)
-	const inPer1m = formatEurPer1MForDisplay(model.inputCostPer1M)
-	const outPer1m = formatEurPer1MForDisplay(model.outputCostPer1M)
-
-	const providerRows = [
-		{
-			provider: model.provider,
-			status: model.status === 'Deprecated' ? 'Inactive' : 'Active',
-			context: ctxShort,
-			inputPer1M: `€${inPer1m}`,
-			outputPer1M: `€${outPer1m}`,
-			avgLatency: '620ms',
-			tps: model.tokensPerSecond.toFixed(1),
-			quant: 'FP16',
-			cert: 'GDPR',
-		},
-		{
-			provider: 'Scaleway',
-			status: 'Active',
-			context: '128K',
-			inputPer1M: '€2.80',
-			outputPer1M: '€8.40',
-			avgLatency: '640ms',
-			tps: '26.5',
-			quant: 'INT8',
-			cert: 'GDPR',
-		},
-		{
-			provider: 'Nebius',
-			status: 'Active',
-			context: '128K',
-			inputPer1M: '€3.10',
-			outputPer1M: '€9.20',
-			avgLatency: '590ms',
-			tps: '29.4',
-			quant: 'FP16',
-			cert: 'GDPR',
-		},
-		{
-			provider: 'Fireworks',
-			status: 'Active',
-			context: '128K',
-			inputPer1M: '€2.95',
-			outputPer1M: '€8.95',
-			avgLatency: '610ms',
-			tps: '27.8',
-			quant: 'Q8',
-			cert: 'GDPR',
-		},
-	] as const
+	const providerRows = getModelCatalogProviderRows(model)
 
 	return (
 		<section className="space-y-3">
@@ -114,16 +65,13 @@ export function ModelProvidersSection({ model }: ModelProvidersSectionProps) {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{providerRows.map((row, index) => (
-							<TableRow key={`${row.provider}-${index}`}>
+						{providerRows.map((row) => (
+							<TableRow key={row.id}>
 								<TableCell>
 									<span className="inline-flex items-center gap-2 text-body-sm-strong text-foreground">
 										<span
 											className={cn(
-												'h-2 w-2 shrink-0 rounded-full',
-												row.status === 'Active'
-													? 'bg-success'
-													: 'bg-muted-foreground',
+												'h-2 w-2 shrink-0 rounded-full bg-success',
 											)}
 											aria-hidden
 										/>
@@ -134,16 +82,16 @@ export function ModelProvidersSection({ model }: ModelProvidersSectionProps) {
 									{row.context}
 								</TableCell>
 								<TableCell className="text-right font-mono tabular-nums text-body-sm text-foreground">
-									{row.inputPer1M}
+									€{formatEurPer1MForDisplay(row.inputPer1M)}
 								</TableCell>
 								<TableCell className="text-right font-mono tabular-nums text-body-sm text-foreground">
-									{row.outputPer1M}
+									€{formatEurPer1MForDisplay(row.outputPer1M)}
 								</TableCell>
 								<TableCell className="text-right font-mono tabular-nums text-body-sm text-foreground">
-									{row.avgLatency}
+									{row.latencyMs}ms
 								</TableCell>
 								<TableCell className="text-right font-mono tabular-nums text-body-sm text-foreground">
-									{row.tps}
+									{row.tps.toFixed(1)}
 								</TableCell>
 								<TableCell className="text-center text-caption text-muted-foreground">
 									{row.quant}
@@ -156,7 +104,7 @@ export function ModelProvidersSection({ model }: ModelProvidersSectionProps) {
 										className="font-normal"
 										leadingIcon={<CheckCircle2 aria-hidden />}
 									>
-										{row.cert}
+										{row.certs.join(', ')}
 									</Badge>
 								</TableCell>
 							</TableRow>

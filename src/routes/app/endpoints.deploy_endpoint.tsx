@@ -3,7 +3,6 @@ import {
 	Activity,
 	ArrowLeft,
 	ArrowRight,
-	RefreshCcw,
 	Rocket,
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
@@ -391,17 +390,6 @@ function RouteComponent() {
 									{selectedModel.domain}
 								</span>
 							</div>
-						</div>
-						<div className="mt-auto border-t border-border p-3">
-							<Button
-								variant="outline"
-								className="w-full"
-								onClick={() =>
-									navigate({ to: '/app/cosmos', search: { hosting: '' } })
-								}
-							>
-								<RefreshCcw className="mr-1 h-icon-16 w-icon-16" /> Swap Model
-							</Button>
 						</div>
 					</Card>
 				</aside>

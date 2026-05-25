@@ -1,4 +1,8 @@
 import { models } from '@/data/mockData'
+import {
+	getModelHostingProviders,
+	HOSTING_PROVIDER_BOOSTER,
+} from '@/data/model-hosting-providers'
 import type { ModelRecord } from '@/lib/model-metrics'
 import { getOverallModelScore } from '@/lib/model-metrics'
 import {
@@ -17,10 +21,9 @@ import {
 	type CapabilityCategoryId,
 } from '@/lib/catalog-filter-meta'
 
-export const BOOSTER_POWERED_PROVIDER = 'Booster Powered'
+export const BOOSTER_POWERED_PROVIDER = HOSTING_PROVIDER_BOOSTER
 
 export type ModelSortId =
-	| 'recommended'
 	| 'capability_desc'
 	| 'input_price_asc'
 	| 'output_price_asc'
@@ -28,7 +31,6 @@ export type ModelSortId =
 	| 'newest'
 
 export const MODEL_SORT_LABELS: Record<ModelSortId, string> = {
-	recommended: 'Recommended',
 	capability_desc: 'Capability score',
 	input_price_asc: 'Lowest input cost',
 	output_price_asc: 'Lowest output cost',
@@ -142,7 +144,7 @@ export const defaultFilters: ModelFilterState = {
 	baseModels: [],
 }
 
-export const defaultSort: ModelSortId = 'recommended'
+export const defaultSort: ModelSortId = 'capability_desc'
 
 /** Toggle membership of `item` in a multi-select string filter list. */
 export function toggleStringList(list: string[], item: string): string[] {
@@ -178,21 +180,15 @@ function contextMinTokens(preset: ContextWindowPreset): number {
 
 export function modelMatchesProvider(model: ModelRecord, providers: string[]) {
 	if (providers.length === 0) return true
-	return providers.some((p) =>
-		p === BOOSTER_POWERED_PROVIDER
-			? model.hosting === 'Booster Powered'
-			: model.provider === p,
-	)
+	const hostingProviders = getModelHostingProviders(model)
+	return providers.some((provider) => hostingProviders.includes(provider))
 }
 
 export function providerOptionCounts(catalog: typeof models) {
 	const counts = new Map<string, number>()
-	for (const m of catalog) {
-		for (const p of new Set<string>([
-			m.provider,
-			...(m.hosting === 'Booster Powered' ? [BOOSTER_POWERED_PROVIDER] : []),
-		])) {
-			counts.set(p, (counts.get(p) ?? 0) + 1)
+	for (const model of catalog) {
+		for (const provider of getModelHostingProviders(model)) {
+			counts.set(provider, (counts.get(provider) ?? 0) + 1)
 		}
 	}
 	return counts
@@ -200,9 +196,10 @@ export function providerOptionCounts(catalog: typeof models) {
 
 export function allProviderOptions(catalog: typeof models): string[] {
 	const set = new Set<string>()
-	for (const m of catalog) {
-		set.add(m.provider)
-		if (m.hosting === 'Booster Powered') set.add(BOOSTER_POWERED_PROVIDER)
+	for (const model of catalog) {
+		for (const provider of getModelHostingProviders(model)) {
+			set.add(provider)
+		}
 	}
 	return [...set].sort((a, b) => a.localeCompare(b))
 }
@@ -491,8 +488,6 @@ export function compareModelsForSort(
 	catalogOrder: Map<string, number>,
 ): number {
 	switch (sort) {
-		case 'recommended':
-			return (catalogOrder.get(a.id) ?? 0) - (catalogOrder.get(b.id) ?? 0)
 		case 'capability_desc':
 			return getOverallModelScore(b) - getOverallModelScore(a)
 		case 'input_price_asc':

@@ -4,7 +4,6 @@ import {
 	ArrowLeft,
 	ArrowRight,
 	Info,
-	RefreshCcw,
 	Rocket,
 } from 'lucide-react'
 import { useMemo, useEffect, useState } from 'react'
@@ -160,13 +159,11 @@ function ModelSummarySidebarEmpty({
 function ModelSummarySidebar({
 	model,
 	providerCount,
-	onSwapModel,
 	inputCostPer1M,
 	outputCostPer1M,
 }: {
 	model: Model
 	providerCount: number
-	onSwapModel: () => void
 	inputCostPer1M: number
 	outputCostPer1M: number
 }) {
@@ -273,12 +270,6 @@ function ModelSummarySidebar({
 						value={formatEurPer1M(outputCostPer1M)}
 					/>
 				</div>
-
-				<div className="relative mt-auto border-t border-border p-3">
-					<Button variant="outline" className="w-full" onClick={onSwapModel}>
-						<RefreshCcw className="mr-1 h-icon-16 w-icon-16" /> Swap Model
-					</Button>
-				</div>
 			</Card>
 		</aside>
 	)
@@ -306,12 +297,8 @@ function RouteComponent() {
 		useState<string>('recommended')
 	const [isDeploying, setIsDeploying] = useState(false)
 	const [modelPickerOpen, setModelPickerOpen] = useState(false)
-	const [modelPickerSeedId, setModelPickerSeedId] = useState<string | null>(
-		null,
-	)
 
-	const openModelPicker = (seedId: string | null) => {
-		setModelPickerSeedId(seedId)
+	const openModelPicker = () => {
 		setModelPickerOpen(true)
 	}
 
@@ -510,14 +497,11 @@ function RouteComponent() {
 					<ModelSummarySidebar
 						model={selectedModel}
 						providerCount={providerCount}
-						onSwapModel={() => openModelPicker(selectedModel.id)}
 						inputCostPer1M={summaryInputCostPer1M}
 						outputCostPer1M={summaryOutputCostPer1M}
 					/>
 				) : (
-					<ModelSummarySidebarEmpty
-						onSelectModel={() => openModelPicker(null)}
-					/>
+					<ModelSummarySidebarEmpty onSelectModel={openModelPicker} />
 				)}
 
 				<section className="min-h-0 h-full min-w-0 lg:col-span-1">
@@ -622,7 +606,6 @@ function RouteComponent() {
 			open={modelPickerOpen}
 			onOpenChange={setModelPickerOpen}
 			models={models}
-			initialSelectedModelId={modelPickerSeedId}
 			onConfirm={(modelId) => {
 				navigate({
 					to: '/app/endpoints/create_endpoint',

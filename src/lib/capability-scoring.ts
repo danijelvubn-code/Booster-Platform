@@ -4,6 +4,7 @@ import {
 	CAPABILITY_INDEXES,
 	CAPABILITY_TAXONOMY,
 } from '@/data/capability-taxonomy'
+import { getModelTaxonomyBenchmarkScore } from '@/data/model-taxonomy-benchmark-scores'
 import type { ModelRecord } from '@/lib/model-metrics'
 
 export type ScoredBenchmark = {
@@ -39,71 +40,11 @@ export type ScoredIndex = {
 	score: number | null
 }
 
-/** Maps taxonomy benchmark ids to catalog benchmark names in mock data. */
-const BENCHMARK_SCORE_ALIASES: Record<string, readonly string[]> = {
-	commonsenseqa: ['HellaSwag', 'CommonsenseQA'],
-	gsm8k: ['GSM8K'],
-	arc_easy: ['ARC-Easy'],
-	arc_challenge: ['ARC-Challenge'],
-	healthbench: ['HealthBench'],
-	mmlu: ['MMLU'],
-	mmlu_stem: ['MMLU'],
-	medqa: ['MedQA'],
-	mmlu_pro_health: ['MMLU'],
-	mmlu_pro_professional_accounting: ['MMLU'],
-	mmlu_pro_economics: ['MMLU'],
-	mmlu_business_economics_accounting: ['MMLU'],
-	mmlu_computer_science: ['MMLU'],
-	mmlu_high_school_biology: ['MMLU'],
-	mmlu_college_biology: ['MMLU'],
-	mmlu_college_medicine: ['MMLU'],
-	mmlu_professional_medicine: ['MMLU'],
-	mmlu_medical_genetics: ['MMLU'],
-	mmlu_virology: ['MMLU'],
-	mmlu_clinical_knowledge: ['MMLU'],
-	mmlu_nutrition: ['MMLU'],
-	mmlu_anatomy: ['MMLU'],
-	air_bench: ['TruthfulQA', 'AIR Bench'],
-	humaneval: ['HumanEval'],
-	ifeval: ['IFEval'],
-	summeval: ['SummEval'],
-}
-
-const aliasToBenchmarkIds = Object.entries(BENCHMARK_SCORE_ALIASES).reduce<
-	Map<string, string[]>
->((map, [benchmarkId, aliases]) => {
-	const primaryAlias = aliases[0]
-	const peers = map.get(primaryAlias) ?? []
-	peers.push(benchmarkId)
-	map.set(primaryAlias, peers)
-	return map
-}, new Map())
-
-function shouldVarySharedBenchmarkScore(benchmarkId: string): boolean {
-	const aliases = BENCHMARK_SCORE_ALIASES[benchmarkId]
-	if (!aliases) return false
-	const peers = aliasToBenchmarkIds.get(aliases[0]) ?? []
-	if (peers.length <= 1) return false
-	const canonicalId = [...peers].sort()[0]
-	return benchmarkId !== canonicalId
-}
-
-function stableBenchmarkVariation(benchmarkId: string, modelId: string): number {
-	let hash = 0
-	for (const char of `${modelId}:${benchmarkId}`) {
-		hash = (hash * 31 + char.charCodeAt(0)) | 0
-	}
-	return (Math.abs(hash) % 25) - 12
-}
-
-function applyBenchmarkScoreVariation(
-	baseScore: number,
+function getBenchmarkScore(
+	model: ModelRecord,
 	benchmarkId: string,
-	modelId: string,
-): number {
-	if (!shouldVarySharedBenchmarkScore(benchmarkId)) return baseScore
-	const varied = baseScore + stableBenchmarkVariation(benchmarkId, modelId)
-	return Math.round(Math.min(100, Math.max(0, varied)) * 10) / 10
+): number | null {
+	return getModelTaxonomyBenchmarkScore(model, benchmarkId)
 }
 
 function weightedAverage(
@@ -118,22 +59,6 @@ function weightedAverage(
 	}
 	if (totalWeight === 0) return null
 	return weightedSum / totalWeight
-}
-
-function getBenchmarkScore(
-	model: ModelRecord,
-	benchmarkId: string,
-): number | null {
-	const aliases = BENCHMARK_SCORE_ALIASES[benchmarkId]
-	if (aliases) {
-		for (const alias of aliases) {
-			const match = model.benchmarks.find((b) => b.name === alias)
-			if (match) {
-				return applyBenchmarkScoreVariation(match.score, benchmarkId, model.id)
-			}
-		}
-	}
-	return null
 }
 
 function normalizeBenchmarkWeights(
@@ -294,6 +219,21 @@ export function getModelIndexScores(model: ModelRecord): ScoredIndex[] {
 			score: weightedAverage(weightedItems),
 		}
 	})
+}
+
+export function getModelCapabilityScoreAverage(
+	model: ModelRecord,
+): number | null {
+	const scoredCapabilities = getModelCapabilityScores(model).filter(
+		(capability) => capability.hasBenchmarkResults && capability.score != null,
+	)
+	if (scoredCapabilities.length === 0) return null
+
+	const total = scoredCapabilities.reduce(
+		(sum, capability) => sum + capability.score!,
+		0,
+	)
+	return total / scoredCapabilities.length
 }
 
 export function getAiIndexScore(model: ModelRecord): number | null {

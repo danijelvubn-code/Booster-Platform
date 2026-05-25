@@ -43,7 +43,7 @@ type ModelCosmosCardProps = {
 }
 
 const cosmosCardSurfaceClass =
-	'hover:border-primary/40 hover:shadow-md flex min-h-cosmos-card flex-col gap-3 overflow-hidden p-4 transition duration-200 ease-standard'
+	'border border-transparent shadow-sm hover:border-primary/40 hover:shadow-md flex min-h-cosmos-card flex-col gap-3 overflow-hidden p-4 transition duration-200 ease-standard'
 
 function ModelCosmosCardAvatar({
 	model,
@@ -219,7 +219,7 @@ function ModelCosmosCardCatalog({
 	return (
 		<Card
 			className={cn(
-				'hover:border-primary/40 hover:shadow-md flex h-full min-h-0 flex-col gap-4 p-4 transition duration-200 ease-standard',
+				'border border-transparent shadow-sm hover:border-primary/40 hover:shadow-md flex h-full min-h-0 flex-col gap-4 p-4 transition duration-200 ease-standard',
 				isDeprecated && 'opacity-50',
 				className,
 			)}

@@ -43,6 +43,7 @@ import {
 } from 'lucide-react'
 import {
 	useCallback,
+	useEffect,
 	useMemo,
 	useRef,
 	useState,
@@ -60,6 +61,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+} from '@/components/ui/collapsible'
 import { IconBox } from '@/components/ui/icon-box'
 import { Progress } from '@/components/ui/progress'
 import { Separator } from '@/components/ui/separator'
@@ -79,7 +85,8 @@ import {
 	TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { ModelLifecycleAlert } from '@/components/model-detail/ModelLifecycleAlert'
-import { getProviderOptions, models } from '@/data/mockData'
+import { getModelCatalogProviderRows } from '@/data/model-hosting-providers'
+import { models } from '@/data/mockData'
 import {
 	getModelModalityLabel,
 	getOverallModelScore,
@@ -92,8 +99,8 @@ import {
 } from '@/lib/model-lifecycle'
 import {
 	formatCapabilityWeight,
-	getAiIndexCapabilityScores,
 	getAiIndexScore,
+	getModelCapabilityScoreAverage,
 	getModelCapabilityScores,
 	type ScoredSubcapability,
 } from '@/lib/capability-scoring'
@@ -432,13 +439,12 @@ function SectionTitle({
 
 function scoreToPercent(score: number): number {
 	if (!Number.isFinite(score)) return 0
-	if (score <= 1) return Math.round(score * 100)
-	if (score <= 100) return Math.round(score)
-	return Math.round(score)
+	const percent = score <= 1 ? score * 100 : score
+	return Math.round(percent * 10) / 10
 }
 
 function formatScore(score: number): string {
-	return `${scoreToPercent(score)}%`
+	return `${scoreToPercent(score).toFixed(1)}%`
 }
 
 function formatEurPer1M(value: number): string {
@@ -447,6 +453,14 @@ function formatEurPer1M(value: number): string {
 
 function isScoreMissing(score: number | null | undefined): boolean {
 	return score == null || !Number.isFinite(score)
+}
+
+function sortByScoreDesc<T extends { score: number | null }>(items: readonly T[]): T[] {
+	return [...items].sort((left, right) => {
+		const leftScore = isScoreMissing(left.score) ? -Infinity : left.score!
+		const rightScore = isScoreMissing(right.score) ? -Infinity : right.score!
+		return rightScore - leftScore
+	})
 }
 
 function formatScoreOrMissing(score: number | null | undefined): string {
@@ -491,40 +505,64 @@ const CAPABILITY_ICONS: Record<string, LucideIcon> = {
 	reranking: ArrowUpNarrowWide,
 }
 
+/** Capabilities list preview count on model detail before expanding. */
+const CAPABILITY_PREVIEW_COUNT = 5
+
 function capabilityRowsFromModel(model: ModelRecord) {
-	return getAiIndexCapabilityScores(model).map((capability) => ({
-		id: capability.id,
-		label: capability.displayName,
-		score:
-			capability.hasBenchmarkResults && capability.score != null
-				? scoreToPercent(capability.score)
-				: 0,
-		icon: CAPABILITY_ICONS[capability.id] ?? Brain,
-	}))
+	return sortByScoreDesc(
+		getModelCapabilityScores(model)
+			.filter((capability) => capability.hasBenchmarkResults)
+			.map((capability) => ({
+				id: capability.id,
+				label: capability.displayName,
+				score:
+					capability.score != null ? scoreToPercent(capability.score) : 0,
+				icon: CAPABILITY_ICONS[capability.id] ?? Brain,
+			})),
+	)
+}
+
+type CapabilityScoreRowData = ReturnType<typeof capabilityRowsFromModel>[number]
+
+function CapabilityScoreRow({ row }: { row: CapabilityScoreRowData }) {
+	const Icon = row.icon
+	return (
+		<div className="grid h-control-md min-w-0 w-full max-w-full grid-cols-[minmax(0,14rem)_minmax(0,1fr)_auto] items-center gap-x-5">
+			<div className="flex min-w-0 items-center gap-1">
+				<IconBox size="xlg" shape="circle">
+					<Icon className="text-hierarchy-secondary" aria-hidden />
+				</IconBox>
+				<span className="min-w-0 truncate text-body-sm text-hierarchy-secondary">
+					{row.label}
+				</span>
+			</div>
+			<div className="min-w-0">
+				<Progress
+					value={row.score}
+					size="dense"
+					className="bg-muted"
+					indicatorClassName="bg-muted-foreground"
+				/>
+			</div>
+			<span className="w-10 shrink-0 text-right text-body font-semibold tabular-nums text-foreground">
+				{row.score.toFixed(1)}%
+			</span>
+		</div>
+	)
 }
 
 function capabilityAccordionFromModel(model: ModelRecord) {
-	return getModelCapabilityScores(model).map((capability) => ({
-		id: capability.id,
-		label: capability.displayName,
-		description: capability.description,
-		icon: CAPABILITY_ICONS[capability.id] ?? Brain,
-		score: capability.score,
-		hasBenchmarkResults: capability.hasBenchmarkResults,
-		subcapabilities: capability.subcapabilities,
-	}))
-}
-
-const CAPABILITY_BENCHMARK_UNAVAILABLE_MESSAGE =
-	'Benchmarking has not been completed for this capability. No results are available yet.'
-
-function CapabilityBenchmarkUnavailableBody() {
-	return (
-		<div className="flex h-16 items-center pl-[76px]">
-			<p className="text-caption text-hierarchy-secondary">
-				{CAPABILITY_BENCHMARK_UNAVAILABLE_MESSAGE}
-			</p>
-		</div>
+	return sortByScoreDesc(
+		getModelCapabilityScores(model)
+			.filter((capability) => capability.hasBenchmarkResults)
+			.map((capability) => ({
+				id: capability.id,
+				label: capability.displayName,
+				description: capability.description,
+				icon: CAPABILITY_ICONS[capability.id] ?? Brain,
+				score: capability.score,
+				subcapabilities: sortByScoreDesc(capability.subcapabilities),
+			})),
 	)
 }
 
@@ -537,18 +575,36 @@ const capabilityLevelBarClass =
 
 const scoreBreakdownSurfaceClass =
 	'!bg-white hover:!bg-white group-hover:!bg-white'
+const scoreBreakdownSubcapabilityIndentClass = 'pl-[48px]'
+const scoreBreakdownBenchmarkIndentClass = '!pl-[76px]'
 const scoreBreakdownBenchmarkCellClass =
-	'!p-0 !py-3 !pl-[92px] !pr-4 align-middle text-left text-body-sm text-muted-foreground'
+	'!py-3 !pr-4 !pl-[76px] align-middle text-left text-body-sm text-muted-foreground'
 const scoreBreakdownMetricCellClass =
-	'!p-0 !py-3 !px-3 align-middle text-right text-body-sm tabular-nums text-muted-foreground'
+	'!py-3 !px-3 align-middle text-right text-body-sm tabular-nums text-muted-foreground'
 const scoreBreakdownBenchmarkHeadClass =
-	'!h-10 !p-0 !pl-[92px] !pr-4 align-middle text-left text-label font-medium text-muted-foreground'
+	'!h-10 !py-0 !pr-4 !pl-[76px] align-middle text-left text-label font-medium text-muted-foreground'
 const scoreBreakdownMetricHeadClass =
-	'!h-10 !p-0 !px-3 align-middle text-right text-label font-medium text-muted-foreground'
+	'!h-10 !py-0 !px-3 align-middle text-right text-label font-medium text-muted-foreground'
+
+function ScoreBreakdownInsetDivider({
+	indentClass,
+}: {
+	indentClass: string
+}) {
+	return (
+		<div className={indentClass} aria-hidden>
+			<div className="border-t border-border" />
+		</div>
+	)
+}
+
+/** Benchmark row separators span from the benchmark indent to the right edge. */
+const scoreBreakdownBenchmarkRowDividerClass =
+	'relative before:pointer-events-none before:absolute before:left-[76px] before:right-0 before:bottom-0 before:border-b before:border-border'
 
 const SCORE_BREAKDOWN_INTRO = {
 	title: 'Capabilities',
-	body: 'Benchmark-derived scores for each evaluated capability area. Expand a capability to see sub-capability weights and scores; expand a sub-capability to see how individual benchmarks contribute. Weights at each level sum to 100%.',
+	body: 'Scores are benchmark-derived. Expand each capability to see sub-capability scores, benchmark weights, and individual benchmark results.',
 } as const
 
 const SCORE_BREAKDOWN_TOOLTIPS = {
@@ -601,13 +657,18 @@ function CapabilityCategoryDetailBody({
 	subcapabilities: ScoredSubcapability[]
 }) {
 	return (
-		<Accordion type="multiple" className="divide-y divide-border">
-			{subcapabilities.map((sub) => (
+		<Accordion type="multiple">
+			{subcapabilities.map((sub, index) => (
 				<AccordionItem
 					key={sub.id}
 					value={sub.id}
 					className={cn('border-0', scoreBreakdownSurfaceClass)}
 				>
+					{index > 0 ? (
+						<ScoreBreakdownInsetDivider
+							indentClass={scoreBreakdownSubcapabilityIndentClass}
+						/>
+					) : null}
 					<AccordionTrigger
 						className={cn(
 							scoreBreakdownSurfaceClass,
@@ -615,11 +676,16 @@ function CapabilityCategoryDetailBody({
 							SCORE_BREAKDOWN_COLS,
 						)}
 					>
-						<div className="flex min-w-0 items-center gap-3 pl-[48px]">
+						<div
+							className={cn(
+								'flex min-w-0 items-center gap-3',
+								scoreBreakdownSubcapabilityIndentClass,
+							)}
+						>
 							<ChevronDown className="h-icon-16 w-icon-16 shrink-0 text-muted-foreground transition-transform duration-200 ease-standard" />
 							<div className="min-w-0 flex-1 text-left">
 								<p className="text-body-sm text-foreground">{sub.displayName}</p>
-								<p className="text-caption text-muted-foreground">
+								<p className="text-caption text-hierarchy-secondary">
 									{sub.description}
 								</p>
 							</div>
@@ -643,93 +709,105 @@ function CapabilityCategoryDetailBody({
 							'px-0 pb-0 pt-0 text-foreground',
 						)}
 					>
-						<div className="border-t border-border">
-							<Table
-								className="table-fixed"
-								containerClassName="overflow-x-auto overflow-y-hidden"
+						<ScoreBreakdownInsetDivider
+							indentClass={scoreBreakdownBenchmarkIndentClass}
+						/>
+						<div className="w-full" role="table">
+							<div
+								role="row"
+								className={cn(
+									'grid w-full items-center gap-0',
+									SCORE_BREAKDOWN_COLS,
+									scoreBreakdownSurfaceClass,
+									'h-10',
+									scoreBreakdownBenchmarkRowDividerClass,
+								)}
 							>
-								<colgroup>
-									<col />
-									<col className="w-[4.5rem]" />
-									<col className="w-[3.5rem]" />
-								</colgroup>
-								<TableHeader>
-									<TableRow
-										className={cn(scoreBreakdownSurfaceClass, '!h-10')}
+								<div
+									role="columnheader"
+									className={cn(
+										scoreBreakdownSurfaceClass,
+										scoreBreakdownBenchmarkHeadClass,
+										'flex h-10 items-center',
+									)}
+								>
+									Benchmark
+								</div>
+								<div
+									role="columnheader"
+									className={cn(
+										scoreBreakdownSurfaceClass,
+										scoreBreakdownMetricHeadClass,
+										'flex h-10 items-center justify-end',
+									)}
+								>
+									Weight
+								</div>
+								<div
+									role="columnheader"
+									className={cn(
+										scoreBreakdownSurfaceClass,
+										scoreBreakdownMetricHeadClass,
+										'flex h-10 items-center justify-end',
+									)}
+								>
+									Score
+								</div>
+							</div>
+							{sub.benchmarks.map((benchmark, benchmarkIndex) => (
+								<div
+									key={`${sub.id}-${benchmark.id}`}
+									role="row"
+									className={cn(
+										'grid w-full items-center gap-0',
+										SCORE_BREAKDOWN_COLS,
+										scoreBreakdownSurfaceClass,
+										benchmarkIndex < sub.benchmarks.length - 1 &&
+											scoreBreakdownBenchmarkRowDividerClass,
+									)}
+								>
+									<div
+										role="cell"
+										className={cn(
+											scoreBreakdownSurfaceClass,
+											scoreBreakdownBenchmarkCellClass,
+										)}
 									>
-										<TableHead
-											className={cn(
-												scoreBreakdownSurfaceClass,
-												scoreBreakdownBenchmarkHeadClass,
-											)}
+										{benchmark.displayName}
+									</div>
+									<div
+										role="cell"
+										className={cn(
+											scoreBreakdownSurfaceClass,
+											scoreBreakdownMetricCellClass,
+										)}
+									>
+										<ScoreBreakdownMetricHint
+											label={SCORE_BREAKDOWN_TOOLTIPS.benchmarkWeight}
+											className="block text-right text-body-sm tabular-nums text-muted-foreground"
 										>
-											Benchmark
-										</TableHead>
-										<TableHead
-											className={cn(
-												scoreBreakdownSurfaceClass,
-												scoreBreakdownMetricHeadClass,
-											)}
+											{formatCapabilityWeight(benchmark.weight)}
+										</ScoreBreakdownMetricHint>
+									</div>
+									<div
+										role="cell"
+										className={cn(
+											scoreBreakdownSurfaceClass,
+											scoreBreakdownMetricCellClass,
+										)}
+									>
+										<ScoreBreakdownMetricHint
+											label={SCORE_BREAKDOWN_TOOLTIPS.benchmarkScore}
+											className="block text-right text-body-sm tabular-nums text-foreground"
 										>
-											Weight
-										</TableHead>
-										<TableHead
-											className={cn(
-												scoreBreakdownSurfaceClass,
-												scoreBreakdownMetricHeadClass,
-											)}
-										>
-											Score
-										</TableHead>
-									</TableRow>
-								</TableHeader>
-								<TableBody>
-									{sub.benchmarks.map((benchmark) => (
-										<TableRow
-											key={`${sub.id}-${benchmark.id}`}
-											className={scoreBreakdownSurfaceClass}
-										>
-											<TableCell
-												className={cn(
-													scoreBreakdownSurfaceClass,
-													scoreBreakdownBenchmarkCellClass,
-												)}
-											>
-												{benchmark.displayName}
-											</TableCell>
-											<TableCell
-												className={cn(
-													scoreBreakdownSurfaceClass,
-													scoreBreakdownMetricCellClass,
-												)}
-											>
-												<ScoreBreakdownMetricHint
-													label={SCORE_BREAKDOWN_TOOLTIPS.benchmarkWeight}
-													className="block text-right text-body-sm tabular-nums text-muted-foreground"
-												>
-													{formatCapabilityWeight(benchmark.weight)}
-												</ScoreBreakdownMetricHint>
-											</TableCell>
-											<TableCell
-												className={cn(
-													scoreBreakdownSurfaceClass,
-													scoreBreakdownMetricCellClass,
-												)}
-											>
-												<ScoreBreakdownMetricHint
-													label={SCORE_BREAKDOWN_TOOLTIPS.benchmarkScore}
-													className="block text-right text-body-sm tabular-nums text-foreground"
-												>
-													<ScoreOrMissing
-														score={benchmark.score}
-														className="text-foreground"
-													/>
-												</ScoreBreakdownMetricHint>
-											</TableCell>
-										</TableRow>
-									))}
-								</TableBody>
-							</Table>
+											<ScoreOrMissing
+												score={benchmark.score}
+												className="text-foreground"
+											/>
+										</ScoreBreakdownMetricHint>
+									</div>
+								</div>
+							))}
 						</div>
 					</AccordionContent>
 				</AccordionItem>
@@ -1071,6 +1149,11 @@ function RouteComponent() {
 	)
 	const scrollRootRef = useRef<HTMLDivElement | null>(null)
 	const [activeNav, setActiveNav] = useState<SectionId>('overview')
+	const [capabilitiesExpanded, setCapabilitiesExpanded] = useState(false)
+
+	useEffect(() => {
+		setCapabilitiesExpanded(false)
+	}, [modelId])
 
 	const modelYaml = useMemo(
 		() => (model ? normalizeModel(model) : null),
@@ -1080,6 +1163,15 @@ function RouteComponent() {
 		() => (model ? capabilityRowsFromModel(model) : []),
 		[model],
 	)
+	const previewCapabilityRows = useMemo(
+		() => capabilityRows.slice(0, CAPABILITY_PREVIEW_COUNT),
+		[capabilityRows],
+	)
+	const expandableCapabilityRows = useMemo(
+		() => capabilityRows.slice(CAPABILITY_PREVIEW_COUNT),
+		[capabilityRows],
+	)
+	const canExpandCapabilityRows = expandableCapabilityRows.length > 0
 	const capabilityAccordionItems = useMemo(
 		() => (model ? capabilityAccordionFromModel(model) : []),
 		[model],
@@ -1101,12 +1193,7 @@ function RouteComponent() {
 		[modelYaml],
 	)
 	const providerRows = useMemo(
-		() =>
-			model
-				? getProviderOptions(model.id).filter(
-						(provider) => provider.id !== 'model-provider-fallback',
-					)
-				: [],
+		() => (model ? getModelCatalogProviderRows(model) : []),
 		[model],
 	)
 	const assignRef = useCallback(
@@ -1154,7 +1241,11 @@ function RouteComponent() {
 	const providerInitials =
 		modelYaml.sources[0]?.repo?.split('/')[0]?.slice(0, 2)?.toUpperCase() ??
 		'AI'
-	const capabilityScore = `${Math.round(modelYaml.capabilities.inteligence_index * 1000) / 10}`
+	const capabilityScoreAverage = getModelCapabilityScoreAverage(model)
+	const capabilityScore =
+		capabilityScoreAverage != null
+			? scoreToPercent(capabilityScoreAverage).toFixed(1)
+			: MISSING_VALUE_PLACEHOLDER
 	const endpointsNewPath = '/app/endpoints/create_endpoint'
 	const deployAllowed = canCreateInferenceEndpoint(model)
 	const paramLabel = formatParameters(modelYaml.parameters)
@@ -1259,8 +1350,8 @@ function RouteComponent() {
 																</Button>
 															</TooltipTrigger>
 															<TooltipContent className="max-w-page-intro">
-																Aggregated score from model capability
-																categories in this catalog.
+																Average of evaluated capability scores shown
+																for this model.
 															</TooltipContent>
 														</Tooltip>
 														<span className="text-display font-bold text-primary tabular-nums">
@@ -1287,7 +1378,7 @@ function RouteComponent() {
 														<span className="min-w-0 truncate text-muted-foreground">
 															Providers:{' '}
 															<span className="text-foreground">
-																{modelYaml.sources.length}
+																{providerRows.length}
 															</span>
 														</span>
 													</OverviewMetaChip>
@@ -1538,8 +1629,6 @@ function RouteComponent() {
 														const isFirst = index === 0
 														const isLast =
 															index === capabilityAccordionItems.length - 1
-														const capabilityUnavailable =
-															!capability.hasBenchmarkResults
 														return (
 															<AccordionItem
 																key={capability.id}
@@ -1555,21 +1644,10 @@ function RouteComponent() {
 																	)}
 																>
 																	<ChevronDown className="h-icon-16 w-icon-16 shrink-0 text-muted-foreground transition-transform duration-200 ease-standard" />
-																	<span
-																		className={cn(
-																			'flex min-w-0 flex-1 items-center gap-2 truncate text-left text-body-sm-strong',
-																			capabilityUnavailable
-																				? 'text-muted-foreground'
-																				: 'text-foreground',
-																		)}
-																	>
+																	<span className="flex min-w-0 flex-1 items-center gap-2 truncate text-left text-body-sm-strong text-foreground">
 																		<IconBox size="lg" shape="circle">
 																			<Icon
-																				className={
-																					capabilityUnavailable
-																						? 'text-muted-foreground'
-																						: 'text-hierarchy-secondary'
-																				}
+																				className="text-hierarchy-secondary"
 																				aria-hidden
 																			/>
 																		</IconBox>
@@ -1583,13 +1661,7 @@ function RouteComponent() {
 																		}
 																		className="shrink-0 text-body-sm-strong tabular-nums text-foreground"
 																	>
-																		<ScoreOrMissing
-																			score={
-																				capability.hasBenchmarkResults
-																					? capability.score
-																					: null
-																			}
-																		/>
+																		<ScoreOrMissing score={capability.score} />
 																	</ScoreBreakdownMetricHint>
 																</AccordionTrigger>
 																<AccordionContent
@@ -1598,15 +1670,11 @@ function RouteComponent() {
 																		'px-0 pb-0 pt-0 text-foreground',
 																	)}
 																>
-																	{capability.hasBenchmarkResults ? (
-																		<CapabilityCategoryDetailBody
-																			subcapabilities={
-																				capability.subcapabilities
-																			}
-																		/>
-																	) : (
-																		<CapabilityBenchmarkUnavailableBody />
-																	)}
+																	<CapabilityCategoryDetailBody
+																		subcapabilities={
+																			capability.subcapabilities
+																		}
+																	/>
 																</AccordionContent>
 															</AccordionItem>
 														)
@@ -1621,38 +1689,43 @@ function RouteComponent() {
 										</Sheet>
 
 										<div className="flex min-w-0 max-w-full flex-col gap-3 p-0">
-											{capabilityRows.map((row) => {
-												const Icon = row.icon
-												return (
-													<div
-														key={row.id}
-														className="grid h-control-md min-w-0 w-full max-w-full grid-cols-[minmax(0,14rem)_minmax(0,1fr)_auto] items-center gap-x-5"
-													>
-														<div className="flex min-w-0 items-center gap-1">
-															<IconBox size="xlg" shape="circle">
-																<Icon
-																	className="text-hierarchy-secondary"
-																	aria-hidden
-																/>
-															</IconBox>
-															<span className="min-w-0 truncate text-body-sm text-hierarchy-secondary">
-																{row.label}
-															</span>
+											{previewCapabilityRows.map((row) => (
+												<CapabilityScoreRow key={row.id} row={row} />
+											))}
+											{canExpandCapabilityRows ? (
+												<Collapsible
+													open={capabilitiesExpanded}
+													onOpenChange={setCapabilitiesExpanded}
+													className="flex flex-col gap-3"
+												>
+													<CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+														<div className="flex flex-col gap-3">
+															{expandableCapabilityRows.map((row) => (
+																<CapabilityScoreRow key={row.id} row={row} />
+															))}
 														</div>
-														<div className="min-w-0">
-															<Progress
-																value={row.score}
-																size="dense"
-																className="bg-muted"
-																indicatorClassName="bg-muted-foreground"
+													</CollapsibleContent>
+													<CollapsibleTrigger asChild>
+														<Button
+															type="button"
+															variant="ghost"
+															size="sm"
+															className="h-auto self-center px-0 text-body-sm text-hierarchy-secondary hover:text-foreground [&_svg]:text-hierarchy-secondary hover:[&_svg]:text-foreground"
+														>
+															{capabilitiesExpanded
+																? 'Show less'
+																: 'Show all'}
+															<ChevronDown
+																className={cn(
+																	'h-icon-16 w-icon-16 shrink-0 transition-transform duration-200 ease-standard',
+																	capabilitiesExpanded && 'rotate-180',
+																)}
+																aria-hidden
 															/>
-														</div>
-														<span className="w-10 shrink-0 text-right text-body font-semibold tabular-nums text-foreground">
-															{row.score}%
-														</span>
-													</div>
-												)
-											})}
+														</Button>
+													</CollapsibleTrigger>
+												</Collapsible>
+											) : null}
 										</div>
 									</div>
 								</div>

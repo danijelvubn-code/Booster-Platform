@@ -1,4 +1,4 @@
-import { BrainCircuit, Eye, ShieldCheck } from 'lucide-react'
+import { BrainCircuit, Eye, LogIn, LogOut, ShieldCheck } from 'lucide-react'
 import { Fragment } from 'react'
 import { EnergyScorePill } from '@/components/EnergyScorePill'
 import { MetricCell, MetricsRow } from '@/components/metrics'
@@ -44,7 +44,10 @@ type ModelCosmosCardProps = {
 }
 
 const cosmosCardSurfaceClass =
-	'border border-transparent shadow-sm hover:border-primary/40 hover:shadow-md flex min-h-cosmos-card flex-col gap-3 overflow-hidden p-4 transition duration-200 ease-standard'
+	'border border-transparent shadow-sm hover:border-primary/40 hover:shadow-md flex min-h-cosmos-card flex-col gap-5 overflow-hidden p-5 transition duration-200 ease-standard'
+
+/** Toggle off to preview cards without the description line. */
+const SHOW_COSMOS_CARD_DESCRIPTION = false
 
 function BoosterHostedShield({ model }: { model: ModelRecord }) {
 	if (model.hosting !== HOSTING_PROVIDER_BOOSTER) return null
@@ -56,11 +59,11 @@ function BoosterHostedShield({ model }: { model: ModelRecord }) {
 					<ShieldCheck
 						className="h-icon-16 w-icon-16 text-info"
 						strokeWidth={2.75}
-						aria-label="Booster Powered"
+						aria-label="Booster Hosted"
 					/>
 				</span>
 			</TooltipTrigger>
-			<TooltipContent side="top">Booster Powered</TooltipContent>
+			<TooltipContent side="top">Booster Hosted</TooltipContent>
 		</Tooltip>
 	)
 }
@@ -142,6 +145,8 @@ function ModelCosmosCardV4({
 	const grade = (model.sustainability ?? 'B').toUpperCase().charAt(0)
 	const subline = getModelSubline(model)
 	const isDeprecated = model.status === 'Deprecated'
+	const inEur = formatEurPer1MForDisplay(model.inputCostPer1M)
+	const outEur = formatEurPer1MForDisplay(model.outputCostPer1M)
 
 	const sortedCapabilityMetrics = [
 		{ label: 'Coding' as const, value: coding },
@@ -209,22 +214,30 @@ function ModelCosmosCardV4({
 							</Fragment>
 						))}
 					</div>
-					<p className="line-clamp-2 h-[42px] min-h-[42px] text-body-sm text-foreground/75">
-						{model.description}
-					</p>
+					{SHOW_COSMOS_CARD_DESCRIPTION ? (
+						<p className="line-clamp-2 h-[42px] min-h-[42px] text-body-sm text-foreground/75">
+							{model.description}
+						</p>
+					) : null}
 				</div>
 			</div>
 
 			<div className="flex gap-3">
 				<div className="w-12 shrink-0" aria-hidden />
-				<MetricsRow className="grid-cols-2">
+				<MetricsRow>
 					<MetricCell
 						icon={BrainCircuit}
 						label={formatContextLength(model.contextLength)}
 					/>
 					<MetricCell
-						className="[&>span]:font-mono [&>span]:tabular-nums"
-						label={`€${formatEurPer1MForDisplay(model.inputCostPer1M)} → €${formatEurPer1MForDisplay(model.outputCostPer1M)}/1M`}
+						icon={LogIn}
+						className="[&_span]:font-mono [&_span]:tabular-nums"
+						label={`€${inEur}`}
+					/>
+					<MetricCell
+						icon={LogOut}
+						className="[&_span]:font-mono [&_span]:tabular-nums"
+						label={`€${outEur}`}
 					/>
 				</MetricsRow>
 			</div>
@@ -300,12 +313,14 @@ function ModelCosmosCardCatalog({
 				<div className="w-14 shrink-0" aria-hidden />
 				<MetricsRow className="grid-cols-2">
 					<MetricCell
-						className="[&>span]:font-mono [&>span]:tabular-nums"
-						label={`in: €${inEur}`}
+						icon={LogIn}
+						className="[&_span]:font-mono [&_span]:tabular-nums"
+						label={`€${inEur}`}
 					/>
 					<MetricCell
-						className="[&>span]:font-mono [&>span]:tabular-nums"
-						label={`out: €${outEur}`}
+						icon={LogOut}
+						className="[&_span]:font-mono [&_span]:tabular-nums"
+						label={`€${outEur}`}
 					/>
 				</MetricsRow>
 			</div>

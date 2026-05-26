@@ -29,6 +29,7 @@ import {
 	InputSegment,
 	InputSuffixAddon,
 } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { toast } from '@/components/ui/sonner'
 import { deployments, endpoints } from '@/data/mockData'
 import { cn } from '@/lib/utils'
@@ -221,6 +222,9 @@ function GeneralSettingsPreview({
 	nameDraft,
 	savedEndpointName,
 	onNameChange,
+	descriptionDraft,
+	savedDescription,
+	onDescriptionChange,
 	endpointUrl,
 	onSave,
 	onAfterEndpointDeleted,
@@ -229,6 +233,9 @@ function GeneralSettingsPreview({
 	nameDraft: string
 	savedEndpointName: string
 	onNameChange: (value: string) => void
+	descriptionDraft: string
+	savedDescription: string
+	onDescriptionChange: (value: string) => void
 	endpointUrl: string
 	onSave: () => void
 	onAfterEndpointDeleted: () => void
@@ -274,10 +281,12 @@ function GeneralSettingsPreview({
 		endpoint.inputTokens > 0 ||
 		endpoint.monthlySpend > 0
 
-	const hasUnsavedChanges = nameDraft.trim() !== savedEndpointName.trim()
+	const hasUnsavedChanges =
+		nameDraft.trim() !== savedEndpointName.trim() ||
+		descriptionDraft.trim() !== savedDescription.trim()
 
 	return (
-		<Card className="overflow-hidden">
+		<Card className="overflow-hidden border-0 shadow-sm">
 			<CardHeader>
 				<CardTitle className="text-h3">General</CardTitle>
 				<p className="text-body-sm text-muted-foreground">
@@ -337,12 +346,24 @@ function GeneralSettingsPreview({
 						</InputSuffixAddon>
 					</InputRoot>
 				</div>
+				<div className="space-y-2">
+					<label htmlFor="endpoint-description" className="text-body-sm-strong">
+						Use Case Description
+					</label>
+					<Textarea
+						id="endpoint-description"
+						value={descriptionDraft}
+						onChange={(e) => onDescriptionChange(e.target.value)}
+						placeholder="Describe your use case in a few sentences. For example: We need to process insurance claim documents and extract policy numbers, dates, and damage descriptions."
+						rows={5}
+					/>
+				</div>
 				<Button type="button" onClick={onSave} disabled={!hasUnsavedChanges}>
 					Save Changes
 				</Button>
 			</CardContent>
 
-			<div className="space-y-3 border-t border-border bg-destructive/4 p-6">
+			<div className="space-y-3 rounded-b-lg border border-destructive/30 bg-destructive/4 p-6">
 				<h3 className="text-h3 text-destructive">Danger Zone</h3>
 				<div className="flex flex-col gap-4">
 					<div className="space-y-2">
@@ -390,11 +411,19 @@ function RouteComponent() {
 	const [savedEndpointName, setSavedEndpointName] = useState(
 		endpoint?.name ?? '',
 	)
+	const [descriptionDraft, setDescriptionDraft] = useState(
+		endpoint?.description ?? '',
+	)
+	const [savedDescription, setSavedDescription] = useState(
+		endpoint?.description ?? '',
+	)
 
 	useEffect(() => {
 		if (!endpoint) return
 		setNameDraft(endpoint.name)
 		setSavedEndpointName(endpoint.name)
+		setDescriptionDraft(endpoint.description ?? '')
+		setSavedDescription(endpoint.description ?? '')
 	}, [endpoint])
 
 	if (!endpoint) {
@@ -411,22 +440,37 @@ function RouteComponent() {
 	}
 
 	const handleSaveGeneral = () => {
-		const trimmed = nameDraft.trim()
-		if (!trimmed) {
+		const trimmedName = nameDraft.trim()
+		if (!trimmedName) {
 			toast.error('Could not save settings', {
 				description: 'Inference endpoint name cannot be empty.',
 			})
 			return
 		}
-		const baseline = savedEndpointName.trim()
-		if (trimmed === baseline) {
+
+		const trimmedDescription = descriptionDraft.trim()
+		const nameChanged = trimmedName !== savedEndpointName.trim()
+		const descriptionChanged =
+			trimmedDescription !== savedDescription.trim()
+
+		if (!nameChanged && !descriptionChanged) {
 			return
 		}
-		endpoint.name = trimmed
-		setSavedEndpointName(trimmed)
-		setNameDraft(trimmed)
+
+		endpoint.name = trimmedName
+		endpoint.description = trimmedDescription || undefined
+		setSavedEndpointName(trimmedName)
+		setNameDraft(trimmedName)
+		setSavedDescription(trimmedDescription)
+		setDescriptionDraft(trimmedDescription)
+
 		toast.success('Settings saved', {
-			description: 'Endpoint name has been updated.',
+			description:
+				nameChanged && descriptionChanged
+					? 'Endpoint name and description have been updated.'
+					: nameChanged
+						? 'Endpoint name has been updated.'
+						: 'Use case description has been updated.',
 		})
 	}
 
@@ -449,6 +493,9 @@ function RouteComponent() {
 							nameDraft={nameDraft}
 							savedEndpointName={savedEndpointName}
 							onNameChange={setNameDraft}
+							descriptionDraft={descriptionDraft}
+							savedDescription={savedDescription}
+							onDescriptionChange={setDescriptionDraft}
 							endpointUrl={endpoint.endpoint}
 							onSave={handleSaveGeneral}
 							onAfterEndpointDeleted={() =>
@@ -458,7 +505,7 @@ function RouteComponent() {
 					) : null}
 
 					{activeSection === 'api-keys' ? (
-						<Card className="overflow-hidden">
+						<Card className="overflow-hidden border-0 shadow-sm">
 							<CardContent className="p-0">
 								<ApiKeysPanel spaceName={endpoint.name} />
 							</CardContent>

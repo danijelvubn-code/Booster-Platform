@@ -1,17 +1,30 @@
 import { Check } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import type { Model, ProviderOption } from '@/data/mockData'
+import type { Model } from '@/data/mockData'
+import {
+	formatEndpointContextWindow,
+	formatEndpointEurPer1M,
+	formatEndpointMinMemory,
+	formatEndpointParameters,
+	getEndpointModelCatalogRow,
+} from '@/lib/endpoint-model-summary'
 
-function formatEurPer1M(value: number): string {
-	return `€${value.toFixed(2)}`
+function ReviewDetailRow({ label, value }: { label: string; value: string }) {
+	return (
+		<>
+			<dt className="text-muted-foreground">{label}</dt>
+			<dd className="min-w-0 text-foreground">{value}</dd>
+		</>
+	)
 }
 
 type ReviewStepProps = {
 	endpointName: string
 	useCase: string
 	selectedModel: Model
-	selectedProvider: ProviderOption
+	inputCostPer1M: number
+	outputCostPer1M: number
 	setStep: (step: 0 | 1) => void
 }
 
@@ -19,9 +32,12 @@ export function ReviewStep({
 	endpointName,
 	useCase,
 	selectedModel,
-	selectedProvider,
+	inputCostPer1M,
+	outputCostPer1M,
 	setStep,
 }: ReviewStepProps) {
+	const catalogRow = getEndpointModelCatalogRow(selectedModel)
+
 	return (
 		<div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
 			<div className="space-y-1">
@@ -58,39 +74,48 @@ export function ReviewStep({
 						Deployment provider
 					</CardTitle>
 				</CardHeader>
-				<CardContent className="grid gap-3 pt-0 text-body-sm md:grid-cols-2">
-					<div className="grid grid-cols-[6rem_1fr] gap-y-1.5">
-						<span className="text-muted-foreground">Provider:</span>
-						<span className="text-foreground">
-							{selectedProvider.provider.replace(' AI', '')}
-						</span>
-						<span className="text-muted-foreground">Context:</span>
-						<span className="text-foreground">{selectedProvider.context}</span>
-						<span className="text-muted-foreground">Quant:</span>
-						<span className="text-foreground">{selectedProvider.quant}</span>
-						<span className="text-muted-foreground">Certs:</span>
-						<span className="text-foreground">
-							{selectedProvider.certs.join(', ')}
-						</span>
-					</div>
-					<div className="grid grid-cols-[7rem_1fr] gap-y-1.5">
-						<span className="text-muted-foreground">Input:</span>
-						<span className="text-foreground">
-							{formatEurPer1M(selectedProvider.inputPer1M)} / 1M
-						</span>
-						<span className="text-muted-foreground">Output:</span>
-						<span className="text-foreground">
-							{formatEurPer1M(selectedProvider.outputPer1M)} / 1M
-						</span>
-						<span className="text-muted-foreground">Avg latency:</span>
-						<span className="text-foreground">
-							{selectedProvider.latencyMs}ms
-						</span>
-						<span className="text-muted-foreground">Tokens / second:</span>
-						<span className="text-foreground">
-							{selectedProvider.tps.toFixed(1)}
-						</span>
-					</div>
+				<CardContent className="grid gap-x-8 gap-y-4 pt-0 text-body-sm md:grid-cols-2">
+					<dl className="grid grid-cols-[minmax(0,7.5rem)_1fr] items-baseline gap-x-4 gap-y-2">
+						<ReviewDetailRow
+							label="Provider"
+							value={selectedModel.hosting}
+						/>
+						<ReviewDetailRow
+							label="Parameters"
+							value={formatEndpointParameters(selectedModel)}
+						/>
+						<ReviewDetailRow
+							label="Context Window"
+							value={formatEndpointContextWindow(selectedModel)}
+						/>
+						<ReviewDetailRow
+							label="Min. Memory"
+							value={formatEndpointMinMemory(selectedModel)}
+						/>
+						<ReviewDetailRow label="Quant" value={catalogRow.quant} />
+					</dl>
+					<dl className="grid grid-cols-[minmax(0,7.5rem)_1fr] items-baseline gap-x-4 gap-y-2">
+						<ReviewDetailRow
+							label="Input Tokens"
+							value={formatEndpointEurPer1M(inputCostPer1M)}
+						/>
+						<ReviewDetailRow
+							label="Output Tokens"
+							value={formatEndpointEurPer1M(outputCostPer1M)}
+						/>
+						<ReviewDetailRow
+							label="Certs"
+							value={catalogRow.certs.join(', ')}
+						/>
+						<ReviewDetailRow
+							label="Avg latency"
+							value={`${catalogRow.latencyMs}ms`}
+						/>
+						<ReviewDetailRow
+							label="Tokens / second"
+							value={catalogRow.tps.toFixed(1)}
+						/>
+					</dl>
 				</CardContent>
 			</Card>
 

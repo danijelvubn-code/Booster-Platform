@@ -1,7 +1,7 @@
 import type { ModelRecord } from '@/lib/model-metrics'
 import { formatContextWindowShort } from '@/lib/model-metrics'
 
-export const HOSTING_PROVIDER_BOOSTER = 'Booster Powered' as const
+export const HOSTING_PROVIDER_BOOSTER = 'Booster Hosted' as const
 export const HOSTING_PROVIDER_SCALEWAY = 'Scaleway' as const
 export const HOSTING_PROVIDER_EUROUTER = 'EUrouter' as const
 

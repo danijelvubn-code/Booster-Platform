@@ -36,7 +36,7 @@ export function ModelSidebar({ model }: ModelSidebarProps) {
 		paramLabel,
 		isMultimodal ? 'MULTIMODAL' : 'TEXT',
 		'API',
-		model.hosting === 'Booster Powered'
+		model.hosting === 'Booster Hosted'
 			? 'MANAGED'
 			: (model.hosting as string | undefined)?.toUpperCase(),
 	].filter((t): t is string => Boolean(t))

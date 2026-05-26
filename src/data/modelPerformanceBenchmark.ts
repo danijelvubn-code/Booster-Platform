@@ -272,7 +272,7 @@ export function getModelPerformanceBenchmark(
 ): ModelPerformanceBenchmark | null {
 	return (
 		MODEL_PERFORMANCE_BENCHMARKS[model.id] ??
-		(model.hosting === 'Booster Powered'
+		(model.hosting === 'Booster Hosted'
 			? QWEN35_27B_PERFORMANCE_BENCHMARK
 			: null)
 	)

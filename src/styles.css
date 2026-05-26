@@ -25,7 +25,7 @@
     --popover: 1 0 0;
     --popover-foreground: 0.3715 0 0;
 
-    --primary: 0.4168 0.1371 297.2301;
+    --primary: 0.5665 0.1594 297.1423;
     --primary-foreground: 0.9851 0 0;
 
     --secondary: 0.889 0.0239 301.9205;
@@ -48,7 +48,7 @@
     --chart-2: 0.7751 0.0495 301.3403;
     --chart-3: 0.657 0.079 301.8908;
     --chart-4: 0.5373 0.1082 300.1578;
-    --chart-5: 0.4168 0.1371 297.2301;
+    --chart-5: 0.5665 0.1594 297.1423;
 
     --sidebar: 0.9851 0 0;
     --sidebar-foreground: 0.2138 0.0019 286.2347;
@@ -140,6 +140,19 @@
      */
     --filter-popover-elevate: drop-shadow(0 14px 24px hsl(0 0% 0% / 0.14))
       drop-shadow(0 8px 14px hsl(0 0% 0% / 0.11));
+
+    /*
+     * Primary border fade — gradient shell (top 0% alpha → bottom 30% alpha).
+     * Use .border-primary-fade-shell on the wrapper; inner surface keeps rounded-lg bg-card.
+     */
+    --border-primary-fade-start: oklch(var(--primary) / 0);
+    --border-primary-fade-end: oklch(var(--primary) / 0.3);
+    --border-primary-fade-width: 1px;
+    --border-primary-fade-gradient: linear-gradient(
+      to bottom,
+      var(--border-primary-fade-start),
+      var(--border-primary-fade-end)
+    );
 
     --foreground-alpha-primary: 1;
     --foreground-alpha-secondary: 0.75;
@@ -261,7 +274,7 @@
     --popover: 0.3715 0 0;
     --popover-foreground: 0.9851 0 0;
 
-    --primary: 0.5373 0.1082 300.1578;
+    --primary: 0.5665 0.1594 297.1423;
     --primary-foreground: 1 0 0;
 
     --secondary: 0.3715 0 0;
@@ -283,7 +296,7 @@
     --chart-1: 0.7751 0.0495 301.3403;
     --chart-2: 0.657 0.079 301.8908;
     --chart-3: 0.5373 0.1082 300.1578;
-    --chart-4: 0.4168 0.1371 297.2301;
+    --chart-4: 0.5665 0.1594 297.1423;
     --chart-5: 0.3586 0.1148 297.7031;
 
     --sidebar: #0a0a0a;
@@ -462,6 +475,18 @@
 @layer utilities {
   .rounded-inherit {
     border-radius: inherit;
+  }
+
+  /** Gradient-only fill — pair with rounded-lg and p-px, or use .border-primary-fade-shell. */
+  .bg-border-primary-fade {
+    background-image: var(--border-primary-fade-gradient);
+  }
+
+  /** 1px primary fade border via gradient padding; inner child uses rounded-lg bg-card. */
+  .border-primary-fade-shell {
+    border-radius: var(--radius-lg);
+    background-image: var(--border-primary-fade-gradient);
+    padding: var(--border-primary-fade-width);
   }
 
   .text-hierarchy-primary {

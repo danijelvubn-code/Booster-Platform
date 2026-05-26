@@ -75,7 +75,7 @@ export function FeaturesFilter({
 												ⓘ
 											</button>
 										</TooltipTrigger>
-										<TooltipContent className="max-w-xs">
+										<TooltipContent side="left" className="max-w-xs">
 											Supports reasoning-oriented behavior or reasoning mode
 											where available.
 										</TooltipContent>

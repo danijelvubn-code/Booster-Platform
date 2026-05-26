@@ -91,7 +91,7 @@ export type CategoryScoreThreshold = '0' | '60' | '70' | '80' | '90'
 export type MinMemoryPreset = 'any' | 'lt50' | '50_150' | '150_300' | '300p'
 
 export interface ModelFilterState {
-	/** Exact match on `model.hosting` (e.g. deep links `?hosting=Booster Powered`). */
+	/** Exact match on `model.hosting` (e.g. deep links `?hosting=Booster Hosted`). */
 	hosting: string[]
 	providers: string[]
 	capabilityScore: CapabilityScorePreset

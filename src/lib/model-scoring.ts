@@ -172,13 +172,13 @@ export function scoreModels(state: WizardState): ScoredModel[] {
 				score += 10
 				tags.push('Budget Friendly')
 			}
-			if (state.sensitiveData && m.hosting === 'Booster Powered') {
+			if (state.sensitiveData && m.hosting === 'Booster Hosted') {
 				score += 5
 				highlights.push('Self-hosted for data sovereignty')
 			}
 			if (
 				state.deploymentPref === 'Protected environment required' &&
-				m.hosting === 'Booster Powered'
+				m.hosting === 'Booster Hosted'
 			) {
 				score += 8
 				tags.push('Regulated Safe')

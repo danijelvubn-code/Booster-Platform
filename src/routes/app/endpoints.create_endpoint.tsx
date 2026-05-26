@@ -1,12 +1,12 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import {
-	Activity,
 	ArrowLeft,
 	ArrowRight,
 	Info,
 	Rocket,
 } from 'lucide-react'
-import { useMemo, useEffect, useState } from 'react'
+import { useMemo, useEffect, useRef, useState } from 'react'
+import { EndpointDeployingScreen, getRandomDeployDurationMs } from '@/components/endpoint-wizard/EndpointDeployingScreen'
 import { EndpointModelSelectSheet } from '@/components/endpoint-wizard/EndpointModelSelectSheet'
 import { BasicSetupStep } from '@/components/endpoint-wizard/BasicSetupStep'
 import { ModelLifecycleAlert } from '@/components/model-detail/ModelLifecycleAlert'
@@ -34,7 +34,6 @@ import {
 import {
 	getModelModalityLabel,
 	getOverallModelScore,
-	getModelParameterCount,
 	overallScoreTextClass,
 } from '@/lib/model-metrics'
 import {
@@ -46,6 +45,10 @@ import {
 	getProviderInitials,
 } from '@/lib/model-provider-logos'
 import { cn } from '@/lib/utils'
+import {
+	getDeployFailureDetails,
+	shouldSimulateDeployFailure,
+} from '@/lib/endpoint-deploy'
 
 export const Route = createFileRoute('/app/endpoints/create_endpoint')({
 	validateSearch: (search: Record<string, unknown>) => ({
@@ -62,11 +65,6 @@ const ENDPOINT_WIZARD_STEPPER_ITEMS = [
 	{ id: 'review', label: 'Review & Deploy' },
 ] as const
 
-function formatEurPer1M(value: number): string {
-	return `€${value.toFixed(2)} / 1M`
-}
-
-/** Cheapest selectable row uses lowest combined In+Out €/1M, then lowest In, then Out. */
 function pickCheapestProviderOption(
 	providers: ProviderOption[],
 ): ProviderOption | null {
@@ -81,31 +79,12 @@ function pickCheapestProviderOption(
 	})
 }
 
-const MISSING_VALUE_PLACEHOLDER = '- -'
-
-function getModelDetailParameterCount(model: Model): number {
-	return getModelParameterCount(model)
-}
-
-function formatDetailParameters(parameters: number | null | undefined): string {
-	if (!parameters) return MISSING_VALUE_PLACEHOLDER
-	if (parameters >= 1_000_000_000) {
-		return `${Math.round(parameters / 1_000_000_000)}B`
-	}
-	if (parameters >= 1_000_000) return `${Math.round(parameters / 1_000_000)}M`
-	return String(parameters)
-}
-
-function formatDetailContextWindow(tokens: number | null | undefined): string {
-	if (!tokens) return MISSING_VALUE_PLACEHOLDER
-	if (tokens >= 1000) return `${Math.round(tokens / 1000)}K`
-	return String(tokens)
-}
-
-function formatDetailMemory(bytes: number | null | undefined): string {
-	if (!bytes) return MISSING_VALUE_PLACEHOLDER
-	return `${Math.round(bytes / 1_000_000_000)} GB`
-}
+import {
+	formatEndpointContextWindow,
+	formatEndpointEurPer1M,
+	formatEndpointMinMemory,
+	formatEndpointParameters,
+} from '@/lib/endpoint-model-summary'
 
 function ModelSummaryRow({ label, value }: { label: string; value: string }) {
 	return (
@@ -150,24 +129,21 @@ function ModelSummarySidebarEmpty({
 
 function ModelSummarySidebar({
 	model,
-	providerCount,
 	inputCostPer1M,
 	outputCostPer1M,
 }: {
 	model: Model
-	providerCount: number
 	inputCostPer1M: number
 	outputCostPer1M: number
 }) {
 	const providerLogoSrc = getModelProviderLogoSrc(model.provider, model.name)
 	const capabilityScore = getOverallModelScore(model)
-	const parameterCount = getModelDetailParameterCount(model)
-	const parameterLabel = formatDetailParameters(parameterCount)
-	const minMemoryLabel = formatDetailMemory(Math.max(parameterCount * 2, 0))
+	const parameterLabel = formatEndpointParameters(model)
+	const minMemoryLabel = formatEndpointMinMemory(model)
 	const modalityLabel = getModelModalityLabel(model)
 	const providerInitials = getProviderInitials(model.provider)
 	const licenseLabel =
-		model.hosting === 'Booster Powered' ? 'Commercial' : 'Open Source'
+		model.hosting === 'Booster Hosted' ? 'Commercial' : 'Open Source'
 
 	return (
 		<aside className="min-w-0 self-start lg:col-span-1 lg:flex lg:h-full lg:min-h-0 lg:flex-col">
@@ -216,7 +192,7 @@ function ModelSummarySidebar({
 							{licenseLabel}
 						</Badge>
 						<Badge variant="outline" appearance="ghost" size="24">
-							{providerCount} {providerCount === 1 ? 'provider' : 'providers'}
+							{model.hosting}
 						</Badge>
 					</div>
 				</div>
@@ -250,16 +226,16 @@ function ModelSummarySidebar({
 					<ModelSummaryRow label="Parameters" value={parameterLabel} />
 					<ModelSummaryRow
 						label="Context Window"
-						value={formatDetailContextWindow(model.contextLength)}
+						value={formatEndpointContextWindow(model)}
 					/>
 					<ModelSummaryRow label="Min. Memory" value={minMemoryLabel} />
 					<ModelSummaryRow
 						label="Input Tokens"
-						value={formatEurPer1M(inputCostPer1M)}
+						value={formatEndpointEurPer1M(inputCostPer1M)}
 					/>
 					<ModelSummaryRow
 						label="Output Tokens"
-						value={formatEurPer1M(outputCostPer1M)}
+						value={formatEndpointEurPer1M(outputCostPer1M)}
 					/>
 				</div>
 			</Card>
@@ -286,6 +262,9 @@ function RouteComponent() {
 	const [selectedProviderId, setSelectedProviderId] =
 		useState<string>('recommended')
 	const [isDeploying, setIsDeploying] = useState(false)
+	const [deployDurationMs, setDeployDurationMs] = useState<number | null>(null)
+	const [deployAttempt, setDeployAttempt] = useState(0)
+	const pendingDeployRef = useRef<{ endpointId: string } | null>(null)
 	const [modelPickerOpen, setModelPickerOpen] = useState(false)
 
 	const openModelPicker = () => {
@@ -349,8 +328,6 @@ function RouteComponent() {
 		return averagePer1M.toFixed(0)
 	}, [selectedProvider])
 
-	const providerCount = selectableProviderOptions.length || 1
-
 	const summaryInputCostPer1M =
 		selectedProvider?.inputPer1M ?? selectedModel?.inputCostPer1M ?? 0
 	const summaryOutputCostPer1M =
@@ -371,7 +348,63 @@ function RouteComponent() {
 		setStep((current) => (current > 0 ? ((current - 1) as StepId) : current))
 	}
 
-	const handleCreate = () => {
+	const handleDeployComplete = () => {
+		const pending = pendingDeployRef.current
+		if (!pending || !selectedModel || !selectedProvider) return
+
+		const newEndpointId = pending.endpointId
+		const slug = endpointName.trim().toLowerCase().replace(/\s+/g, '-')
+		const endpointUrl = `https://api.booster.ai/v1/endpoints/${endpointType.toLowerCase()}/${slug}`
+
+		endpoints.push({
+			id: newEndpointId,
+			name: endpointName.trim(),
+			type: endpointType,
+			defaultDeployment: selectedModel.name,
+			description: useCase.trim(),
+			budgetUsed: 0,
+			status: 'Running',
+			monthlySpend: 0,
+			inputTokens: 0,
+			outputTokens: 0,
+			endpoint: endpointUrl,
+			tokenBudget: 1_000_000,
+			monthlyBudgetEur: Math.max(1, Math.round(Number(estimatedMonthlyCost))),
+			performanceProfile: 'best-effort',
+		})
+
+		deployments[newEndpointId] = [
+			{
+				id: `dep-${Date.now()}`,
+				name: `${selectedModel.name.toLowerCase().replace(/\s+/g, '-')}-${slug}`,
+				model: selectedModel.name,
+				version: selectedModel.version,
+				mode: 'Shared',
+				budgetUsed: 0,
+				slaStatus: 'OK',
+				region:
+					selectedProvider.provider === 'Scaleway' ? 'EU-West' : 'EU-Central',
+				confidentialCompute: false,
+				latencyP50: selectedProvider.latencyMs,
+				costPer1MTokens: selectedProvider.inputPer1M,
+			},
+		]
+
+		pendingDeployRef.current = null
+		setIsDeploying(false)
+		setDeployDurationMs(null)
+
+		toast.success('Inference endpoint deployed', {
+			description: `"${endpointName.trim()}" is live on ${selectedModel.hosting}.`,
+		})
+		navigate({
+			to: '/app/endpoints/$endpointId',
+			params: { endpointId: newEndpointId },
+			search: { returnTo: '/app/overview', returnLabel: 'Endpoints' },
+		})
+	}
+
+	const startDeploy = () => {
 		if (
 			!selectedModel ||
 			!selectedProvider ||
@@ -380,55 +413,40 @@ function RouteComponent() {
 			!canCreateInferenceEndpoint(selectedModel)
 		)
 			return
+
+		pendingDeployRef.current = { endpointId: `sp-${Date.now()}` }
+		setDeployDurationMs(getRandomDeployDurationMs())
 		setIsDeploying(true)
+	}
 
-		window.setTimeout(() => {
-			const newEndpointId = `sp-${Date.now()}`
-			const slug = endpointName.trim().toLowerCase().replace(/\s+/g, '-')
-			const endpointUrl = `https://api.booster.ai/v1/endpoints/${endpointType.toLowerCase()}/${slug}`
+	const handleCreate = () => {
+		startDeploy()
+	}
 
-			endpoints.push({
-				id: newEndpointId,
-				name: endpointName.trim(),
-				type: endpointType,
-				defaultDeployment: selectedModel.name,
-				description: useCase.trim(),
-				budgetUsed: 0,
-				status: 'Running',
-				monthlySpend: 0,
-				inputTokens: 0,
-				outputTokens: 0,
-				endpoint: endpointUrl,
-				tokenBudget: 1_000_000,
-				monthlyBudgetEur: Math.max(1, Math.round(Number(estimatedMonthlyCost))),
-				performanceProfile: 'best-effort',
-			})
+	const handleDeployFailure = () => {
+		if (!selectedModel) return
+		const failure = getDeployFailureDetails(selectedModel)
+		toast.error(failure.title, {
+			description: failure.description,
+		})
+	}
 
-			deployments[newEndpointId] = [
-				{
-					id: `dep-${Date.now()}`,
-					name: `${selectedModel.name.toLowerCase().replace(/\s+/g, '-')}-${slug}`,
-					model: selectedModel.name,
-					version: selectedModel.version,
-					mode: 'Shared',
-					budgetUsed: 0,
-					slaStatus: 'OK',
-					region:
-						selectedProvider.provider === 'Scaleway' ? 'EU-West' : 'EU-Central',
-					confidentialCompute: false,
-					latencyP50: selectedProvider.latencyMs,
-					costPer1MTokens: selectedProvider.inputPer1M,
-				},
-			]
+	const handleDeployRetry = () => {
+		if (!selectedModel || !selectedProvider) return
+		pendingDeployRef.current = { endpointId: `sp-${Date.now()}` }
+		setDeployDurationMs(getRandomDeployDurationMs())
+		setDeployAttempt((attempt) => attempt + 1)
+	}
 
-			toast.success('Inference endpoint deployed', {
-				description: `"${endpointName.trim()}" is live on ${selectedProvider.provider}.`,
-			})
-			navigate({
-				to: '/app/endpoints/$endpointId',
-				params: { endpointId: newEndpointId },
-			})
-		}, 900)
+	const handleDeployDismiss = () => {
+		pendingDeployRef.current = null
+		setIsDeploying(false)
+		setDeployDurationMs(null)
+	}
+
+	const handleDeployChooseModel = () => {
+		handleDeployDismiss()
+		openModelPicker()
 	}
 
 	return (
@@ -459,7 +477,6 @@ function RouteComponent() {
 				{selectedModel ? (
 					<ModelSummarySidebar
 						model={selectedModel}
-						providerCount={providerCount}
 						inputCostPer1M={summaryInputCostPer1M}
 						outputCostPer1M={summaryOutputCostPer1M}
 					/>
@@ -469,6 +486,22 @@ function RouteComponent() {
 
 				<section className="min-h-0 h-full min-w-0 lg:col-span-1">
 					<Card className="flex h-full flex-col overflow-hidden p-0">
+						{isDeploying && deployDurationMs != null && selectedModel ? (
+							<EndpointDeployingScreen
+								key={deployAttempt}
+								endpointName={endpointName.trim() || selectedModel.domain}
+								modelName={selectedModel.name}
+								durationMs={deployDurationMs}
+								shouldFail={shouldSimulateDeployFailure(selectedModel)}
+								failureDetails={getDeployFailureDetails(selectedModel)}
+								onComplete={handleDeployComplete}
+								onFailure={handleDeployFailure}
+								onRetry={handleDeployRetry}
+								onBackToReview={handleDeployDismiss}
+								onChooseModel={handleDeployChooseModel}
+							/>
+						) : (
+							<>
 						<div className="flex h-endpoint-deploy-strip min-h-endpoint-deploy-strip shrink-0 items-center justify-center border-b border-border px-4">
 							<WizardStepper
 								className="min-h-0 min-w-0"
@@ -496,7 +529,8 @@ function RouteComponent() {
 									endpointName={endpointName}
 									useCase={useCase}
 									selectedModel={selectedModel}
-									selectedProvider={selectedProvider}
+									inputCostPer1M={summaryInputCostPer1M}
+									outputCostPer1M={summaryOutputCostPer1M}
 									setStep={setStep}
 								/>
 							) : null
@@ -507,38 +541,25 @@ function RouteComponent() {
 								<Button
 									variant="outline"
 									onClick={goBack}
-									disabled={step === 0 || isDeploying}
+									disabled={step === 0}
 								>
 									<ArrowLeft className="mr-1 h-icon-16 w-icon-16" /> Back
 								</Button>
 
 								{step < 1 ? (
-									<Button
-										onClick={goNext}
-										disabled={!canProceed || isDeploying}
-									>
+									<Button onClick={goNext} disabled={!canProceed}>
 										Next <ArrowRight className="ml-1 h-icon-16 w-icon-16" />
 									</Button>
 								) : (
-									<Button
-										onClick={handleCreate}
-										disabled={!canProceed || isDeploying}
-									>
-										{isDeploying ? (
-											<>
-												<Activity className="mr-1 h-icon-16 w-icon-16" />
-												Deploying endpoint...
-											</>
-										) : (
-											<>
-												<Rocket className="mr-1 h-icon-16 w-icon-16" />
-												Deploy inference endpoint
-											</>
-										)}
+									<Button onClick={handleCreate} disabled={!canProceed}>
+										<Rocket className="mr-1 h-icon-16 w-icon-16" />
+										Deploy inference endpoint
 									</Button>
 								)}
 							</div>
 						</div>
+							</>
+						)}
 					</Card>
 				</section>
 			</div>

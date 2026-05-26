@@ -5,6 +5,10 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ApiCapabilitiesFilter } from '@/components/model-cosmos/filters/ApiCapabilitiesFilter'
 import { CapabilityFilter } from '@/components/model-cosmos/filters/CapabilityFilter'
+import {
+	FILTER_TOOLBAR_ROW_CLASS,
+	filterToolbarActionButtonClassName,
+} from '@/components/model-cosmos/filters/cosmos-filter-styles'
 import { FeaturesFilter } from '@/components/model-cosmos/filters/FeaturesFilter'
 import { ModalityFilter } from '@/components/model-cosmos/filters/ModalityFilter'
 import { MoreFiltersSheet } from '@/components/model-cosmos/filters/MoreFiltersSheet'
@@ -55,7 +59,7 @@ export function ModelCosmosFilterBar({
 
 	return (
 		<div className={cn('flex min-w-0 flex-col gap-3', className)}>
-			<div className="flex min-w-0 flex-wrap items-center gap-2">
+			<div className={FILTER_TOOLBAR_ROW_CLASS}>
 				<ProviderFilter
 					catalog={catalog}
 					filters={filters}
@@ -89,15 +93,17 @@ export function ModelCosmosFilterBar({
 
 				<Button
 					type="button"
-					variant="outline"
+					variant="ghost"
 					size="sm"
-					className="gap-1"
+					className={filterToolbarActionButtonClassName(
+						moreFiltersActiveCount > 0,
+					)}
 					onClick={() => setMoreOpen(true)}
 				>
-					<SlidersHorizontal className="h-icon-16 w-icon-16" aria-hidden />
+					<SlidersHorizontal className="h-icon-16 w-icon-16 shrink-0" aria-hidden />
 					More filters
 					{moreFiltersActiveCount > 0 ? (
-						<Badge variant="secondary" className="ml-0.5 px-1.5">
+						<Badge variant="secondary" className="shrink-0 px-1.5">
 							{moreFiltersActiveCount}
 						</Badge>
 					) : null}

@@ -96,13 +96,16 @@ import {
 	canCreateInferenceEndpoint,
 	getModelStatusBadgeVariant,
 } from '@/lib/model-lifecycle'
+import { getModelBaseFamily } from '@/lib/catalog-filter-meta'
 import {
 	getModelModalityLabel,
 	getModelParameterCount,
 	getOverallModelScore,
+	modelIsQuantized,
 	type ModelRecord,
 } from '@/lib/model-metrics'
 import { getModelProviderLogoSrc } from '@/lib/model-provider-logos'
+import { getModelSourceRows } from '@/lib/model-sources'
 import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/app/cosmos_/$modelId')({
@@ -128,8 +131,8 @@ const SECTION_IDS = [
 	'endpoints',
 	'features',
 	'specifications',
-	'sources',
 	'performance',
+	'sources',
 ] as const
 
 const NAV: Array<{ id: SectionId; label: string }> = [
@@ -139,8 +142,8 @@ const NAV: Array<{ id: SectionId; label: string }> = [
 	{ id: 'endpoints', label: 'Endpoints' },
 	{ id: 'features', label: 'Features' },
 	{ id: 'specifications', label: 'Specifications' },
-	{ id: 'sources', label: 'Sources' },
 	{ id: 'performance', label: 'Performance' },
+	{ id: 'sources', label: 'Sources' },
 ]
 
 type ModalityValue = 'input_output' | 'input_only' | 'unsupported'
@@ -202,10 +205,6 @@ type ModelYaml = {
 	min_memory_bytes: number
 	input_price_per_1m?: string
 	output_price_per_1m?: string
-	sources: Array<{
-		type: string
-		repo: string
-	}>
 	type: string
 	max_context_length: number
 	features: {
@@ -846,6 +845,7 @@ function getMockParameterCount(model: ModelRecord): number {
 function normalizeModel(model: ModelRecord): ModelYaml {
 	const score = getOverallModelScore(model)
 	const parameters = getMockParameterCount(model)
+	const isQuantized = modelIsQuantized(model)
 	const hasVision = model.strengths.some((s) =>
 		/vision|image|multimodal/i.test(s),
 	)
@@ -855,9 +855,11 @@ function normalizeModel(model: ModelRecord): ModelYaml {
 		id: model.id,
 		name: model.name,
 		version: model.version,
-		base_model: null,
+		base_model: isQuantized
+			? (getModelBaseFamily(model) ?? model.name)
+			: null,
 		description: model.description,
-		license: model.hosting === 'Booster Powered' ? 'Commercial' : 'Open Source',
+		license: model.hosting === 'Booster Hosted' ? 'Commercial' : 'Open Source',
 		status: model.status.toLowerCase(),
 		modalities: {
 			text: 'input_output',
@@ -877,7 +879,7 @@ function normalizeModel(model: ModelRecord): ModelYaml {
 			audio_translations: false,
 		},
 		origin: model.provider,
-		format: 'API',
+		format: isQuantized ? 'Safetensors' : 'API',
 		quantization:
 			'quantization' in model && model.quantization ? model.quantization : null,
 		dtype: 'bf16',
@@ -885,12 +887,6 @@ function normalizeModel(model: ModelRecord): ModelYaml {
 		min_memory_bytes: Math.max(parameters * 2, 0),
 		input_price_per_1m: model.inputCostPer1M.toFixed(2),
 		output_price_per_1m: model.outputCostPer1M.toFixed(2),
-		sources: [
-			{
-				type: model.hosting,
-				repo: model.provider,
-			},
-		],
 		type: getModelModalityLabel(model),
 		max_context_length: model.contextLength,
 		features: {
@@ -1146,6 +1142,71 @@ function SpecRow({
 	)
 }
 
+function getSourceRowIcon(label: string): LucideIcon {
+	switch (label) {
+		case 'Provider / creator':
+		case 'Provider':
+			return Brain
+		case 'Access type':
+		case 'Served by':
+			return Cloud
+		case 'Source type':
+			return Layers
+		case 'Repository':
+			return FileText
+		case 'License':
+		case 'License or usage terms':
+			return Scale
+		case 'Format':
+			return FileArchive
+		case 'Quantization':
+			return Weight
+		case 'Base model / variant':
+			return Box
+		case 'Base URL':
+			return Share2
+		default:
+			return FileText
+	}
+}
+
+function SourceRow({
+	label,
+	value,
+	href,
+}: {
+	label: string
+	value: string
+	href?: string
+}) {
+	const Icon = getSourceRowIcon(label)
+
+	return (
+		<div className="flex h-model-detail-row items-center gap-2 border-b border-transparent py-2 last:border-b-0">
+			<IconBox size="xlg" shape="circle">
+				<Icon className="text-hierarchy-secondary" aria-hidden />
+			</IconBox>
+			<span className="min-w-0 flex-1 text-body-sm text-hierarchy-secondary">
+				{label}
+			</span>
+			{href ? (
+				<a
+					href={href}
+					target="_blank"
+					rel="noopener noreferrer"
+					className="min-w-0 max-w-[min(100%,20rem)] shrink truncate text-label text-primary hover:underline"
+				>
+					{value}
+				</a>
+			) : (
+				<span className="min-w-0 max-w-[min(100%,20rem)] shrink truncate text-right text-label text-foreground">
+					{value}
+				</span>
+			)}
+		</div>
+	)
+}
+
 function OverviewMetaChip({
 	icon: Icon,
 	children,
@@ -1218,6 +1279,10 @@ function RouteComponent() {
 		() => (modelYaml ? specRowsFromYaml(modelYaml) : []),
 		[modelYaml],
 	)
+	const sourceRows = useMemo(
+		() => (model ? getModelSourceRows(model) : []),
+		[model],
+	)
 	const performanceBenchmark = useMemo(
 		() => (model ? getModelPerformanceBenchmark(model) : null),
 		[model],
@@ -1264,9 +1329,7 @@ function RouteComponent() {
 	if (!modelYaml) return null
 
 	const providerLogoSrc = getModelProviderLogoSrc(model.provider, model.name)
-	const providerInitials =
-		modelYaml.sources[0]?.repo?.split('/')[0]?.slice(0, 2)?.toUpperCase() ??
-		'AI'
+	const providerInitials = model.provider.slice(0, 2).toUpperCase()
 	const capabilityScoreAverage = getModelCapabilityScoreAverage(model)
 	const capabilityScore =
 		capabilityScoreAverage != null
@@ -1316,8 +1379,9 @@ function RouteComponent() {
 								ref={assignRef('overview')}
 								data-section="overview"
 								id="model-detail-overview"
-								className="relative overflow-hidden rounded-lg border border-primary/30 bg-card p-6 shadow-sm"
+								className="border-primary-fade-shell shadow-sm"
 							>
+								<div className="relative overflow-hidden rounded-lg bg-card p-6">
 								<div
 									className="pointer-events-none absolute inset-0 rounded-lg bg-gradient-to-bl from-primary/20 via-card to-card opacity-90"
 									aria-hidden
@@ -1428,7 +1492,7 @@ function RouteComponent() {
 															search={{ model: modelYaml.id }}
 														>
 															<Plus className="size-icon-16" aria-hidden />
-															Inference Endpoint
+															Create Endpoint
 														</Link>
 													</Button>
 												) : (
@@ -1440,12 +1504,13 @@ function RouteComponent() {
 														disabled
 													>
 														<Plus className="size-icon-16" aria-hidden />
-														Inference Endpoint
+														Create Endpoint
 													</Button>
 												)}
 											</div>
 										</div>
 									</div>
+								</div>
 								</div>
 							</div>
 
@@ -1936,46 +2001,12 @@ function RouteComponent() {
 								</div>
 							</div>
 
-							<div
-								ref={assignRef('sources')}
-								data-section="sources"
-								id="model-detail-sources"
-								className="flex min-w-0 gap-16 rounded-lg bg-card px-6 py-6 shadow-sm max-lg:flex-col max-lg:gap-6"
-							>
-								<SectionTitle className="w-[124px] min-w-[124px] basis-[124px]">
-									Sources
-								</SectionTitle>
-								<div className="flex min-w-0 flex-1 flex-col gap-3">
-									{modelYaml.sources.map((source) => (
-										<div
-											key={`${source.type}-${source.repo}`}
-											className="flex items-center gap-3 rounded-md border border-border p-3"
-										>
-											<IconBox size="xlg" shape="circle" className="bg-muted">
-												<FileText
-													className="text-hierarchy-secondary"
-													aria-hidden
-												/>
-											</IconBox>
-											<div className="min-w-0">
-												<p className="text-body-sm-strong text-foreground">
-													{source.repo}
-												</p>
-												<p className="text-body-sm text-muted-foreground">
-													{source.type}
-												</p>
-											</div>
-										</div>
-									))}
-								</div>
-							</div>
-
 							{performanceBenchmark ? (
 								<div
 									ref={assignRef('performance')}
 									data-section="performance"
 									id="model-detail-performance"
-									className="mb-[30vh] flex min-w-0 flex-col gap-4 rounded-lg bg-white px-6 py-6 shadow-sm"
+									className="flex min-w-0 flex-col gap-4 rounded-lg bg-white px-6 py-6 shadow-sm"
 								>
 									<div className="flex min-w-0 items-start justify-between gap-4">
 										<div className="flex min-w-0 flex-col gap-1">
@@ -2009,6 +2040,27 @@ function RouteComponent() {
 									</div>
 								</div>
 							) : null}
+
+							<div
+								ref={assignRef('sources')}
+								data-section="sources"
+								id="model-detail-sources"
+								className="mb-[30vh] flex min-w-0 gap-16 rounded-lg bg-card px-6 py-6 shadow-sm max-lg:flex-col max-lg:gap-6"
+							>
+								<SectionTitle className="w-[124px] min-w-[124px] basis-[124px]">
+									Sources
+								</SectionTitle>
+								<div className="flex min-w-0 flex-1 flex-col">
+									{sourceRows.map((row) => (
+										<SourceRow
+											key={row.label}
+											label={row.label}
+											value={row.value}
+											href={row.href}
+										/>
+									))}
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>

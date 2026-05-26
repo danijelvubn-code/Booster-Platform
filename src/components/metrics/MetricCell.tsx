@@ -35,10 +35,10 @@ export function MetricCell({
 	if (hasIcon && Icon) {
 		return (
 			<div className={cn(cellSurface, className)}>
-				<div className="flex min-w-0 items-center justify-center gap-1">
-					<div className="flex h-icon-20 w-icon-20 shrink-0 items-center justify-center rounded-md p-0.5">
+				<div className="flex min-w-0 items-center justify-center gap-2">
+					<div className="flex h-icon-24 w-icon-24 shrink-0 items-center justify-center rounded-md">
 						<Icon
-							className="h-icon-16 w-icon-16 text-foreground/75"
+							className="h-icon-20 w-icon-20 text-foreground/50"
 							aria-hidden
 						/>
 					</div>

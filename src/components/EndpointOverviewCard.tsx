@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { Link2, MoreHorizontal, RefreshCw, Trash2 } from 'lucide-react'
+import { Box, Link2, MoreHorizontal, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -10,7 +10,6 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { IconBox } from '@/components/ui/icon-box'
 import { EndpointStatusBadge } from '@/components/endpoint/EndpointStatusBadge'
 import { Progress } from '@/components/ui/progress'
 import type { endpoints } from '@/data/mockData'
@@ -34,22 +33,10 @@ const endpointTypeBadgeProps = (type: string) => {
 	return { variant: 'secondary' as const, appearance: 'ghost' as const }
 }
 
-function EndpointIcon({ className }: { className?: string }) {
-	return (
-		<IconBox
-			size="xlg"
-			shape="square"
-			className={cn('shrink-0 bg-primary/4', className)}
-		>
-			<RefreshCw className="text-primary" aria-hidden />
-		</IconBox>
-	)
-}
-
 type EndpointOverviewCardProps = {
 	endpoint: EndpointOverviewRecord
 	className?: string
-	/** `basic`: icon, name, URL, model line (phase 1). `full`: badges, tokens, budget bar (phase 2). */
+	/** `basic`: name, URL, model line (phase 1). `full`: badges, tokens, budget bar (phase 2). */
 	variant?: EndpointOverviewCardVariant
 	onDelete?: (id: string) => void
 }
@@ -76,37 +63,43 @@ function EndpointOverviewCardBasic({
 					search={{ returnTo: '/app/overview', returnLabel: 'Endpoints' }}
 					className="flex flex-col gap-3 text-left outline-none ring-offset-background focus-visible:rounded-md focus-visible:ring-2 focus-visible:ring-ring"
 				>
-					<div className="flex min-w-0 items-center gap-2">
-						<EndpointIcon />
-						<span className="min-w-0 flex-1 truncate text-body-strong text-foreground">
-							{endpoint.name}
-						</span>
+					<div className="flex min-w-0 items-start gap-2">
+						<div className="flex min-w-0 flex-1 flex-col gap-0.5">
+							<span className="truncate text-body-strong text-foreground">
+								{endpoint.name}
+							</span>
+							<div className="flex min-w-0 items-center gap-1">
+								<Link2
+									className="h-icon-16 w-icon-16 shrink-0 text-muted-foreground"
+									aria-hidden
+								/>
+								<p className="min-w-0 truncate text-body-sm text-muted-foreground">
+									{endpoint.endpoint}
+								</p>
+							</div>
+						</div>
 						<EndpointStatusBadge
 							status={resolveEndpointStatus(endpoint)}
 							size="24"
+							className="shrink-0"
 						/>
 					</div>
-					<div className="flex min-w-0 items-center gap-1">
-						<Link2
-							className="h-icon-16 w-icon-16 shrink-0 text-muted-foreground"
+					<div className="flex min-w-0 items-center gap-1.5 text-body-sm">
+						<Box
+							className="h-icon-20 w-icon-20 shrink-0 text-muted-foreground"
 							aria-hidden
 						/>
-						<p className="min-w-0 truncate text-body-sm text-muted-foreground">
-							{endpoint.endpoint}
-						</p>
-					</div>
-					<p className="text-body-sm">
-						<span className="text-muted-foreground">Model:</span>{' '}
 						<span
-							className={
+							className={cn(
+								'min-w-0 truncate',
 								endpoint.defaultDeployment
 									? 'text-foreground/75'
-									: 'text-muted-foreground'
-							}
+									: 'text-muted-foreground',
+							)}
 						>
 							{endpoint.defaultDeployment || '—'}
 						</span>
-					</p>
+					</div>
 				</Link>
 			</CardContent>
 		</Card>
@@ -284,4 +277,4 @@ export function EndpointOverviewCard({
 	)
 }
 
-export { EndpointOverviewCardBasic, EndpointOverviewCardFull, EndpointIcon }
+export { EndpointOverviewCardBasic, EndpointOverviewCardFull }

@@ -32,13 +32,18 @@ export const FilterTriggerButton = forwardRef<
 			className={cn(filterToolbarButtonClassName(active), className)}
 			{...props}
 		>
-			{children}
-			{badgeCount != null && badgeCount > 0 ? (
-				<Badge variant="secondary" className="ml-0.5 px-1.5">
-					{badgeCount}
-				</Badge>
-			) : null}
-			<ChevronDown className="h-icon-16 w-icon-16 opacity-50" aria-hidden />
+			<span className="flex min-w-0 items-center gap-1 truncate">
+				<span className="truncate">{children}</span>
+				{badgeCount != null && badgeCount > 0 ? (
+					<Badge variant="secondary" className="shrink-0 px-1.5">
+						{badgeCount}
+					</Badge>
+				) : null}
+			</span>
+			<ChevronDown
+				className="h-icon-16 w-icon-16 shrink-0 opacity-50"
+				aria-hidden
+			/>
 		</Button>
 	)
 })

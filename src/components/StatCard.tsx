@@ -1,5 +1,6 @@
 import type { LucideIcon } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
+import { IconBox } from '@/components/ui/icon-box'
 import { cn } from '@/lib/utils'
 
 interface StatCardProps {
@@ -8,6 +9,7 @@ interface StatCardProps {
 	value: string
 	bgColor?: string
 	textColor?: string
+	className?: string
 }
 
 export function StatCard({
@@ -16,18 +18,18 @@ export function StatCard({
 	value,
 	bgColor = 'bg-primary/10',
 	textColor = 'text-primary',
+	className,
 }: StatCardProps) {
 	return (
-		<Card className="border-border shadow-xs">
+		<Card className={cn('border-border shadow-xs', className)}>
 			<CardContent className="flex items-center gap-3 p-4">
-				<div
-					className={cn(
-						'flex h-icon-40 w-icon-40 shrink-0 items-center justify-center rounded-lg',
-						bgColor,
-					)}
+				<IconBox
+					size="xxxlg"
+					shape="square"
+					className={cn('rounded-md', bgColor)}
 				>
-					<Icon className={cn('h-icon-20 w-icon-20', textColor)} aria-hidden />
-				</div>
+					<Icon className={textColor} aria-hidden />
+				</IconBox>
 				<div className="min-w-0">
 					<p className="text-body-sm text-muted-foreground">{label}</p>
 					<p className="text-body-sm font-semibold text-foreground">{value}</p>

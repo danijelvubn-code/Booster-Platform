@@ -374,7 +374,8 @@ function RouteComponent() {
 								endpointName={endpointName}
 								useCase={useCase}
 								selectedModel={selectedModel}
-								selectedProvider={selectedProvider}
+								inputCostPer1M={selectedProvider.inputPer1M}
+								outputCostPer1M={selectedProvider.outputPer1M}
 								setStep={setStep}
 							/>
 						) : null}

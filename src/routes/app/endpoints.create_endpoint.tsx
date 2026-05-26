@@ -10,7 +10,6 @@ import { useMemo, useEffect, useState } from 'react'
 import { EndpointModelSelectSheet } from '@/components/endpoint-wizard/EndpointModelSelectSheet'
 import { BasicSetupStep } from '@/components/endpoint-wizard/BasicSetupStep'
 import { ModelLifecycleAlert } from '@/components/model-detail/ModelLifecycleAlert'
-import { ProviderSelectionStep } from '@/components/endpoint-wizard/ProviderSelectionStep'
 import { ReviewStep } from '@/components/endpoint-wizard/ReviewStep'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -55,18 +54,11 @@ export const Route = createFileRoute('/app/endpoints/create_endpoint')({
 	component: RouteComponent,
 })
 
-type StepId = 0 | 1 | 2
+type StepId = 0 | 1
 type EndpointType = 'Production' | 'POC' | 'Demo'
-type ProviderSort =
-	| 'recommended'
-	| 'lowest-cost'
-	| 'lowest-latency'
-	| 'highest-throughput'
-	| 'largest-context'
 
 const ENDPOINT_WIZARD_STEPPER_ITEMS = [
 	{ id: 'basic', label: 'Basic' },
-	{ id: 'provider', label: 'Model Provider' },
 	{ id: 'review', label: 'Review & Deploy' },
 ] as const
 
@@ -291,8 +283,6 @@ function RouteComponent() {
 	const [endpointType] = useState<EndpointType>('Production')
 	const [useCase, setUseCase] = useState('')
 	const [selectedPreset, setSelectedPreset] = useState<string | null>(null)
-	const [providerSort, setProviderSort] =
-		useState<ProviderSort>('highest-throughput')
 	const [selectedProviderId, setSelectedProviderId] =
 		useState<string>('recommended')
 	const [isDeploying, setIsDeploying] = useState(false)
@@ -344,42 +334,12 @@ function RouteComponent() {
 		)
 	}, [providerOptions, recommendedProvider, selectedProviderId])
 
-	const sortedProviders = useMemo(() => {
-		const rows = [...providerOptions]
-		switch (providerSort) {
-			case 'lowest-cost':
-				rows.sort(
-					(a, b) =>
-						a.inputPer1M + a.outputPer1M - (b.inputPer1M + b.outputPer1M),
-				)
-				return rows
-			case 'lowest-latency':
-				rows.sort((a, b) => a.latencyMs - b.latencyMs)
-				return rows
-			case 'highest-throughput':
-				rows.sort((a, b) => b.tps - a.tps)
-				return rows
-			case 'largest-context':
-				rows.sort((a, b) => b.contextTokens - a.contextTokens)
-				return rows
-			default:
-				rows.sort(
-					(a, b) =>
-						Number(Boolean(b.recommended)) - Number(Boolean(a.recommended)),
-				)
-				return rows
-		}
-	}, [providerOptions, providerSort])
-
 	const canProceed = useMemo(() => {
 		if (!selectedModel) return false
 		if (step === 0) {
 			return endpointName.trim().length > 0 && useCase.trim().length > 0
 		}
-		if (step === 1) {
-			return Boolean(selectedProvider)
-		}
-		return canCreateInferenceEndpoint(selectedModel)
+		return canCreateInferenceEndpoint(selectedModel) && Boolean(selectedProvider)
 	}, [endpointName, selectedModel, selectedProvider, step, useCase])
 
 	const estimatedMonthlyCost = useMemo(() => {
@@ -404,7 +364,7 @@ function RouteComponent() {
 
 	const goNext = () => {
 		if (!canProceed) return
-		setStep((current) => (current < 2 ? ((current + 1) as StepId) : current))
+		setStep((current) => (current < 1 ? ((current + 1) as StepId) : current))
 	}
 
 	const goBack = () => {
@@ -529,32 +489,11 @@ function RouteComponent() {
 
 						{step === 1 ? (
 							selectedModel && selectedProvider ? (
-								<ProviderSelectionStep
-									providerSort={providerSort}
-									setProviderSort={setProviderSort}
-									selectedProvider={selectedProvider}
-									selectedProviderId={selectedProviderId}
-									setSelectedProviderId={setSelectedProviderId}
-									sortedProviders={sortedProviders}
-								/>
-							) : (
-								<div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 overflow-y-auto p-6 text-center">
-									<p className="max-w-md text-body-sm text-muted-foreground">
-										Select a model from the catalog to compare deployment
-										providers.
-									</p>
-								</div>
-							)
-						) : null}
-
-						{step === 2 ? (
-							selectedModel && selectedProvider ? (
 								<ReviewStep
 									endpointName={endpointName}
 									useCase={useCase}
 									selectedModel={selectedModel}
 									selectedProvider={selectedProvider}
-									estimatedMonthlyCost={estimatedMonthlyCost}
 									setStep={setStep}
 								/>
 							) : null
@@ -570,7 +509,7 @@ function RouteComponent() {
 									<ArrowLeft className="mr-1 h-icon-16 w-icon-16" /> Back
 								</Button>
 
-								{step < 2 ? (
+								{step < 1 ? (
 									<Button
 										onClick={goNext}
 										disabled={!canProceed || isDeploying}

@@ -10,7 +10,6 @@ import {
 	Braces,
 	Brain,
 	BrainCircuit,
-	CheckCircle2,
 	ChevronDown,
 	CircleStop,
 	Code2,
@@ -77,14 +76,6 @@ import { Progress } from '@/components/ui/progress'
 import { Separator } from '@/components/ui/separator'
 import { Sheet, SheetTrigger } from '@/components/ui/sheet'
 import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from '@/components/ui/table'
-import {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
@@ -137,7 +128,6 @@ const SECTION_IDS = [
 	'features',
 	'specifications',
 	'sources',
-	'providers',
 	'performance',
 ] as const
 
@@ -149,7 +139,6 @@ const NAV: Array<{ id: SectionId; label: string }> = [
 	{ id: 'features', label: 'Features' },
 	{ id: 'specifications', label: 'Specifications' },
 	{ id: 'sources', label: 'Sources' },
-	{ id: 'providers', label: 'Providers' },
 	{ id: 'performance', label: 'Performance' },
 ]
 
@@ -455,10 +444,6 @@ function scoreToPercent(score: number): number {
 
 function formatScore(score: number): string {
 	return `${scoreToPercent(score).toFixed(1)}%`
-}
-
-function formatEurPer1M(value: number): string {
-	return `€${value.toFixed(2)}`
 }
 
 function isScoreMissing(score: number | null | undefined): boolean {
@@ -1978,74 +1963,6 @@ function RouteComponent() {
 											</div>
 										</div>
 									))}
-								</div>
-							</div>
-
-							<div
-								ref={assignRef('providers')}
-								data-section="providers"
-								id="model-detail-providers"
-								className="flex min-w-0 flex-col gap-4 rounded-lg border border-border bg-card px-6 py-6 shadow-sm"
-							>
-								<SectionTitle>Providers</SectionTitle>
-								<div className="min-w-0">
-									<div className="overflow-x-auto rounded-lg border border-border">
-										<Table>
-											<TableHeader>
-												<TableRow className="h-14 hover:bg-transparent">
-													<TableHead>Provider</TableHead>
-													<TableHead>Context</TableHead>
-													<TableHead className="text-right">In / 1M</TableHead>
-													<TableHead className="text-right">Out / 1M</TableHead>
-													<TableHead className="text-right">Latency</TableHead>
-													<TableHead className="text-right">TPS</TableHead>
-													<TableHead className="text-right">Quant.</TableHead>
-													<TableHead className="text-right">Certs</TableHead>
-												</TableRow>
-											</TableHeader>
-											<TableBody>
-												{providerRows.map((provider) => (
-													<TableRow
-														key={provider.id}
-														className="h-14 hover:bg-muted/50"
-													>
-														<TableCell className="text-body-sm text-foreground">
-															{provider.provider}
-														</TableCell>
-														<TableCell className="text-body-sm text-foreground">
-															{provider.context}
-														</TableCell>
-														<TableCell className="text-right text-body-sm text-foreground">
-															{formatEurPer1M(provider.inputPer1M)}
-														</TableCell>
-														<TableCell className="text-right text-body-sm text-foreground">
-															{formatEurPer1M(provider.outputPer1M)}
-														</TableCell>
-														<TableCell className="text-right text-body-sm text-foreground">
-															{provider.latencyMs}ms
-														</TableCell>
-														<TableCell className="text-right text-body-sm text-foreground">
-															{provider.tps.toFixed(1)}
-														</TableCell>
-														<TableCell className="text-right text-body-sm text-foreground">
-															{provider.quant}
-														</TableCell>
-														<TableCell className="text-right">
-															<Badge
-																variant="success"
-																appearance="ghost"
-																size="24"
-																className="font-normal"
-																leadingIcon={<CheckCircle2 aria-hidden />}
-															>
-																{provider.certs.join(', ')}
-															</Badge>
-														</TableCell>
-													</TableRow>
-												))}
-											</TableBody>
-										</Table>
-									</div>
 								</div>
 							</div>
 

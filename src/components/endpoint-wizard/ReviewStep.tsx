@@ -12,8 +12,7 @@ type ReviewStepProps = {
 	useCase: string
 	selectedModel: Model
 	selectedProvider: ProviderOption
-	estimatedMonthlyCost: string
-	setStep: (step: 0 | 1 | 2) => void
+	setStep: (step: 0 | 1) => void
 }
 
 export function ReviewStep({
@@ -21,7 +20,6 @@ export function ReviewStep({
 	useCase,
 	selectedModel,
 	selectedProvider,
-	estimatedMonthlyCost,
 	setStep,
 }: ReviewStepProps) {
 	return (
@@ -29,8 +27,7 @@ export function ReviewStep({
 			<div className="space-y-1">
 				<h2 className="text-h3 text-foreground">Review &amp; Deploy</h2>
 				<p className="text-body-sm text-muted-foreground">
-					Review your configuration before deploying. Default budget and safety
-					settings can be changed later.
+					Review your configuration before deploying.
 				</p>
 			</div>
 
@@ -56,17 +53,10 @@ export function ReviewStep({
 			</Card>
 
 			<Card className="bg-muted/20">
-				<CardHeader className="flex-row items-start justify-between space-y-0 pb-3">
+				<CardHeader className="pb-3">
 					<CardTitle className="text-body-sm-strong">
 						Deployment provider
 					</CardTitle>
-					<button
-						type="button"
-						onClick={() => setStep(1)}
-						className="text-caption text-primary"
-					>
-						Edit
-					</button>
 				</CardHeader>
 				<CardContent className="grid gap-3 pt-0 text-body-sm md:grid-cols-2">
 					<div className="grid grid-cols-[6rem_1fr] gap-y-1.5">
@@ -100,26 +90,6 @@ export function ReviewStep({
 						<span className="text-foreground">
 							{selectedProvider.tps.toFixed(1)}
 						</span>
-					</div>
-				</CardContent>
-			</Card>
-
-			<Card className="bg-muted/20">
-				<CardHeader className="pb-3">
-					<CardTitle className="text-body-sm-strong">Budget & Safety</CardTitle>
-				</CardHeader>
-				<CardContent className="grid gap-3 pt-0 text-body-sm md:grid-cols-2">
-					<div className="grid grid-cols-[8rem_1fr] gap-y-1.5">
-						<span className="text-muted-foreground">Monthly budget:</span>
-						<span className="text-foreground">1,000,000 tokens/mo</span>
-						<span className="text-muted-foreground">Est. cost:</span>
-						<span className="text-foreground">~€{estimatedMonthlyCost}/mo</span>
-					</div>
-					<div className="grid grid-cols-[6rem_1fr] gap-y-1.5">
-						<span className="text-muted-foreground">Alert:</span>
-						<span className="text-foreground">at 80%</span>
-						<span className="text-muted-foreground">Hard stop:</span>
-						<span className="text-foreground">No</span>
 					</div>
 				</CardContent>
 			</Card>

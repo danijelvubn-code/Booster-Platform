@@ -9,6 +9,12 @@ import {
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { BackButton } from '@/components/BackButton'
+import { PageContainer } from '@/components/layout/PageContainer'
+import {
+	ModelPerformanceBenchmarkSection,
+	PerformanceBenchmarkDetailsSheet,
+	PerformanceBenchmarkMetadataDialog,
+} from '@/components/model-detail/ModelPerformanceBenchmarkSection'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
@@ -23,6 +29,7 @@ import { SaveProfileDialog } from '@/components/wizard/SaveProfileDialog'
 import { WizardStepObjective } from '@/components/wizard/WizardStepObjective'
 import { WizardStepResults } from '@/components/wizard/WizardStepResults'
 import { WizardStepUseCase } from '@/components/wizard/WizardStepUseCase'
+import { QWEN35_27B_PERFORMANCE_BENCHMARK } from '@/data/modelPerformanceBenchmark'
 import {
 	getSavedUseCaseProfiles,
 	type SavedUseCaseProfile,
@@ -72,6 +79,7 @@ function RouteComponent() {
 	const [loadedProfileId, setLoadedProfileId] = useState<string | null>(
 		initial.profileId,
 	)
+	const [performanceTableView, setPerformanceTableView] = useState(false)
 
 	// Computed values
 	const results = useMemo(() => scoreModels(state), [state])
@@ -114,7 +122,7 @@ function RouteComponent() {
 	}
 
 	return (
-		<div className="container space-y-6 py-8">
+		<PageContainer gap="space-y-6" className="py-8">
 			<div className="flex items-center justify-between">
 				<BackButton to="/app/model-cosmos" label="Model Cosmos" />
 				<div className="flex items-center gap-2">
@@ -181,6 +189,41 @@ function RouteComponent() {
 				</CardContent>
 			</Card>
 
+			{step === 2 ? (
+				<section className="space-y-4 rounded-lg border border-border bg-white p-6 shadow-sm">
+					<div className="flex items-start justify-between gap-4">
+						<div>
+							<h2 className="text-lg font-semibold">Performance</h2>
+							<p className="text-sm text-muted-foreground">
+								Deployment characterization benchmark covering throughput,
+								latency, and energy across representative workloads.
+							</p>
+						</div>
+						<div className="flex shrink-0 items-center gap-2">
+							<PerformanceBenchmarkDetailsSheet
+								benchmark={QWEN35_27B_PERFORMANCE_BENCHMARK}
+								showTableView={performanceTableView}
+								onShowTableViewChange={setPerformanceTableView}
+							>
+								<Button
+									variant="outline"
+									size="sm"
+									className="shrink-0 shadow-xs"
+								>
+									Performance details
+								</Button>
+							</PerformanceBenchmarkDetailsSheet>
+							<PerformanceBenchmarkMetadataDialog
+								benchmark={QWEN35_27B_PERFORMANCE_BENCHMARK}
+							/>
+						</div>
+					</div>
+					<ModelPerformanceBenchmarkSection
+						benchmark={QWEN35_27B_PERFORMANCE_BENCHMARK}
+					/>
+				</section>
+			) : null}
+
 			<div className="flex justify-between">
 				<Button
 					variant="outline"
@@ -217,6 +260,6 @@ function RouteComponent() {
 				onConfirmSave={saveDialog.confirmSave}
 				loadedProfileId={loadedProfileId}
 			/>
-		</div>
+		</PageContainer>
 	)
 }

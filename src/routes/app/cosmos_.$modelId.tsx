@@ -52,6 +52,12 @@ import {
 	type ReactNode,
 } from 'react'
 import { AppSideSheetContent } from '@/components/layout/AppSideSheet'
+import { ModelLifecycleAlert } from '@/components/model-detail/ModelLifecycleAlert'
+import {
+	ModelPerformanceBenchmarkSection,
+	PerformanceBenchmarkDetailsSheet,
+	PerformanceBenchmarkMetadataDialog,
+} from '@/components/model-detail/ModelPerformanceBenchmarkSection'
 import {
 	Accordion,
 	AccordionContent,
@@ -84,19 +90,9 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { ModelLifecycleAlert } from '@/components/model-detail/ModelLifecycleAlert'
-import { getModelCatalogProviderRows } from '@/data/model-hosting-providers'
 import { models } from '@/data/mockData'
-import {
-	getModelModalityLabel,
-	getOverallModelScore,
-	getModelParameterCount,
-	type ModelRecord,
-} from '@/lib/model-metrics'
-import {
-	canCreateInferenceEndpoint,
-	getModelStatusBadgeVariant,
-} from '@/lib/model-lifecycle'
+import { getModelCatalogProviderRows } from '@/data/model-hosting-providers'
+import { getModelPerformanceBenchmark } from '@/data/modelPerformanceBenchmark'
 import {
 	formatCapabilityWeight,
 	getAiIndexScore,
@@ -104,6 +100,16 @@ import {
 	getModelCapabilityScores,
 	type ScoredSubcapability,
 } from '@/lib/capability-scoring'
+import {
+	canCreateInferenceEndpoint,
+	getModelStatusBadgeVariant,
+} from '@/lib/model-lifecycle'
+import {
+	getModelModalityLabel,
+	getModelParameterCount,
+	getOverallModelScore,
+	type ModelRecord,
+} from '@/lib/model-metrics'
 import { getModelProviderLogoSrc } from '@/lib/model-provider-logos'
 import { cn } from '@/lib/utils'
 
@@ -132,6 +138,7 @@ const SECTION_IDS = [
 	'specifications',
 	'sources',
 	'providers',
+	'performance',
 ] as const
 
 const NAV: Array<{ id: SectionId; label: string }> = [
@@ -143,6 +150,7 @@ const NAV: Array<{ id: SectionId; label: string }> = [
 	{ id: 'specifications', label: 'Specifications' },
 	{ id: 'sources', label: 'Sources' },
 	{ id: 'providers', label: 'Providers' },
+	{ id: 'performance', label: 'Performance' },
 ]
 
 type ModalityValue = 'input_output' | 'input_only' | 'unsupported'
@@ -375,16 +383,18 @@ function BackToPrevious({ to, label }: { to: string; label: string }) {
 function NavRail({
 	active,
 	onSelect,
+	items = NAV,
 }: {
 	active: SectionId
 	onSelect: (id: SectionId) => void
+	items?: Array<{ id: SectionId; label: string }>
 }) {
 	return (
 		<nav
 			className="sticky top-8 flex w-40 shrink-0 flex-col"
 			aria-label="Model detail sections"
 		>
-			{NAV.map((item) => {
+			{items.map((item) => {
 				const isActive = active === item.id
 
 				return (
@@ -585,6 +595,8 @@ const scoreBreakdownBenchmarkHeadClass =
 	'!h-10 !py-0 !pr-4 !pl-[76px] align-middle text-left text-label font-medium text-muted-foreground'
 const scoreBreakdownMetricHeadClass =
 	'!h-10 !py-0 !px-3 align-middle text-right text-label font-medium text-muted-foreground'
+const scoreBreakdownMetricTriggerCellClass =
+	'flex !px-3 items-center justify-end self-stretch text-right text-body-sm tabular-nums'
 
 function ScoreBreakdownInsetDivider({
 	indentClass,
@@ -672,7 +684,7 @@ function CapabilityCategoryDetailBody({
 					<AccordionTrigger
 						className={cn(
 							scoreBreakdownSurfaceClass,
-							'!grid h-16 w-full items-center gap-0 !p-0 !pr-3 py-0 text-left text-body-sm hover:no-underline [&>svg:last-child]:hidden [&[data-state=open]>svg:first-child]:rotate-180',
+							'!grid h-16 w-full items-center gap-0 !p-0 py-0 text-left text-body-sm hover:no-underline [&>svg:last-child]:hidden [&[data-state=open]>svg:first-child]:rotate-180',
 							SCORE_BREAKDOWN_COLS,
 						)}
 					>
@@ -690,18 +702,34 @@ function CapabilityCategoryDetailBody({
 								</p>
 							</div>
 						</div>
-						<ScoreBreakdownMetricHint
-							label={SCORE_BREAKDOWN_TOOLTIPS.subcapabilityWeight}
-							className="text-right text-body-sm tabular-nums text-muted-foreground"
+						<div
+							className={cn(
+								scoreBreakdownSurfaceClass,
+								scoreBreakdownMetricTriggerCellClass,
+								'text-muted-foreground',
+							)}
 						>
-							{formatCapabilityWeight(sub.weight)}
-						</ScoreBreakdownMetricHint>
-						<ScoreBreakdownMetricHint
-							label={SCORE_BREAKDOWN_TOOLTIPS.subcapabilityScore}
-							className="text-right text-body-sm tabular-nums text-foreground"
+							<ScoreBreakdownMetricHint
+								label={SCORE_BREAKDOWN_TOOLTIPS.subcapabilityWeight}
+								className="block w-full text-right text-body-sm tabular-nums text-muted-foreground"
+							>
+								{formatCapabilityWeight(sub.weight)}
+							</ScoreBreakdownMetricHint>
+						</div>
+						<div
+							className={cn(
+								scoreBreakdownSurfaceClass,
+								scoreBreakdownMetricTriggerCellClass,
+								'text-foreground',
+							)}
 						>
-							<ScoreOrMissing score={sub.score} />
-						</ScoreBreakdownMetricHint>
+							<ScoreBreakdownMetricHint
+								label={SCORE_BREAKDOWN_TOOLTIPS.subcapabilityScore}
+								className="block w-full text-right text-body-sm tabular-nums text-foreground"
+							>
+								<ScoreOrMissing score={sub.score} />
+							</ScoreBreakdownMetricHint>
+						</div>
 					</AccordionTrigger>
 					<AccordionContent
 						className={cn(
@@ -780,11 +808,12 @@ function CapabilityCategoryDetailBody({
 										className={cn(
 											scoreBreakdownSurfaceClass,
 											scoreBreakdownMetricCellClass,
+											'flex items-center justify-end',
 										)}
 									>
 										<ScoreBreakdownMetricHint
 											label={SCORE_BREAKDOWN_TOOLTIPS.benchmarkWeight}
-											className="block text-right text-body-sm tabular-nums text-muted-foreground"
+											className="block w-full text-right text-body-sm tabular-nums text-muted-foreground"
 										>
 											{formatCapabilityWeight(benchmark.weight)}
 										</ScoreBreakdownMetricHint>
@@ -794,11 +823,12 @@ function CapabilityCategoryDetailBody({
 										className={cn(
 											scoreBreakdownSurfaceClass,
 											scoreBreakdownMetricCellClass,
+											'flex items-center justify-end',
 										)}
 									>
 										<ScoreBreakdownMetricHint
 											label={SCORE_BREAKDOWN_TOOLTIPS.benchmarkScore}
-											className="block text-right text-body-sm tabular-nums text-foreground"
+											className="block w-full text-right text-body-sm tabular-nums text-foreground"
 										>
 											<ScoreOrMissing
 												score={benchmark.score}
@@ -1150,6 +1180,7 @@ function RouteComponent() {
 	const scrollRootRef = useRef<HTMLDivElement | null>(null)
 	const [activeNav, setActiveNav] = useState<SectionId>('overview')
 	const [capabilitiesExpanded, setCapabilitiesExpanded] = useState(false)
+	const [performanceTableView, setPerformanceTableView] = useState(false)
 
 	useEffect(() => {
 		setCapabilitiesExpanded(false)
@@ -1194,6 +1225,10 @@ function RouteComponent() {
 	)
 	const providerRows = useMemo(
 		() => (model ? getModelCatalogProviderRows(model) : []),
+		[model],
+	)
+	const performanceBenchmark = useMemo(
+		() => (model ? getModelPerformanceBenchmark(model) : null),
 		[model],
 	)
 	const assignRef = useCallback(
@@ -1272,7 +1307,15 @@ function RouteComponent() {
 					<BackToPrevious to={returnTo} label={`Back to ${returnLabel}`} />
 
 					<div className="flex items-start gap-10 rounded-lg">
-						<NavRail active={activeNav} onSelect={scrollToSection} />
+						<NavRail
+							active={activeNav}
+							onSelect={scrollToSection}
+							items={
+								performanceBenchmark
+									? NAV
+									: NAV.filter((item) => item.id !== 'performance')
+							}
+						/>
 
 						<div className="flex min-w-0 flex-1 flex-col gap-4">
 							<ModelLifecycleAlert model={model} />
@@ -1472,16 +1515,16 @@ function RouteComponent() {
 											</p>
 										</StatColumn>
 										<StatColumn showDivider>
-											<div className="flex flex-wrap items-baseline gap-2">
+											<div className="flex flex-nowrap items-baseline gap-2 whitespace-nowrap">
 												<p
 													className={cn(
-														'text-h1 font-bold tabular-nums',
+														'shrink-0 text-h1 font-bold tabular-nums',
 														kpiValueToneClass(inputPrice),
 													)}
 												>
 													{inputPrice}
 												</p>
-												<span className="flex min-w-0 flex-1 items-center gap-1 text-body-sm text-muted-foreground">
+												<span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-body-sm text-muted-foreground">
 													€ / 1M
 													<Tooltip>
 														<TooltipTrigger asChild>
@@ -1506,16 +1549,16 @@ function RouteComponent() {
 											</p>
 										</StatColumn>
 										<StatColumn>
-											<div className="flex flex-wrap items-baseline gap-2">
+											<div className="flex flex-nowrap items-baseline gap-1 whitespace-nowrap">
 												<p
 													className={cn(
-														'text-h1 font-bold tabular-nums',
+														'shrink-0 text-h1 font-bold tabular-nums',
 														kpiValueToneClass(outputPrice),
 													)}
 												>
 													{outputPrice}
 												</p>
-												<span className="flex min-w-0 flex-1 items-center gap-1 text-body-sm text-muted-foreground">
+												<span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-body-sm text-muted-foreground">
 													€ / 1M
 													<Tooltip>
 														<TooltipTrigger asChild>
@@ -1942,7 +1985,7 @@ function RouteComponent() {
 								ref={assignRef('providers')}
 								data-section="providers"
 								id="model-detail-providers"
-								className="mb-[30vh] flex min-w-0 flex-col gap-4 rounded-lg border border-border bg-card px-6 py-6 shadow-sm"
+								className="flex min-w-0 flex-col gap-4 rounded-lg border border-border bg-card px-6 py-6 shadow-sm"
 							>
 								<SectionTitle>Providers</SectionTitle>
 								<div className="min-w-0">
@@ -2005,6 +2048,49 @@ function RouteComponent() {
 									</div>
 								</div>
 							</div>
+
+							{performanceBenchmark ? (
+								<div
+									ref={assignRef('performance')}
+									data-section="performance"
+									id="model-detail-performance"
+									className="mb-[30vh] flex min-w-0 flex-col gap-4 rounded-lg border border-border bg-white px-6 py-6 shadow-sm"
+								>
+									<div className="flex min-w-0 items-start justify-between gap-4">
+										<div className="flex min-w-0 flex-col gap-1">
+											<SectionTitle>Performance</SectionTitle>
+											<p className="max-w-page-intro text-body-sm text-muted-foreground">
+												Review benchmark results across workloads to balance
+												speed, responsiveness, and energy efficiency for your
+												use case.
+											</p>
+										</div>
+										<div className="flex shrink-0 items-center gap-2">
+											<PerformanceBenchmarkDetailsSheet
+												benchmark={performanceBenchmark}
+												showTableView={performanceTableView}
+												onShowTableViewChange={setPerformanceTableView}
+											>
+												<Button
+													variant="outline"
+													size="sm"
+													className="shrink-0 shadow-xs"
+												>
+													Performance details
+												</Button>
+											</PerformanceBenchmarkDetailsSheet>
+											<PerformanceBenchmarkMetadataDialog
+												benchmark={performanceBenchmark}
+											/>
+										</div>
+									</div>
+									<div className="min-w-0">
+										<ModelPerformanceBenchmarkSection
+											benchmark={performanceBenchmark}
+										/>
+									</div>
+								</div>
+							) : null}
 						</div>
 					</div>
 				</div>

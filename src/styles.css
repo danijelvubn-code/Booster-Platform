@@ -203,6 +203,7 @@
     --sheet-size-md: 35rem; /* 560px */
     --sheet-size-lg: 40rem; /* 640px */
     --sheet-size-xl: 45rem; /* 720px */
+    --sheet-size-xxl: 57.5rem; /* 920px */
     --chart-height-sm: 15rem; /* 240px */
     --chart-height-md: 18.75rem; /* 300px */
     /* Control Panel — illustrated cards (First Time User, Login; object-contain preserves aspect ratio). */
@@ -414,6 +415,7 @@
     --sheet-size-md: 35rem; /* 560px */
     --sheet-size-lg: 40rem; /* 640px */
     --sheet-size-xl: 45rem; /* 720px */
+    --sheet-size-xxl: 57.5rem; /* 920px */
     --components-dropdown-max-height: 520px;
     --cosmos-card-height: 152px;
     --cosmos-card-basic-height: var(--cosmos-card-height);
@@ -682,5 +684,10 @@
   .sm\:w-sheet-xl {
     width: var(--sheet-size-xl);
     max-width: var(--sheet-size-xl);
+  }
+
+  .sm\:w-sheet-xxl {
+    width: var(--sheet-size-xxl);
+    max-width: var(--sheet-size-xxl);
   }
 }

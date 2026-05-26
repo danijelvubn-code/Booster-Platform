@@ -14,6 +14,7 @@ export const sheetWidthClasses = {
 	md: 'max-sm:w-3/4 sm:w-sheet-md',
 	lg: 'max-sm:w-3/4 sm:w-sheet-lg',
 	xl: 'max-sm:w-3/4 sm:w-sheet-xl',
+	xxl: 'max-sm:w-3/4 sm:w-sheet-xxl',
 } as const
 
 export type SheetWidth = keyof typeof sheetWidthClasses

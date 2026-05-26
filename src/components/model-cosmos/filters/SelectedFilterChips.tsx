@@ -25,17 +25,17 @@ export function SelectedFilterChips({
 					key={c.key}
 					className={cn(
 						badgeVariants({
-							variant: 'secondary',
+							variant: 'outline',
 							appearance: 'pill',
-							size: '24',
+							size: '28',
 						}),
-						'max-w-full min-w-0 pr-1 font-normal',
+						'max-w-full min-w-0 border-border bg-white pr-1 font-normal text-foreground hover:border-border hover:bg-white',
 					)}
 				>
 					<span className="min-w-0 max-w-[240px] truncate">{c.label}</span>
 					<button
 						type="button"
-						className="inline-flex shrink-0 items-center justify-center rounded-sm p-0.5 hover:bg-background/80"
+						className="inline-flex shrink-0 items-center justify-center rounded-sm p-0.5 hover:bg-muted/60"
 						onClick={c.onRemove}
 						aria-label={`Remove ${c.label}`}
 					>

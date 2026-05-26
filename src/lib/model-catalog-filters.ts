@@ -1,6 +1,5 @@
 import { models } from '@/data/mockData'
 import {
-	getModelHostingProviders,
 	HOSTING_PROVIDER_BOOSTER,
 } from '@/data/model-hosting-providers'
 import type { ModelRecord } from '@/lib/model-metrics'
@@ -180,16 +179,13 @@ function contextMinTokens(preset: ContextWindowPreset): number {
 
 export function modelMatchesProvider(model: ModelRecord, providers: string[]) {
 	if (providers.length === 0) return true
-	const hostingProviders = getModelHostingProviders(model)
-	return providers.some((provider) => hostingProviders.includes(provider))
+	return providers.includes(model.hosting)
 }
 
 export function providerOptionCounts(catalog: typeof models) {
 	const counts = new Map<string, number>()
 	for (const model of catalog) {
-		for (const provider of getModelHostingProviders(model)) {
-			counts.set(provider, (counts.get(provider) ?? 0) + 1)
-		}
+		counts.set(model.hosting, (counts.get(model.hosting) ?? 0) + 1)
 	}
 	return counts
 }
@@ -197,9 +193,7 @@ export function providerOptionCounts(catalog: typeof models) {
 export function allProviderOptions(catalog: typeof models): string[] {
 	const set = new Set<string>()
 	for (const model of catalog) {
-		for (const provider of getModelHostingProviders(model)) {
-			set.add(provider)
-		}
+		set.add(model.hosting)
 	}
 	return [...set].sort((a, b) => a.localeCompare(b))
 }

@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useLocation } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
-import { Box, Check, Copy, Settings } from 'lucide-react'
+import { Check, Copy, RefreshCw, Settings } from 'lucide-react'
 import { BackButton } from '@/components/BackButton'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -30,6 +30,8 @@ import {
 	getModelProviderLogoSrc,
 	getProviderInitials,
 } from '@/lib/model-provider-logos'
+import { EndpointStatusBadge } from '@/components/endpoint/EndpointStatusBadge'
+import { resolveEndpointStatus } from '@/lib/endpoint-status'
 import { toastMessages } from '@/lib/toast-messages'
 import { cn } from '@/lib/utils'
 
@@ -367,11 +369,14 @@ function RouteComponent() {
 							<div className="flex min-w-0 flex-1 flex-col gap-1">
 								<div className="flex flex-wrap items-center gap-2">
 									<IconBox size="xxxlg" shape="square" className="bg-primary/10">
-										<Box className="text-primary" aria-hidden />
+										<RefreshCw className="text-primary" aria-hidden />
 									</IconBox>
 									<h1 className="text-3xl font-bold tracking-tight text-foreground">
 										{endpoint.name}
 									</h1>
+									<EndpointStatusBadge
+										status={resolveEndpointStatus(endpoint)}
+									/>
 								</div>
 								<div className="flex min-w-0 items-center gap-2 text-hierarchy-secondary">
 									<p className="min-w-0 break-all font-mono text-body-sm">

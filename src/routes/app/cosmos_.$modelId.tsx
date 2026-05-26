@@ -11,6 +11,7 @@ import {
 	Brain,
 	BrainCircuit,
 	ChevronDown,
+	Cloud,
 	CircleStop,
 	Code2,
 	Eye,
@@ -55,7 +56,7 @@ import { ModelLifecycleAlert } from '@/components/model-detail/ModelLifecycleAle
 import {
 	ModelPerformanceBenchmarkSection,
 	PerformanceBenchmarkDetailsSheet,
-	PerformanceBenchmarkMetadataDialog,
+	type PerformanceBenchmarkView,
 } from '@/components/model-detail/ModelPerformanceBenchmarkSection'
 import {
 	Accordion,
@@ -82,7 +83,7 @@ import {
 	TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { models } from '@/data/mockData'
-import { getModelCatalogProviderRows } from '@/data/model-hosting-providers'
+import { getModelHostingProvider } from '@/data/model-hosting-providers'
 import { getModelPerformanceBenchmark } from '@/data/modelPerformanceBenchmark'
 import {
 	formatCapabilityWeight,
@@ -536,7 +537,7 @@ function CapabilityScoreRow({ row }: { row: CapabilityScoreRowData }) {
 					value={row.score}
 					size="dense"
 					className="bg-muted"
-					indicatorClassName="bg-muted-foreground"
+					indicatorClassName="bg-foreground/75"
 				/>
 			</div>
 			<span className="w-10 shrink-0 text-right text-body font-semibold tabular-nums text-foreground">
@@ -562,7 +563,8 @@ function capabilityAccordionFromModel(model: ModelRecord) {
 }
 
 /** Shared column template: benchmark | weight | score */
-const SCORE_BREAKDOWN_COLS = 'grid-cols-[minmax(0,1fr)_4.5rem_3.5rem]' as const
+const SCORE_BREAKDOWN_COLS =
+	'grid-cols-[minmax(0,1fr)_112px_112px]' as const
 
 /** Top-level capability row: white at rest, muted gray on bar hover only. */
 const capabilityLevelBarClass =
@@ -574,14 +576,22 @@ const scoreBreakdownSubcapabilityIndentClass = 'pl-[48px]'
 const scoreBreakdownBenchmarkIndentClass = '!pl-[76px]'
 const scoreBreakdownBenchmarkCellClass =
 	'!py-3 !pr-4 !pl-[76px] align-middle text-left text-body-sm text-muted-foreground'
-const scoreBreakdownMetricCellClass =
-	'!py-3 !px-3 align-middle text-right text-body-sm tabular-nums text-muted-foreground'
+const scoreBreakdownMetricColClass =
+	'w-[112px] max-w-[112px] shrink-0 justify-end text-right tabular-nums !pr-6'
+const scoreBreakdownMetricCellClass = cn(
+	scoreBreakdownMetricColClass,
+	'!py-3 !pl-3 align-middle text-body-sm text-muted-foreground',
+)
 const scoreBreakdownBenchmarkHeadClass =
 	'!h-10 !py-0 !pr-4 !pl-[76px] align-middle text-left text-label font-medium text-muted-foreground'
-const scoreBreakdownMetricHeadClass =
-	'!h-10 !py-0 !px-3 align-middle text-right text-label font-medium text-muted-foreground'
-const scoreBreakdownMetricTriggerCellClass =
-	'flex !px-3 items-center justify-end self-stretch text-right text-body-sm tabular-nums'
+const scoreBreakdownMetricHeadClass = cn(
+	scoreBreakdownMetricColClass,
+	'!h-10 !py-0 !pl-3 align-middle text-label font-medium text-muted-foreground flex items-center',
+)
+const scoreBreakdownMetricTriggerCellClass = cn(
+	scoreBreakdownMetricColClass,
+	'flex !pl-3 items-center self-stretch text-body-sm',
+)
 
 function ScoreBreakdownInsetDivider({
 	indentClass,
@@ -751,7 +761,6 @@ function CapabilityCategoryDetailBody({
 									className={cn(
 										scoreBreakdownSurfaceClass,
 										scoreBreakdownMetricHeadClass,
-										'flex h-10 items-center justify-end',
 									)}
 								>
 									Weight
@@ -761,7 +770,6 @@ function CapabilityCategoryDetailBody({
 									className={cn(
 										scoreBreakdownSurfaceClass,
 										scoreBreakdownMetricHeadClass,
-										'flex h-10 items-center justify-end',
 									)}
 								>
 									Score
@@ -793,7 +801,7 @@ function CapabilityCategoryDetailBody({
 										className={cn(
 											scoreBreakdownSurfaceClass,
 											scoreBreakdownMetricCellClass,
-											'flex items-center justify-end',
+											'flex items-center',
 										)}
 									>
 										<ScoreBreakdownMetricHint
@@ -808,7 +816,7 @@ function CapabilityCategoryDetailBody({
 										className={cn(
 											scoreBreakdownSurfaceClass,
 											scoreBreakdownMetricCellClass,
-											'flex items-center justify-end',
+											'flex items-center',
 										)}
 									>
 										<ScoreBreakdownMetricHint
@@ -870,7 +878,8 @@ function normalizeModel(model: ModelRecord): ModelYaml {
 		},
 		origin: model.provider,
 		format: 'API',
-		quantization: null,
+		quantization:
+			'quantization' in model && model.quantization ? model.quantization : null,
 		dtype: 'bf16',
 		parameters,
 		min_memory_bytes: Math.max(parameters * 2, 0),
@@ -1165,7 +1174,8 @@ function RouteComponent() {
 	const scrollRootRef = useRef<HTMLDivElement | null>(null)
 	const [activeNav, setActiveNav] = useState<SectionId>('overview')
 	const [capabilitiesExpanded, setCapabilitiesExpanded] = useState(false)
-	const [performanceTableView, setPerformanceTableView] = useState(false)
+	const [performanceView, setPerformanceView] =
+		useState<PerformanceBenchmarkView>('chart')
 
 	useEffect(() => {
 		setCapabilitiesExpanded(false)
@@ -1207,10 +1217,6 @@ function RouteComponent() {
 	const specRows = useMemo(
 		() => (modelYaml ? specRowsFromYaml(modelYaml) : []),
 		[modelYaml],
-	)
-	const providerRows = useMemo(
-		() => (model ? getModelCatalogProviderRows(model) : []),
-		[model],
 	)
 	const performanceBenchmark = useMemo(
 		() => (model ? getModelPerformanceBenchmark(model) : null),
@@ -1268,6 +1274,7 @@ function RouteComponent() {
 			: MISSING_VALUE_PLACEHOLDER
 	const endpointsNewPath = '/app/endpoints/create_endpoint'
 	const deployAllowed = canCreateInferenceEndpoint(model)
+	const hostingProvider = getModelHostingProvider(model)
 	const paramLabel = formatParameters(modelYaml.parameters)
 	const ctxShort = formatContextWindow(modelYaml.max_context_length)
 	const { memoryValue, memoryNumber, memoryUnit } = formatMemoryKpi(
@@ -1394,19 +1401,16 @@ function RouteComponent() {
 
 											<div className="flex flex-wrap items-center justify-between gap-3">
 												<div className="flex min-w-0 flex-wrap items-center gap-2">
+													<OverviewMetaChip icon={Cloud}>
+														<span className="min-w-0 truncate text-foreground">
+															{hostingProvider}
+														</span>
+													</OverviewMetaChip>
 													<OverviewMetaChip icon={Scale}>
 														<span className="min-w-0 truncate text-muted-foreground">
 															License:{' '}
 															<span className="text-foreground">
 																{modelYaml.license ?? '-'}
-															</span>
-														</span>
-													</OverviewMetaChip>
-													<OverviewMetaChip icon={Share2}>
-														<span className="min-w-0 truncate text-muted-foreground">
-															Providers:{' '}
-															<span className="text-foreground">
-																{providerRows.length}
 															</span>
 														</span>
 													</OverviewMetaChip>
@@ -1445,7 +1449,7 @@ function RouteComponent() {
 								</div>
 							</div>
 
-							<div className="flex min-w-0 flex-col gap-8 overflow-x-clip rounded-lg border border-border bg-card shadow-sm">
+							<div className="flex min-w-0 flex-col gap-8 overflow-x-clip rounded-lg bg-card shadow-sm">
 								<div className="px-6 pt-8">
 									<div className="flex flex-wrap items-stretch gap-5 md:flex-nowrap">
 										<StatColumn isFirst showDivider>
@@ -1633,7 +1637,7 @@ function RouteComponent() {
 																className="text-[20px] font-semibold tabular-nums leading-none text-foreground"
 															/>
 															<p className="text-caption text-muted-foreground">
-																AI Index
+																CAPABILITIES SCORE
 															</p>
 														</div>
 													</div>
@@ -1666,7 +1670,7 @@ function RouteComponent() {
 																<AccordionTrigger
 																	className={cn(
 																		capabilityLevelBarClass,
-																		'h-20 items-center gap-3 px-4 py-0 text-left text-body-sm hover:no-underline [&>svg:last-child]:hidden [&[data-state=open]>svg:first-child]:rotate-180',
+																		'h-20 items-center gap-3 pl-4 !pr-6 py-0 text-left text-body-sm hover:no-underline [&>svg:last-child]:hidden [&[data-state=open]>svg:first-child]:rotate-180',
 																		isFirst && 'rounded-t-lg',
 																		isLast && 'rounded-b-lg',
 																	)}
@@ -1936,7 +1940,7 @@ function RouteComponent() {
 								ref={assignRef('sources')}
 								data-section="sources"
 								id="model-detail-sources"
-								className="flex min-w-0 gap-16 rounded-lg border border-border bg-card px-6 py-6 shadow-sm max-lg:flex-col max-lg:gap-6"
+								className="flex min-w-0 gap-16 rounded-lg bg-card px-6 py-6 shadow-sm max-lg:flex-col max-lg:gap-6"
 							>
 								<SectionTitle className="w-[124px] min-w-[124px] basis-[124px]">
 									Sources
@@ -1971,7 +1975,7 @@ function RouteComponent() {
 									ref={assignRef('performance')}
 									data-section="performance"
 									id="model-detail-performance"
-									className="mb-[30vh] flex min-w-0 flex-col gap-4 rounded-lg border border-border bg-white px-6 py-6 shadow-sm"
+									className="mb-[30vh] flex min-w-0 flex-col gap-4 rounded-lg bg-white px-6 py-6 shadow-sm"
 								>
 									<div className="flex min-w-0 items-start justify-between gap-4">
 										<div className="flex min-w-0 flex-col gap-1">
@@ -1985,8 +1989,8 @@ function RouteComponent() {
 										<div className="flex shrink-0 items-center gap-2">
 											<PerformanceBenchmarkDetailsSheet
 												benchmark={performanceBenchmark}
-												showTableView={performanceTableView}
-												onShowTableViewChange={setPerformanceTableView}
+												view={performanceView}
+												onViewChange={setPerformanceView}
 											>
 												<Button
 													variant="outline"
@@ -1996,9 +2000,6 @@ function RouteComponent() {
 													Performance details
 												</Button>
 											</PerformanceBenchmarkDetailsSheet>
-											<PerformanceBenchmarkMetadataDialog
-												benchmark={performanceBenchmark}
-											/>
 										</div>
 									</div>
 									<div className="min-w-0">

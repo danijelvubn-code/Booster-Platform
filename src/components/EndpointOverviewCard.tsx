@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { Box, Link2, MoreHorizontal, Trash2 } from 'lucide-react'
+import { Link2, MoreHorizontal, RefreshCw, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -10,13 +10,21 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { IconBox } from '@/components/ui/icon-box'
+import { EndpointStatusBadge } from '@/components/endpoint/EndpointStatusBadge'
 import { Progress } from '@/components/ui/progress'
 import type { endpoints } from '@/data/mockData'
+import {
+	resolveEndpointStatus,
+} from '@/lib/endpoint-status'
 import { cn } from '@/lib/utils'
 
 export type EndpointOverviewRecord = (typeof endpoints)[number]
 
 export type EndpointOverviewCardVariant = 'full' | 'basic'
+
+const endpointCardSurfaceClass =
+	'border border-transparent shadow-sm hover:border-primary/40 hover:shadow-md transition duration-200 ease-standard'
 
 const endpointTypeBadgeProps = (type: string) => {
 	if (type === 'Production')
@@ -24,6 +32,18 @@ const endpointTypeBadgeProps = (type: string) => {
 	if (type === 'POC')
 		return { variant: 'warning' as const, appearance: 'ghost' as const }
 	return { variant: 'secondary' as const, appearance: 'ghost' as const }
+}
+
+function EndpointIcon({ className }: { className?: string }) {
+	return (
+		<IconBox
+			size="xlg"
+			shape="square"
+			className={cn('shrink-0 bg-primary/4', className)}
+		>
+			<RefreshCw className="text-primary" aria-hidden />
+		</IconBox>
+	)
 }
 
 type EndpointOverviewCardProps = {
@@ -44,7 +64,8 @@ function EndpointOverviewCardBasic({
 	return (
 		<Card
 			className={cn(
-				'border border-border bg-card shadow-xs transition duration-200 ease-standard hover:border-primary/40 hover:shadow-md',
+				endpointCardSurfaceClass,
+				'bg-card',
 				className,
 			)}
 		>
@@ -55,14 +76,15 @@ function EndpointOverviewCardBasic({
 					search={{ returnTo: '/app/overview', returnLabel: 'Endpoints' }}
 					className="flex flex-col gap-3 text-left outline-none ring-offset-background focus-visible:rounded-md focus-visible:ring-2 focus-visible:ring-ring"
 				>
-					<div className="flex min-w-0 items-start gap-2">
-						<Box
-							className="mt-0.5 h-icon-20 w-icon-20 shrink-0 text-primary"
-							aria-hidden
-						/>
+					<div className="flex min-w-0 items-center gap-2">
+						<EndpointIcon />
 						<span className="min-w-0 flex-1 truncate text-body-strong text-foreground">
 							{endpoint.name}
 						</span>
+						<EndpointStatusBadge
+							status={resolveEndpointStatus(endpoint)}
+							size="24"
+						/>
 					</div>
 					<div className="flex min-w-0 items-center gap-1">
 						<Link2
@@ -107,7 +129,8 @@ function EndpointOverviewCardFull({
 	return (
 		<Card
 			className={cn(
-				'border border-border bg-card shadow-xs transition duration-200 ease-standard hover:border-primary/40 hover:shadow-md',
+				endpointCardSurfaceClass,
+				'bg-card',
 				className,
 			)}
 		>
@@ -124,6 +147,10 @@ function EndpointOverviewCardFull({
 								<span className="text-body-strong text-foreground">
 									{endpoint.name}
 								</span>
+								<EndpointStatusBadge
+									status={resolveEndpointStatus(endpoint)}
+									size="24"
+								/>
 								<Badge
 									variant={typeProps.variant}
 									appearance={typeProps.appearance}
@@ -150,12 +177,6 @@ function EndpointOverviewCardFull({
 								appearance="ghost"
 								size="24"
 								className="rounded-md"
-								leadingIcon={
-									<Box
-										className="h-icon-16 w-icon-16 text-muted-foreground"
-										aria-hidden
-									/>
-								}
 							>
 								{endpoint.defaultDeployment}
 							</Badge>
@@ -263,4 +284,4 @@ export function EndpointOverviewCard({
 	)
 }
 
-export { EndpointOverviewCardBasic, EndpointOverviewCardFull }
+export { EndpointOverviewCardBasic, EndpointOverviewCardFull, EndpointIcon }

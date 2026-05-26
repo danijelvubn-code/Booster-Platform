@@ -394,7 +394,7 @@ function RouteComponent() {
 				defaultDeployment: selectedModel.name,
 				description: useCase.trim(),
 				budgetUsed: 0,
-				health: 'OK',
+				status: 'Running',
 				monthlySpend: 0,
 				inputTokens: 0,
 				outputTokens: 0,
@@ -424,7 +424,10 @@ function RouteComponent() {
 			toast.success('Inference endpoint deployed', {
 				description: `"${endpointName.trim()}" is live on ${selectedProvider.provider}.`,
 			})
-			navigate({ to: '/app/overview' })
+			navigate({
+				to: '/app/endpoints/$endpointId',
+				params: { endpointId: newEndpointId },
+			})
 		}, 900)
 	}
 

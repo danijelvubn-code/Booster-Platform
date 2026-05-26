@@ -21,15 +21,6 @@ import {
 	AccordionTrigger,
 } from '@/components/ui/accordion'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
-} from '@/components/ui/dialog'
 import { Sheet, SheetTrigger } from '@/components/ui/sheet'
 import {
 	Table,
@@ -338,7 +329,9 @@ function MetadataRow({ label, value }: { label: string; value: string }) {
 	)
 }
 
-export function PerformanceBenchmarkMetadataDialog({
+export type PerformanceBenchmarkView = 'chart' | 'table' | 'details'
+
+function PerformanceBenchmarkMetadataContent({
 	benchmark,
 }: {
 	benchmark: ModelPerformanceBenchmark
@@ -346,52 +339,46 @@ export function PerformanceBenchmarkMetadataDialog({
 	const { metadata } = benchmark
 
 	return (
-		<Dialog>
-			<DialogTrigger asChild>
-				<Button variant="outline" size="sm" className="shrink-0 shadow-xs">
-					Experiment details
-				</Button>
-			</DialogTrigger>
-			<DialogContent className="sm:max-w-lg">
-				<DialogHeader>
-					<DialogTitle>Experiment details</DialogTitle>
-					<DialogDescription>{metadata.description}</DialogDescription>
-				</DialogHeader>
-				<dl className="grid gap-3 pt-2">
-					<MetadataRow label="Experiment" value={metadata.experiment_id} />
-					<MetadataRow label="Deployment" value={metadata.deployment_id} />
-					<MetadataRow label="Model" value={metadata.model} />
-					<MetadataRow label="Hardware" value={metadata.hardware} />
-					<MetadataRow label="Provider" value={metadata.provider} />
-					<MetadataRow label="Image" value={metadata.image} />
-					<MetadataRow label="Timestamp" value={metadata.timestamp} />
-				</dl>
-			</DialogContent>
-		</Dialog>
+		<div className="space-y-4">
+			<p className="text-body-sm text-muted-foreground">{metadata.description}</p>
+			<dl className="grid gap-3">
+				<MetadataRow label="Experiment" value={metadata.experiment_id} />
+				<MetadataRow label="Deployment" value={metadata.deployment_id} />
+				<MetadataRow label="Model" value={metadata.model} />
+				<MetadataRow label="Hardware" value={metadata.hardware} />
+				<MetadataRow label="Provider" value={metadata.provider} />
+				<MetadataRow label="Image" value={metadata.image} />
+				<MetadataRow label="Timestamp" value={metadata.timestamp} />
+			</dl>
+		</div>
 	)
 }
 
 export function PerformanceBenchmarkViewTabs({
-	showTableView,
-	onShowTableViewChange,
+	view,
+	onViewChange,
 }: {
-	showTableView: boolean
-	onShowTableViewChange: (showTableView: boolean) => void
+	view: PerformanceBenchmarkView
+	onViewChange: (view: PerformanceBenchmarkView) => void
 }) {
 	return (
 		<Tabs
-			value={showTableView ? 'table' : 'chart'}
-			onValueChange={(value) => onShowTableViewChange(value === 'table')}
+			value={view}
+			onValueChange={(value) => onViewChange(value as PerformanceBenchmarkView)}
 			size="sm"
 		>
 			<TabsList>
+				<TabsTrigger value="table" className="gap-1.5">
+					<Table2 aria-hidden />
+					Table view
+				</TabsTrigger>
 				<TabsTrigger value="chart" className="gap-1.5">
 					<LineChart aria-hidden />
 					Chart view
 				</TabsTrigger>
-				<TabsTrigger value="table" className="gap-1.5">
-					<Table2 aria-hidden />
-					Table view
+				<TabsTrigger value="details" className="gap-1.5">
+					<FileText aria-hidden />
+					Experiment details
 				</TabsTrigger>
 			</TabsList>
 		</Tabs>
@@ -561,13 +548,13 @@ function WorkloadDetailsContent({
 
 export function PerformanceBenchmarkDetailsSheet({
 	benchmark,
-	showTableView,
-	onShowTableViewChange,
+	view,
+	onViewChange,
 	children,
 }: {
 	benchmark: ModelPerformanceBenchmark
-	showTableView: boolean
-	onShowTableViewChange: (showTableView: boolean) => void
+	view: PerformanceBenchmarkView
+	onViewChange: (view: PerformanceBenchmarkView) => void
 	children: ReactNode
 }) {
 	return (
@@ -580,19 +567,21 @@ export function PerformanceBenchmarkDetailsSheet({
 				toolbar={
 					<div className="flex items-center px-6 py-3">
 						<PerformanceBenchmarkViewTabs
-							showTableView={showTableView}
-							onShowTableViewChange={onShowTableViewChange}
+							view={view}
+							onViewChange={onViewChange}
 						/>
 					</div>
 				}
-				footer={
-					showTableView ? undefined : <WorkloadMeasurementsChartLegend />
-				}
+				footer={view === 'chart' ? <WorkloadMeasurementsChartLegend /> : undefined}
 			>
-				<WorkloadDetailsContent
-					benchmark={benchmark}
-					showTableView={showTableView}
-				/>
+				{view === 'details' ? (
+					<PerformanceBenchmarkMetadataContent benchmark={benchmark} />
+				) : (
+					<WorkloadDetailsContent
+						benchmark={benchmark}
+						showTableView={view === 'table'}
+					/>
+				)}
 			</AppSideSheetContent>
 		</Sheet>
 	)

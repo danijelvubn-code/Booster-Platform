@@ -143,5 +143,7 @@ export {
   Content as C,
   Root as R,
   Trigger as T,
+  CollapsibleContent as a,
+  CollapsibleTrigger as b,
   createCollapsibleScope as c
 };

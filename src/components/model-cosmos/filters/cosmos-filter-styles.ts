@@ -11,6 +11,6 @@ export function filterToolbarButtonClassName(active: boolean) {
 	return cn(
 		'gap-1 rounded-md border border-input bg-card px-2.5 text-body-sm font-medium shadow-xs transition-colors ease-standard hover:border-ring',
 		active &&
-			'border-primary/60 bg-primary/5 hover:border-primary hover:bg-primary/10',
+			'border-primary/60 bg-white hover:border-primary hover:bg-white',
 	)
 }

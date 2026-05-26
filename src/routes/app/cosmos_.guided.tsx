@@ -13,7 +13,7 @@ import { PageContainer } from '@/components/layout/PageContainer'
 import {
 	ModelPerformanceBenchmarkSection,
 	PerformanceBenchmarkDetailsSheet,
-	PerformanceBenchmarkMetadataDialog,
+	type PerformanceBenchmarkView,
 } from '@/components/model-detail/ModelPerformanceBenchmarkSection'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -79,7 +79,8 @@ function RouteComponent() {
 	const [loadedProfileId, setLoadedProfileId] = useState<string | null>(
 		initial.profileId,
 	)
-	const [performanceTableView, setPerformanceTableView] = useState(false)
+	const [performanceView, setPerformanceView] =
+		useState<PerformanceBenchmarkView>('chart')
 
 	// Computed values
 	const results = useMemo(() => scoreModels(state), [state])
@@ -202,8 +203,8 @@ function RouteComponent() {
 						<div className="flex shrink-0 items-center gap-2">
 							<PerformanceBenchmarkDetailsSheet
 								benchmark={QWEN35_27B_PERFORMANCE_BENCHMARK}
-								showTableView={performanceTableView}
-								onShowTableViewChange={setPerformanceTableView}
+								view={performanceView}
+								onViewChange={setPerformanceView}
 							>
 								<Button
 									variant="outline"
@@ -213,9 +214,6 @@ function RouteComponent() {
 									Performance details
 								</Button>
 							</PerformanceBenchmarkDetailsSheet>
-							<PerformanceBenchmarkMetadataDialog
-								benchmark={QWEN35_27B_PERFORMANCE_BENCHMARK}
-							/>
 						</div>
 					</div>
 					<ModelPerformanceBenchmarkSection

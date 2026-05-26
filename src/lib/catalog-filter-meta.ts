@@ -250,11 +250,9 @@ export function getCatalogQuantizations(
 	model: ModelRecord,
 ): QuantizationLabel[] {
 	const out: QuantizationLabel[] = ['None']
-	if (
-		getParamBillions(model) != null &&
-		(getParamBillions(model) as number) >= 50
-	) {
-		out.push('int8')
-	}
+	const quantization =
+		'quantization' in model ? model.quantization : undefined
+	if (quantization === 'INT8') out.push('int8')
+	if (quantization === 'INT4') out.push('int4')
 	return out
 }

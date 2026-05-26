@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { endpoints, models } from '@/data/mockData'
+import { getEndpointStatusLabel, resolveEndpointStatus } from '@/lib/endpoint-status'
 
 export const Route = createFileRoute('/app/deploy')({
 	validateSearch: (search: Record<string, unknown>) => ({
@@ -134,8 +135,8 @@ function RouteComponent() {
 										{endpoint.defaultDeployment}
 									</p>
 									<p>
-										<span className="font-medium text-foreground">Health:</span>{' '}
-										{endpoint.health}
+										<span className="font-medium text-foreground">Status:</span>{' '}
+										{getEndpointStatusLabel(resolveEndpointStatus(endpoint))}
 									</p>
 									<p>
 										<span className="font-medium text-foreground">Budget:</span>{' '}

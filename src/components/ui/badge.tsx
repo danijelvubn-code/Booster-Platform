@@ -202,10 +202,11 @@ function Badge({
 		</>
 	)
 
-	if (isDismissible) {
+	if (isDismissible || onClick) {
 		return (
 			<button
 				type="button"
+				tabIndex={isDismissible ? undefined : 0}
 				className={baseClassName}
 				onClick={handleClick}
 				onKeyDown={handleKeyDown}
@@ -217,16 +218,9 @@ function Badge({
 	}
 
 	return (
-		<button
-			type="button"
-			tabIndex={0}
-			className={baseClassName}
-			onClick={handleClick}
-			onKeyDown={handleKeyDown}
-			{...props}
-		>
+		<span className={baseClassName} {...props}>
 			{content}
-		</button>
+		</span>
 	)
 }
 

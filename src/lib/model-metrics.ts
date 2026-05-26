@@ -77,11 +77,17 @@ export function modelHasVisionCapability(model: ModelRecord): boolean {
 	})
 }
 
+export function modelIsQuantized(model: ModelRecord): boolean {
+	return 'quantization' in model && Boolean(model.quantization)
+}
+
 export function getModelSubline(model: ModelRecord): string {
 	const param = getModelParameterSizeLabel(model)
 	const version = `v${model.version}`
 	const type = getModelModalityLabel(model)
-	return `${version} · ${param} · ${type}`
+	const parts = [version, param, type]
+	if (modelIsQuantized(model)) parts.push('Quantized')
+	return parts.join(' · ')
 }
 
 /** Per-token price in EUR when `inputCostPer1M` is EUR per 1M tokens. */

@@ -233,7 +233,7 @@ function RouteComponent() {
 				type: endpointType,
 				defaultDeployment: selectedModel.name,
 				budgetUsed: 0,
-				health: 'OK',
+				status: 'Running',
 				monthlySpend: 0,
 				inputTokens: 0,
 				outputTokens: 0,

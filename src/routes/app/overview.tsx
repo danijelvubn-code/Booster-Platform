@@ -10,15 +10,25 @@ export const Route = createFileRoute('/app/overview')({
 	component: RouteComponent,
 })
 
-const overviewEndpoints = [...endpoints]
-	.filter((e) => e.id !== 'sp-default')
-	.sort((a, b) => b.budgetUsed - a.budgetUsed)
-	.slice(0, 4)
+function endpointListSortKey(id: string): number {
+	const numeric = Number(id.replace(/^sp-/, ''))
+	return Number.isFinite(numeric) ? numeric : 0
+}
+
+function getOverviewEndpoints() {
+	return [...endpoints]
+		.filter((endpoint) => endpoint.id !== 'sp-default')
+		.sort(
+			(a, b) => endpointListSortKey(b.id) - endpointListSortKey(a.id),
+		)
+}
 
 /**
  * MVP overview — leaner than post-MVP: no KPI tiles or charts, just the endpoints list.
  */
 function RouteComponent() {
+	const overviewEndpoints = getOverviewEndpoints()
+
 	return (
 		<>
 			<OnboardingModal />

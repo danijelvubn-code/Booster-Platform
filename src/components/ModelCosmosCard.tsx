@@ -1,4 +1,4 @@
-import { BrainCircuit, Eye } from 'lucide-react'
+import { BrainCircuit, Eye, ShieldCheck } from 'lucide-react'
 import { Fragment } from 'react'
 import { EnergyScorePill } from '@/components/EnergyScorePill'
 import { MetricCell, MetricsRow } from '@/components/metrics'
@@ -11,6 +11,7 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { HOSTING_PROVIDER_BOOSTER } from '@/data/model-hosting-providers'
 import {
 	formatContextLength,
 	formatEurPer1MForDisplay,
@@ -44,6 +45,36 @@ type ModelCosmosCardProps = {
 
 const cosmosCardSurfaceClass =
 	'border border-transparent shadow-sm hover:border-primary/40 hover:shadow-md flex min-h-cosmos-card flex-col gap-3 overflow-hidden p-4 transition duration-200 ease-standard'
+
+function BoosterHostedShield({ model }: { model: ModelRecord }) {
+	if (model.hosting !== HOSTING_PROVIDER_BOOSTER) return null
+
+	return (
+		<Tooltip delayDuration={300}>
+			<TooltipTrigger asChild>
+				<span className="inline-flex shrink-0" tabIndex={0}>
+					<ShieldCheck
+						className="h-icon-16 w-icon-16 text-info"
+						strokeWidth={2.75}
+						aria-label="Booster Powered"
+					/>
+				</span>
+			</TooltipTrigger>
+			<TooltipContent side="top">Booster Powered</TooltipContent>
+		</Tooltip>
+	)
+}
+
+function ModelCosmosCardTitle({ model }: { model: ModelRecord }) {
+	return (
+		<div className="flex min-w-0 flex-1 items-center gap-1.5">
+			<p className="truncate text-lg font-semibold leading-tight text-foreground">
+				{model.name}
+			</p>
+			<BoosterHostedShield model={model} />
+		</div>
+	)
+}
 
 function ModelCosmosCardAvatar({
 	model,
@@ -134,9 +165,7 @@ function ModelCosmosCardV4({
 				<div className="flex min-w-0 flex-1 flex-col gap-0.5">
 					<div className="flex min-w-0 items-start gap-3">
 						<div className="min-w-0 flex-1">
-							<p className="truncate text-lg font-semibold leading-tight text-foreground">
-								{model.name}
-							</p>
+							<ModelCosmosCardTitle model={model} />
 							<p className="truncate text-body-sm text-foreground/75">
 								{subline}
 							</p>
@@ -226,9 +255,7 @@ function ModelCosmosCardCatalog({
 		>
 			<div className="flex min-w-0 flex-1 items-start gap-3">
 				<ModelCosmosCardAvatar model={model} className="h-14 w-14" />
-				<p className="min-w-0 flex-1 truncate text-lg font-semibold leading-tight text-foreground">
-					{model.name}
-				</p>
+				<ModelCosmosCardTitle model={model} />
 			</div>
 
 			<div className="flex gap-3">

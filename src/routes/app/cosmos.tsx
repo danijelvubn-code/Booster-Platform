@@ -14,7 +14,6 @@ import {
 } from '@/components/ModelFilters'
 import { ModelCosmosResults } from '@/components/model-cosmos/ModelCosmosResults'
 import { ModelCosmosSearchBar } from '@/components/model-cosmos/ModelCosmosSearchBar'
-import { ModelCosmosUseCaseBanner } from '@/components/model-cosmos/ModelCosmosUseCaseBanner'
 import { models } from '@/data/mockData'
 
 export const Route = createFileRoute('/app/cosmos')({
@@ -73,8 +72,6 @@ function ModelCosmosPage() {
 				description="Explore models designed for different tasks and performance needs. Assign to endpoints and switch anytime without disruption."
 				descriptionMaxWidthPageIntro
 			/>
-
-			<ModelCosmosUseCaseBanner />
 
 			<ModelCosmosSearchBar
 				search={search}

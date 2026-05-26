@@ -24,26 +24,23 @@ export function EnergyScorePill({ grade, className }: EnergyScorePillProps) {
 			<TooltipTrigger asChild>
 				<div
 					className={cn(
-						'border-border flex h-7 shrink-0 cursor-default items-center rounded-md border p-0.5',
+						'flex h-7 shrink-0 cursor-default items-center gap-1 rounded-md px-2 py-1',
+						styles.box,
 						className,
 					)}
 				>
-					<div
+					<Leaf
+						className={cn('h-icon-16 w-icon-16 shrink-0', styles.icon)}
+						aria-hidden
+					/>
+					<span
 						className={cn(
-							'flex h-full min-w-0 items-center justify-center rounded-bl-md rounded-tl-md px-2 py-1',
-							styles.box,
+							'text-body-sm leading-none tabular-nums',
+							styles.icon,
 						)}
 					>
-						<Leaf
-							className={cn('h-icon-16 w-icon-16', styles.icon)}
-							aria-hidden
-						/>
-					</div>
-					<div className="flex w-6 flex-col items-center justify-center">
-						<span className="text-body-sm text-muted-foreground text-center leading-none">
-							{g}
-						</span>
-					</div>
+						{g}
+					</span>
 				</div>
 			</TooltipTrigger>
 			<TooltipContent side="top">Energy efficiency score</TooltipContent>

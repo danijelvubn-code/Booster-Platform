@@ -1,11 +1,9 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { Plus } from 'lucide-react'
+import { createFileRoute } from '@tanstack/react-router'
 import { CardGrid } from '@/components/CardGrid'
 import { EndpointOverviewCard } from '@/components/EndpointOverviewCard'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { PageHeader } from '@/components/layout/PageHeader'
 import OnboardingModal from '@/components/OnboardingModal'
-import { Button } from '@/components/ui/button'
 import { endpoints } from '@/data/mockData'
 
 export const Route = createFileRoute('/app/overview')({
@@ -38,17 +36,6 @@ function RouteComponent() {
 						introClassName="max-w-3xl"
 						title="Endpoints"
 						description="View and manage the stable API endpoints your applications use for model inference."
-						actions={
-							<Button className="shrink-0" asChild>
-								<Link
-									to="/app/endpoints/create_endpoint"
-									search={{ model: '' }}
-								>
-									<Plus className="h-icon-16 w-icon-16" aria-hidden />
-									Create Endpoint
-								</Link>
-							</Button>
-						}
 					/>
 
 					<CardGrid cols={{ xs: 1, md: 2 }}>

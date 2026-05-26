@@ -195,7 +195,7 @@ function ModelCosmosCardV4({
 					/>
 					<MetricCell
 						className="[&>span]:font-mono [&>span]:tabular-nums"
-						label={`€${formatEurPer1MForDisplay(model.inputCostPer1M)}→€${formatEurPer1MForDisplay(model.outputCostPer1M)}/1M`}
+						label={`€${formatEurPer1MForDisplay(model.inputCostPer1M)} → €${formatEurPer1MForDisplay(model.outputCostPer1M)}/1M`}
 					/>
 				</MetricsRow>
 			</div>

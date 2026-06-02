@@ -1,4 +1,11 @@
-import { BrainCircuit, Eye, LogIn, LogOut, ShieldCheck } from 'lucide-react'
+import {
+	BrainCircuit,
+	Eye,
+	Gauge,
+	LogIn,
+	LogOut,
+	ShieldCheck,
+} from 'lucide-react'
 import { Fragment } from 'react'
 import { EnergyScorePill } from '@/components/EnergyScorePill'
 import { MetricCell, MetricsRow } from '@/components/metrics'
@@ -15,6 +22,7 @@ import { HOSTING_PROVIDER_BOOSTER } from '@/data/model-hosting-providers'
 import {
 	formatContextLength,
 	formatEurPer1MForDisplay,
+	formatTokensPerSecond,
 	getCodingScore,
 	getMathScore,
 	getModelCatalogBadge,
@@ -224,10 +232,15 @@ function ModelCosmosCardV4({
 
 			<div className="flex gap-3">
 				<div className="w-12 shrink-0" aria-hidden />
-				<MetricsRow>
+				<MetricsRow className="grid-cols-4">
 					<MetricCell
 						icon={BrainCircuit}
 						label={formatContextLength(model.contextLength)}
+					/>
+					<MetricCell
+						icon={Gauge}
+						className="[&_span]:font-mono [&_span]:tabular-nums"
+						label={formatTokensPerSecond(model.tokensPerSecond)}
 					/>
 					<MetricCell
 						icon={LogIn}

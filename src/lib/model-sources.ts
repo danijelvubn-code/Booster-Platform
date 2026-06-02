@@ -5,20 +5,16 @@ import {
 	type CatalogHostingProvider,
 	getModelHostingProvider,
 } from '@/data/model-hosting-providers'
-import {
-	getLicenseCategory,
-	getModelBaseFamily,
-} from '@/lib/catalog-filter-meta'
-import { type ModelRecord, modelIsQuantized } from '@/lib/model-metrics'
+import { getLicenseCategory } from '@/lib/catalog-filter-meta'
+import type { ModelRecord } from '@/lib/model-metrics'
 
 export type ModelSourceRow = {
 	label: string
 	value: string
 	href?: string
+	tag?: string
+	className?: string
 }
-
-const ACCESS_TYPE_BOOSTER = 'Booster hosted'
-const ACCESS_TYPE_EXTERNAL = 'External API'
 
 const HUGGINGFACE_ORG: Partial<Record<string, string>> = {
 	Meta: 'meta-llama',
@@ -27,40 +23,24 @@ const HUGGINGFACE_ORG: Partial<Record<string, string>> = {
 	DeepSeek: 'deepseek-ai',
 }
 
-const EXTERNAL_BASE_URLS: Partial<Record<CatalogHostingProvider, string>> = {
+const EXTERNAL_PROVIDER_BASE_URLS: Partial<Record<string, string>> = {
+	OpenAI: 'https://api.openai.com/v1',
+	Google: 'https://generativelanguage.googleapis.com',
+	Anthropic: 'https://api.anthropic.com',
+}
+
+const HOSTING_BASE_URLS: Partial<Record<CatalogHostingProvider, string>> = {
 	[HOSTING_PROVIDER_SCALEWAY]: 'https://api.scaleway.com/llm/v1',
 	[HOSTING_PROVIDER_EUROUTER]: 'https://api.eurouter.eu/v1',
 }
 
-function pushRow(
-	rows: ModelSourceRow[],
-	label: string,
-	value: string | null | undefined,
-	href?: string,
-) {
-	if (!value?.trim()) return
-	rows.push({ label, value: value.trim(), href })
-}
+const MISSING_VALUE = '- -'
 
 function slugify(value: string): string {
 	return value
 		.toLowerCase()
 		.replace(/[^a-z0-9]+/g, '-')
 		.replace(/^-|-$/g, '')
-}
-
-function getLicenseLabel(model: ModelRecord): string | null {
-	const category = getLicenseCategory(model)
-	if (category === 'Open source') return 'Open Source'
-	if (category === 'Research') return 'Research use terms'
-	return 'Commercial'
-}
-
-function getSourceType(model: ModelRecord): string | null {
-	if (getLicenseCategory(model) === 'Open source') return 'Hugging Face'
-	if (model.provider === 'OpenAI') return 'OpenAI Platform'
-	if (model.provider === 'Google') return 'Google AI'
-	return 'Provider API'
 }
 
 function getRepository(
@@ -78,45 +58,75 @@ function getRepository(
 	}
 }
 
-function getBaseModelRelationship(model: ModelRecord): string | null {
-	const family = getModelBaseFamily(model)
-	if (family) return `${family} · Quantized variant`
-	return `Quantized variant of ${model.name}`
+function getExternalProviderBaseUrl(model: ModelRecord): string {
+	return (
+		EXTERNAL_PROVIDER_BASE_URLS[model.provider] ??
+		HOSTING_BASE_URLS[getModelHostingProvider(model)] ??
+		MISSING_VALUE
+	)
 }
 
+export function sourceGridRowClassName(
+	index: number,
+	total: number,
+): string {
+	const firstColCount = Math.ceil(total / 2)
+	const isFirstCol = index < firstColCount
+
+	if (isFirstCol) {
+		return `border-b border-transparent last:border-b-0 md:[&:nth-child(${firstColCount})]:border-b-0`
+	}
+
+	return 'border-b border-transparent last:border-b-0'
+}
+
+export function sourceGridRowsClass(rowCount: number): string {
+	switch (rowCount) {
+		case 1:
+			return 'md:grid-rows-[repeat(1,56px)]'
+		case 2:
+			return 'md:grid-rows-[repeat(2,56px)]'
+		default:
+			return 'md:grid-rows-[repeat(2,56px)]'
+	}
+}
+
+/** Booster: Provider + Type + Repo. API: Provider (External) + Base URL. */
 export function getModelSourceRows(model: ModelRecord): ModelSourceRow[] {
-	const rows: ModelSourceRow[] = []
-	const isBoosterHosted = model.hosting === HOSTING_PROVIDER_BOOSTER
-	const isQuantized = modelIsQuantized(model)
+	const isBooster = model.hosting === HOSTING_PROVIDER_BOOSTER
 
-	if (isBoosterHosted && !isQuantized) {
-		pushRow(rows, 'Provider / creator', model.provider)
-		pushRow(rows, 'Access type', ACCESS_TYPE_BOOSTER)
-		pushRow(rows, 'Source type', getSourceType(model))
-		const repo = getRepository(model)
-		if (repo) pushRow(rows, 'Repository', repo.value, repo.href)
-		pushRow(rows, 'License', getLicenseLabel(model))
-		return rows
-	}
+	const rows: ModelSourceRow[] = isBooster
+		? (() => {
+				const repo = getRepository(model)
+				return [
+					{ label: 'Provider', value: 'Booster' },
+					{ label: 'Type', value: 'Hugging Face' },
+					{
+						label: 'Repo',
+						value: repo?.value ?? MISSING_VALUE,
+						href: repo?.href,
+					},
+				]
+			})()
+		: (() => {
+				const baseUrl = getExternalProviderBaseUrl(model)
+				return [
+					{
+						label: 'Provider',
+						value: model.provider,
+						tag: 'External',
+					},
+					{
+						label: 'Base URL',
+						value: baseUrl,
+						href: baseUrl !== MISSING_VALUE ? baseUrl : undefined,
+					},
+				]
+			})()
 
-	if (isBoosterHosted && isQuantized) {
-		pushRow(rows, 'Provider / creator', model.provider)
-		pushRow(rows, 'Access type', ACCESS_TYPE_BOOSTER)
-		pushRow(rows, 'Format', 'Safetensors')
-		const quantization =
-			'quantization' in model ? model.quantization : undefined
-		pushRow(rows, 'Quantization', quantization ?? null)
-		pushRow(rows, 'Base model / variant', getBaseModelRelationship(model))
-		const repo = getRepository(model)
-		if (repo) pushRow(rows, 'Repository', repo.value, repo.href)
-		return rows
-	}
+	return rows.map((row, index) => ({
+		...row,
+		className: sourceGridRowClassName(index, rows.length),
+	}))
 
-	pushRow(rows, 'Provider', model.provider)
-	pushRow(rows, 'Access type', ACCESS_TYPE_EXTERNAL)
-	pushRow(rows, 'Served by', getModelHostingProvider(model))
-	const baseUrl = EXTERNAL_BASE_URLS[getModelHostingProvider(model)]
-	if (baseUrl) pushRow(rows, 'Base URL', baseUrl, baseUrl)
-	pushRow(rows, 'License or usage terms', getLicenseLabel(model))
-	return rows
 }

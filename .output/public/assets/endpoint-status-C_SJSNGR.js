@@ -1,0 +1,1 @@
+const t={Deploying:"Deploying",Running:"Running"};function u(n){return n.status==="Deploying"||n.status==="Running"?n.status:n.health==="OK"?"Running":n.health==="At Risk"?"Deploying":"Running"}function e(n){return t[n]}function i(n){switch(n){case"Deploying":return"info";case"Running":return"success";default:return"info"}}export{i as a,e as g,u as r};

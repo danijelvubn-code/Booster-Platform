@@ -23,6 +23,7 @@ export {
 	modelMatchesProvider,
 	moreFiltersSheetBadgeCount,
 	modalityOptionCounts,
+	pinDeprecatedModelsToFirstPage,
 	providerOptionCounts,
 	sortModels,
 	toggleStringList,

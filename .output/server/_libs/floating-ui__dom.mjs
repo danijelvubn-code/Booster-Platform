@@ -1,5 +1,5 @@
 import { c as computePosition$1, o as offset$1, s as shift$1, f as flip$1, a as size$1, h as hide$1, b as arrow$1, l as limitShift$1 } from "./floating-ui__core.mjs";
-import { p as isElement, q as getDocumentElement, t as getOverflowAncestors, u as getComputedStyle$1, v as isHTMLElement, w as createCoords, x as round, y as getWindow, z as isTopLayer, A as getParentNode, B as isLastTraversableNode, C as isTableElement, D as isContainingBlock, E as getContainingBlock, l as max, m as min, F as getNodeName, G as isOverflowElement, H as getNodeScroll, I as getFrameElement, r as rectToClientRect, J as floor, K as isWebKit } from "./floating-ui__utils.mjs";
+import { p as isElement, q as getDocumentElement, t as getOverflowAncestors, u as getComputedStyle$1, v as isHTMLElement, w as createCoords, x as round, y as getWindow, z as isTopLayer, A as getParentNode, B as isLastTraversableNode, C as isTableElement, D as isContainingBlock, E as getContainingBlock, n as max, m as min, F as getNodeName, G as isOverflowElement, H as getNodeScroll, I as getFrameElement, r as rectToClientRect, J as floor, K as isWebKit } from "./floating-ui__utils.mjs";
 function getCssDimensions(element) {
   const css = getComputedStyle$1(element);
   let width = parseFloat(css.width) || 0;

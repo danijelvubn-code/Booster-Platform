@@ -1,1 +1,0 @@
-function x(n,i,g){const a=Math.max(1,g),s=Math.max(1,Math.ceil(n/a)),t=Math.min(i,s),e=(t-1)*a,c=Math.min(e+a,n),o=n>0?e+1:0,d=n>0?c:0;return{totalItems:n,page:i,pageSize:a,totalPages:s,safePage:t,startIndex:e,endIndexExclusive:c,displayRangeStart:o,displayRangeEnd:d}}export{x as g};

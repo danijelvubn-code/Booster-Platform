@@ -11,7 +11,6 @@ import {
 	Brain,
 	BrainCircuit,
 	ChevronDown,
-	Cloud,
 	CircleStop,
 	Code2,
 	Eye,
@@ -52,6 +51,7 @@ import {
 	type ReactNode,
 } from 'react'
 import { AppSideSheetContent } from '@/components/layout/AppSideSheet'
+import { EnergyScorePill } from '@/components/EnergyScorePill'
 import { ModelLifecycleAlert } from '@/components/model-detail/ModelLifecycleAlert'
 import {
 	ModelPerformanceBenchmarkSection,
@@ -105,7 +105,10 @@ import {
 	type ModelRecord,
 } from '@/lib/model-metrics'
 import { getModelProviderLogoSrc } from '@/lib/model-provider-logos'
-import { getModelSourceRows } from '@/lib/model-sources'
+import {
+	getModelSourceRows,
+	sourceGridRowsClass,
+} from '@/lib/model-sources'
 import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/app/cosmos_/$modelId')({
@@ -127,22 +130,22 @@ type SectionId = (typeof SECTION_IDS)[number]
 const SECTION_IDS = [
 	'overview',
 	'capabilities',
+	'performance',
 	'modalities',
 	'endpoints',
 	'features',
 	'specifications',
-	'performance',
 	'sources',
 ] as const
 
 const NAV: Array<{ id: SectionId; label: string }> = [
 	{ id: 'overview', label: 'Overview' },
 	{ id: 'capabilities', label: 'Capabilities' },
+	{ id: 'performance', label: 'Performance' },
 	{ id: 'modalities', label: 'Modalities' },
 	{ id: 'endpoints', label: 'Endpoints' },
 	{ id: 'features', label: 'Features' },
 	{ id: 'specifications', label: 'Specifications' },
-	{ id: 'performance', label: 'Performance' },
 	{ id: 'sources', label: 'Sources' },
 ]
 
@@ -203,6 +206,7 @@ type ModelYaml = {
 	dtype: string
 	parameters: number
 	min_memory_bytes: number
+	tokens_per_second: number
 	input_price_per_1m?: string
 	output_price_per_1m?: string
 	type: string
@@ -522,7 +526,7 @@ type CapabilityScoreRowData = ReturnType<typeof capabilityRowsFromModel>[number]
 function CapabilityScoreRow({ row }: { row: CapabilityScoreRowData }) {
 	const Icon = row.icon
 	return (
-		<div className="grid h-control-md min-w-0 w-full max-w-full grid-cols-[minmax(0,14rem)_minmax(0,1fr)_auto] items-center gap-x-5">
+		<div className="grid h-control-md min-w-0 w-full max-w-full grid-cols-[minmax(0,14rem)_minmax(0,1fr)_64px] items-center gap-x-5">
 			<div className="flex min-w-0 items-center gap-1">
 				<IconBox size="xlg" shape="circle">
 					<Icon className="text-hierarchy-secondary" aria-hidden />
@@ -539,7 +543,7 @@ function CapabilityScoreRow({ row }: { row: CapabilityScoreRowData }) {
 					indicatorClassName="bg-foreground/75"
 				/>
 			</div>
-			<span className="w-10 shrink-0 text-right text-body font-semibold tabular-nums text-foreground">
+			<span className="w-[64px] shrink-0 text-right text-body font-semibold tabular-nums text-foreground">
 				{row.score.toFixed(1)}%
 			</span>
 		</div>
@@ -885,6 +889,7 @@ function normalizeModel(model: ModelRecord): ModelYaml {
 		dtype: 'bf16',
 		parameters,
 		min_memory_bytes: Math.max(parameters * 2, 0),
+		tokens_per_second: model.tokensPerSecond,
 		input_price_per_1m: model.inputCostPer1M.toFixed(2),
 		output_price_per_1m: model.outputCostPer1M.toFixed(2),
 		type: getModelModalityLabel(model),
@@ -939,30 +944,33 @@ function formatContextWindow(tokens: number | null | undefined): string {
 	return String(tokens)
 }
 
-function formatMemoryKpi(bytes: number | null | undefined): {
-	memoryValue: string
-	memoryNumber: string
-	memoryUnit: string | null
+function formatTokensPerSecondKpi(tps: number | null | undefined): {
+	tpsValue: string
+	tpsNumber: string
+	tpsUnit: string | null
 } {
-	if (!bytes) {
+	if (!tps || !Number.isFinite(tps) || tps <= 0) {
 		return {
-			memoryValue: MISSING_VALUE_PLACEHOLDER,
-			memoryNumber: MISSING_VALUE_PLACEHOLDER,
-			memoryUnit: null,
+			tpsValue: MISSING_VALUE_PLACEHOLDER,
+			tpsNumber: MISSING_VALUE_PLACEHOLDER,
+			tpsUnit: null,
 		}
 	}
-	const gb = Math.round(bytes / 1_000_000_000)
+	const rounded = Math.round(tps)
 	return {
-		memoryValue: `${gb} GB`,
-		memoryNumber: String(gb),
-		memoryUnit: 'GB',
+		tpsValue: `${rounded} tok/s`,
+		tpsNumber: String(rounded),
+		tpsUnit: 'tok/s',
 	}
 }
 
+const MODEL_DETAIL_LIST_ROW_CLASS =
+	'flex h-[56px] min-h-[56px] shrink-0 items-center gap-2'
+
 const SPEC_GRID_ROW_FIRST_COL =
-	'border-b border-transparent py-2 last:border-b-0 md:[&:nth-child(4)]:border-b-0'
+	'border-b border-transparent last:border-b-0 md:[&:nth-child(4)]:border-b-0'
 const SPEC_GRID_ROW_SECOND_COL =
-	'border-b border-transparent py-2 last:border-b-0'
+	'border-b border-transparent last:border-b-0'
 
 function displayOrMissing(value: string | null | undefined): string {
 	return value && value.trim() ? value : MISSING_VALUE_PLACEHOLDER
@@ -1077,7 +1085,7 @@ function ModelDetailSupportRow({
 }) {
 	return (
 		<div
-			className={cn('flex h-model-detail-row items-center gap-2', className)}
+			className={cn(MODEL_DETAIL_LIST_ROW_CLASS, className)}
 		>
 			<IconBox size="xlg" shape="circle">
 				<Icon
@@ -1120,7 +1128,7 @@ function SpecRow({
 }) {
 	return (
 		<div
-			className={cn('flex h-model-detail-row items-center gap-2', className)}
+			className={cn(MODEL_DETAIL_LIST_ROW_CLASS, className)}
 		>
 			<IconBox size="xlg" shape="circle">
 				<Icon className="text-hierarchy-secondary" aria-hidden />
@@ -1144,25 +1152,12 @@ function SpecRow({
 
 function getSourceRowIcon(label: string): LucideIcon {
 	switch (label) {
-		case 'Provider / creator':
 		case 'Provider':
 			return Brain
-		case 'Access type':
-		case 'Served by':
-			return Cloud
-		case 'Source type':
+		case 'Type':
 			return Layers
-		case 'Repository':
+		case 'Repo':
 			return FileText
-		case 'License':
-		case 'License or usage terms':
-			return Scale
-		case 'Format':
-			return FileArchive
-		case 'Quantization':
-			return Weight
-		case 'Base model / variant':
-			return Box
 		case 'Base URL':
 			return Share2
 		default:
@@ -1174,22 +1169,35 @@ function SourceRow({
 	label,
 	value,
 	href,
+	tag,
+	className,
 }: {
 	label: string
 	value: string
 	href?: string
+	tag?: string
+	className?: string
 }) {
 	const Icon = getSourceRowIcon(label)
 
 	return (
-		<div className="flex h-model-detail-row items-center gap-2 border-b border-transparent py-2 last:border-b-0">
+		<div className={cn(MODEL_DETAIL_LIST_ROW_CLASS, className)}>
 			<IconBox size="xlg" shape="circle">
 				<Icon className="text-hierarchy-secondary" aria-hidden />
 			</IconBox>
 			<span className="min-w-0 flex-1 text-body-sm text-hierarchy-secondary">
 				{label}
 			</span>
-			{href ? (
+			{tag ? (
+				<span className="flex min-w-0 max-w-[min(100%,20rem)] shrink items-center justify-end gap-2">
+					<span className="min-w-0 truncate text-label text-foreground">
+						{value}
+					</span>
+					<Badge appearance="ghost" variant="muted" size="24">
+						{tag}
+					</Badge>
+				</span>
+			) : href ? (
 				<a
 					href={href}
 					target="_blank"
@@ -1199,7 +1207,14 @@ function SourceRow({
 					{value}
 				</a>
 			) : (
-				<span className="min-w-0 max-w-[min(100%,20rem)] shrink truncate text-right text-label text-foreground">
+				<span
+					className={cn(
+						'min-w-0 max-w-[min(100%,20rem)] shrink truncate text-right text-label',
+						value === MISSING_VALUE_PLACEHOLDER
+							? 'text-muted-foreground'
+							: 'text-foreground',
+					)}
+				>
 					{value}
 				</span>
 			)}
@@ -1211,15 +1226,17 @@ function OverviewMetaChip({
 	icon: Icon,
 	children,
 }: {
-	icon: LucideIcon
+	icon?: LucideIcon
 	children: React.ReactNode
 }) {
 	return (
 		<span className="inline-flex h-icon-28 max-w-full shrink-0 items-center gap-2 whitespace-nowrap rounded-md border border-border bg-card px-2 text-body-sm">
-			<Icon
-				className="h-icon-20 w-icon-20 shrink-0 text-muted-foreground"
-				aria-hidden
-			/>
+			{Icon ? (
+				<Icon
+					className="h-icon-20 w-icon-20 shrink-0 text-muted-foreground"
+					aria-hidden
+				/>
+			) : null}
 			{children}
 		</span>
 	)
@@ -1338,10 +1355,15 @@ function RouteComponent() {
 	const endpointsNewPath = '/app/endpoints/create_endpoint'
 	const deployAllowed = canCreateInferenceEndpoint(model)
 	const hostingProvider = getModelHostingProvider(model)
+	const energyGrade = (model.sustainability ?? 'B').toUpperCase().charAt(0)
+	const quantizationLabel =
+		modelIsQuantized(model) && modelYaml.quantization
+			? modelYaml.quantization
+			: null
 	const paramLabel = formatParameters(modelYaml.parameters)
 	const ctxShort = formatContextWindow(modelYaml.max_context_length)
-	const { memoryValue, memoryNumber, memoryUnit } = formatMemoryKpi(
-		modelYaml.min_memory_bytes,
+	const { tpsValue, tpsNumber, tpsUnit } = formatTokensPerSecondKpi(
+		modelYaml.tokens_per_second,
 	)
 	const inputPrice = modelYaml.input_price_per_1m ?? MISSING_VALUE_PLACEHOLDER
 	const outputPrice = modelYaml.output_price_per_1m ?? MISSING_VALUE_PLACEHOLDER
@@ -1465,11 +1487,24 @@ function RouteComponent() {
 
 											<div className="flex flex-wrap items-center justify-between gap-3">
 												<div className="flex min-w-0 flex-wrap items-center gap-2">
-													<OverviewMetaChip icon={Cloud}>
+													<EnergyScorePill grade={energyGrade} bordered />
+													<OverviewMetaChip>
+														<span className="min-w-0 truncate text-foreground">
+															v{modelYaml.version}
+														</span>
+													</OverviewMetaChip>
+													<OverviewMetaChip>
 														<span className="min-w-0 truncate text-foreground">
 															{hostingProvider}
 														</span>
 													</OverviewMetaChip>
+													{quantizationLabel ? (
+														<OverviewMetaChip>
+															<span className="min-w-0 truncate text-foreground">
+																{quantizationLabel}
+															</span>
+														</OverviewMetaChip>
+													) : null}
 													<OverviewMetaChip icon={Scale}>
 														<span className="min-w-0 truncate text-muted-foreground">
 															License:{' '}
@@ -1553,19 +1588,19 @@ function RouteComponent() {
 												<p
 													className={cn(
 														'text-h1 font-bold tabular-nums',
-														kpiValueToneClass(memoryValue),
+														kpiValueToneClass(tpsValue),
 													)}
 												>
-													{memoryNumber}
+													{tpsNumber}
 												</p>
-												{memoryUnit ? (
+												{tpsUnit ? (
 													<span className="text-body-sm text-muted-foreground">
-														{memoryUnit}
+														{tpsUnit}
 													</span>
 												) : null}
 											</div>
 											<p className="text-caption text-muted-foreground">
-												MIN. MEMORY
+												TOKENS PER SECOND
 											</p>
 										</StatColumn>
 										<StatColumn showDivider>
@@ -1827,6 +1862,50 @@ function RouteComponent() {
 									</div>
 								</div>
 
+								{performanceBenchmark ? (
+									<>
+										<Separator />
+
+										<div
+											ref={assignRef('performance')}
+											data-section="performance"
+											id="model-detail-performance"
+											className="flex min-w-0 gap-16 px-6 max-lg:flex-col max-lg:gap-6"
+										>
+											<SectionTitle className="w-[124px] min-w-[124px] basis-[124px]">
+												Performance
+											</SectionTitle>
+											<div className="flex min-w-0 flex-1 flex-col gap-6">
+												<div className="flex min-w-0 flex-nowrap items-center justify-between gap-4 pt-3">
+													<p className="max-w-page-intro min-w-0 text-body-sm text-hierarchy-secondary">
+														Review benchmark results across workloads to balance
+														speed, responsiveness, and energy efficiency for your
+														use case.
+													</p>
+													<PerformanceBenchmarkDetailsSheet
+														benchmark={performanceBenchmark}
+														view={performanceView}
+														onViewChange={setPerformanceView}
+													>
+														<Button
+															variant="outline"
+															size="sm"
+															className="shrink-0 shadow-xs"
+														>
+															Performance details
+														</Button>
+													</PerformanceBenchmarkDetailsSheet>
+												</div>
+												<div className="min-w-0">
+													<ModelPerformanceBenchmarkSection
+														benchmark={performanceBenchmark}
+													/>
+												</div>
+											</div>
+										</div>
+									</>
+								) : null}
+
 								<Separator />
 
 								<div
@@ -1908,8 +1987,8 @@ function RouteComponent() {
 									</SectionTitle>
 									<div
 										className={cn(
-											'grid min-h-min min-w-0 max-w-full flex-1 basis-0 grid-cols-1 gap-y-0',
-											'md:grid-flow-col md:grid-cols-2 md:grid-rows-5 md:gap-x-10',
+											'grid min-h-min min-w-0 max-w-full flex-1 basis-0 grid-cols-1 auto-rows-[56px] gap-y-0',
+											'md:grid-flow-col md:grid-cols-2 md:grid-rows-[repeat(5,56px)] md:gap-x-10',
 										)}
 									>
 										{endpointsLeft.map((row) => (
@@ -1918,7 +1997,7 @@ function RouteComponent() {
 												icon={row.icon}
 												label={row.name}
 												supported={row.supported}
-												className="border-b border-transparent py-2 last:border-b-0 md:[&:nth-child(5)]:border-b-0"
+												className="border-b border-transparent last:border-b-0 md:[&:nth-child(5)]:border-b-0"
 											/>
 										))}
 										{endpointsRight.map((row) => (
@@ -1927,7 +2006,7 @@ function RouteComponent() {
 												icon={row.icon}
 												label={row.name}
 												supported={row.supported}
-												className="border-b border-transparent py-2 last:border-b-0"
+												className="border-b border-transparent last:border-b-0"
 											/>
 										))}
 									</div>
@@ -1946,8 +2025,8 @@ function RouteComponent() {
 									</SectionTitle>
 									<div
 										className={cn(
-											'grid min-h-min min-w-0 max-w-full flex-1 basis-0 grid-cols-1 gap-y-0',
-											'md:grid-flow-col md:grid-cols-2 md:grid-rows-3 md:gap-x-10',
+											'grid min-h-min min-w-0 max-w-full flex-1 basis-0 grid-cols-1 auto-rows-[56px] gap-y-0',
+											'md:grid-flow-col md:grid-cols-2 md:grid-rows-[repeat(3,56px)] md:gap-x-10',
 										)}
 									>
 										{featuresLeft.map((row) => (
@@ -1956,7 +2035,7 @@ function RouteComponent() {
 												icon={row.icon}
 												label={row.name}
 												supported={row.supported}
-												className="border-b border-transparent py-2 last:border-b-0 md:[&:nth-child(3)]:border-b-0"
+												className="border-b border-transparent last:border-b-0 md:[&:nth-child(3)]:border-b-0"
 											/>
 										))}
 										{featuresRight.map((row) => (
@@ -1965,7 +2044,7 @@ function RouteComponent() {
 												icon={row.icon}
 												label={row.name}
 												supported={row.supported}
-												className="border-b border-transparent py-2 last:border-b-0"
+												className="border-b border-transparent last:border-b-0"
 											/>
 										))}
 									</div>
@@ -1984,8 +2063,8 @@ function RouteComponent() {
 									</SectionTitle>
 									<div
 										className={cn(
-											'grid min-h-min min-w-0 max-w-full flex-1 basis-0 grid-cols-1 gap-y-0',
-											'md:grid-flow-col md:grid-cols-2 md:grid-rows-4 md:gap-x-10',
+											'grid min-h-min min-w-0 max-w-full flex-1 basis-0 grid-cols-1 auto-rows-[56px] gap-y-0',
+											'md:grid-flow-col md:grid-cols-2 md:grid-rows-[repeat(4,56px)] md:gap-x-10',
 										)}
 									>
 										{specRows.map((row) => (
@@ -2001,62 +2080,32 @@ function RouteComponent() {
 								</div>
 							</div>
 
-							{performanceBenchmark ? (
-								<div
-									ref={assignRef('performance')}
-									data-section="performance"
-									id="model-detail-performance"
-									className="flex min-w-0 flex-col gap-4 rounded-lg bg-white px-6 py-6 shadow-sm"
-								>
-									<div className="flex min-w-0 items-start justify-between gap-4">
-										<div className="flex min-w-0 flex-col gap-1">
-											<SectionTitle>Performance</SectionTitle>
-											<p className="max-w-page-intro text-body-sm text-muted-foreground">
-												Review benchmark results across workloads to balance
-												speed, responsiveness, and energy efficiency for your
-												use case.
-											</p>
-										</div>
-										<div className="flex shrink-0 items-center gap-2">
-											<PerformanceBenchmarkDetailsSheet
-												benchmark={performanceBenchmark}
-												view={performanceView}
-												onViewChange={setPerformanceView}
-											>
-												<Button
-													variant="outline"
-													size="sm"
-													className="shrink-0 shadow-xs"
-												>
-													Performance details
-												</Button>
-											</PerformanceBenchmarkDetailsSheet>
-										</div>
-									</div>
-									<div className="min-w-0">
-										<ModelPerformanceBenchmarkSection
-											benchmark={performanceBenchmark}
-										/>
-									</div>
-								</div>
-							) : null}
-
 							<div
 								ref={assignRef('sources')}
 								data-section="sources"
 								id="model-detail-sources"
-								className="mb-[30vh] flex min-w-0 gap-16 rounded-lg bg-card px-6 py-6 shadow-sm max-lg:flex-col max-lg:gap-6"
+								className="mb-[30vh] flex min-w-0 flex-wrap items-start gap-16 rounded-lg bg-card px-6 py-6 shadow-sm max-lg:flex-col max-lg:gap-6"
 							>
 								<SectionTitle className="w-[124px] min-w-[124px] basis-[124px]">
 									Sources
 								</SectionTitle>
-								<div className="flex min-w-0 flex-1 flex-col">
+								<div
+									className={cn(
+										'grid min-h-min min-w-0 max-w-full flex-1 basis-0 grid-cols-1 auto-rows-[56px] gap-y-0',
+										'md:grid-flow-col md:grid-cols-2 md:gap-x-10',
+										sourceGridRowsClass(
+											Math.ceil(sourceRows.length / 2),
+										),
+									)}
+								>
 									{sourceRows.map((row) => (
 										<SourceRow
 											key={row.label}
 											label={row.label}
 											value={row.value}
 											href={row.href}
+											tag={row.tag}
+											className={row.className}
 										/>
 									))}
 								</div>

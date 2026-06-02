@@ -5,6 +5,7 @@ import { c as createContextScope } from "./radix-ui__react-context.mjs";
 import { D as DismissableLayer } from "./@radix-ui/react-dismissable-layer+[...].mjs";
 import { u as useId } from "./radix-ui__react-id.mjs";
 import { c as createPopperScope, A as Anchor, C as Content, a as Arrow, R as Root2 } from "./radix-ui__react-popper.mjs";
+import { P as Portal$1 } from "./radix-ui__react-portal.mjs";
 import { P as Presence } from "./radix-ui__react-presence.mjs";
 import { P as Primitive } from "./radix-ui__react-primitive.mjs";
 import { b as createSlottable } from "./radix-ui__react-slot.mjs";
@@ -207,6 +208,12 @@ var PORTAL_NAME = "TooltipPortal";
 var [PortalProvider, usePortalContext] = createTooltipContext(PORTAL_NAME, {
   forceMount: void 0
 });
+var TooltipPortal = (props) => {
+  const { __scopeTooltip, forceMount, children, container } = props;
+  const context = useTooltipContext(PORTAL_NAME, __scopeTooltip);
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(PortalProvider, { scope: __scopeTooltip, forceMount, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Presence, { present: forceMount || context.open, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Portal$1, { asChild: true, container, children }) }) });
+};
+TooltipPortal.displayName = PORTAL_NAME;
 var CONTENT_NAME = "TooltipContent";
 var TooltipContent = reactExports.forwardRef(
   (props, forwardedRef) => {
@@ -475,6 +482,7 @@ function getHullPresorted(points) {
 var Provider = TooltipProvider;
 var Root3 = Tooltip;
 var Trigger = TooltipTrigger;
+var Portal = TooltipPortal;
 var Content2 = TooltipContent;
 var Arrow2 = TooltipArrow;
 export {
@@ -482,5 +490,6 @@ export {
   Content2 as C,
   Provider as P,
   Root3 as R,
-  Trigger as T
+  Trigger as T,
+  Portal as a
 };

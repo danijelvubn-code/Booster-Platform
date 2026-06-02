@@ -8,6 +8,7 @@ import {
 	defaultFilters,
 	defaultSort,
 	isFiltersActive,
+	pinDeprecatedModelsToFirstPage,
 	type ModelFilterState,
 	type ModelSortId,
 	sortModels,
@@ -55,7 +56,11 @@ function ModelCosmosPage() {
 	)
 
 	const sortedFiltered = useMemo(
-		() => sortModels(filtered, sort, modelCatalogOrder),
+		() =>
+			pinDeprecatedModelsToFirstPage(
+				sortModels(filtered, sort, modelCatalogOrder),
+				COSMOS_PAGE_SIZE,
+			),
 		[filtered, sort],
 	)
 

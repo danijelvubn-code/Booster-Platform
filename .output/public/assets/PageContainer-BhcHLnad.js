@@ -1,1 +1,0 @@
-import{j as e,c as l}from"./index--MyyVpbD.js";function s({children:a,gap:o="gap-6",className:n}){return e.jsx("div",{className:"flex min-h-0 flex-1 flex-col overflow-y-auto bg-background",children:e.jsx("div",{className:l("container flex flex-col py-8",o,n),children:a})})}export{s as P};

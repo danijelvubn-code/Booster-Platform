@@ -147,7 +147,7 @@ export function ModelSidebar({ model }: ModelSidebarProps) {
 					{deployAllowed ? (
 						<Button asChild variant="default" size="default" className="w-full">
 							<Link
-								to="/app/endpoints/deploy_endpoint"
+								to="/app/endpoints/create_endpoint"
 								search={{ model: model.id }}
 							>
 								Add to Endpoint

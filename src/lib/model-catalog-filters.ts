@@ -509,3 +509,21 @@ export function sortModels(
 	out.sort((a, b) => compareModelsForSort(a, b, sort, catalogOrder))
 	return out
 }
+
+/** Keeps deprecated models visible on page 1 without changing the primary sort order. */
+export function pinDeprecatedModelsToFirstPage(
+	sorted: ModelRecord[],
+	pageSize: number,
+): ModelRecord[] {
+	const deprecated = sorted.filter((m) => m.status === 'Deprecated')
+	if (deprecated.length === 0) return sorted
+
+	const rest = sorted.filter((m) => m.status !== 'Deprecated')
+	const firstPageSlots = Math.max(pageSize - deprecated.length, 0)
+
+	return [
+		...rest.slice(0, firstPageSlots),
+		...deprecated,
+		...rest.slice(firstPageSlots),
+	]
+}

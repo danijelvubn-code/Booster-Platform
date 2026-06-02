@@ -7,10 +7,10 @@ import {
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { BasicSetupStep } from '@/components/endpoint-wizard/BasicSetupStep'
+import { ModelSummarySidebar } from '@/components/endpoint-wizard/ModelSummarySidebar'
 import { ModelLifecycleAlert } from '@/components/model-detail/ModelLifecycleAlert'
 import { ReviewStep } from '@/components/endpoint-wizard/ReviewStep'
 import { PageHeader } from '@/components/layout/PageHeader'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { toast } from '@/components/ui/sonner'
@@ -21,16 +21,8 @@ import {
 	models,
 	type ProviderOption,
 } from '@/data/mockData'
-import {
-	formatContextWindowShort,
-	getOverallModelScore,
-	getModelParameterSizeLabel,
-	modelHasVisionCapability,
-} from '@/lib/model-metrics'
-import {
-	canCreateInferenceEndpoint,
-	getModelStatusBadgeVariant,
-} from '@/lib/model-lifecycle'
+import { formatContextWindowShort } from '@/lib/model-metrics'
+import { canCreateInferenceEndpoint } from '@/lib/model-lifecycle'
 
 type StepId = 0 | 1
 type Environment = 'Production' | 'Staging' | 'Development'
@@ -184,14 +176,6 @@ function RouteComponent() {
 		return averagePer1M.toFixed(0)
 	}, [selectedProvider.inputPer1M, selectedProvider.outputPer1M])
 
-	const selectedModelScore = Math.round(getOverallModelScore(selectedModel))
-	const modelSizeTag = getModelParameterSizeLabel(selectedModel)
-	const modelTags = [
-		modelSizeTag,
-		modelHasVisionCapability(selectedModel) ? 'MULTIMODAL' : 'TEXT',
-		'API',
-	]
-
 	const goToStep = (target: StepId) => {
 		if (target < step) {
 			setStep(target)
@@ -288,64 +272,11 @@ function RouteComponent() {
 			<ModelLifecycleAlert model={selectedModel} className="shrink-0" />
 
 			<div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-endpoint-deploy-wizard">
-				<aside className="h-full min-w-0 lg:col-span-1">
-					<Card className="flex h-full flex-col overflow-hidden p-0">
-						<div className="flex h-endpoint-deploy-strip min-h-endpoint-deploy-strip shrink-0 items-center justify-between gap-x-3 border-b border-border bg-success/7 px-4">
-							<span className="min-w-0 flex-1 truncate text-body-sm-strong leading-tight text-foreground">
-								{selectedModel.name}
-							</span>
-							<span className="shrink-0 text-h2 leading-none text-success tabular-nums">
-								{selectedModelScore}
-							</span>
-						</div>
-						<div className="space-y-4 border-b border-border p-4">
-							<p className="text-body-sm text-muted-foreground">
-								{selectedModel.description}
-							</p>
-							<div className="flex flex-wrap gap-2">
-								{modelTags.map((tag) => (
-									<Badge
-										key={tag}
-										variant="outline"
-										appearance="ghost"
-										size="24"
-									>
-										{tag}
-									</Badge>
-								))}
-							</div>
-						</div>
-						<div className="divide-y divide-border">
-							<div className="flex items-center justify-between px-4 py-3">
-								<span className="text-body-sm text-muted-foreground">
-									Status
-								</span>
-								<Badge
-									variant={getModelStatusBadgeVariant(selectedModel.status)}
-									size="20"
-								>
-									{selectedModel.status}
-								</Badge>
-							</div>
-							<div className="flex items-center justify-between px-4 py-3">
-								<span className="text-body-sm text-muted-foreground">
-									Version
-								</span>
-								<span className="text-body-sm text-foreground">
-									v{selectedModel.version}
-								</span>
-							</div>
-							<div className="flex items-center justify-between px-4 py-3">
-								<span className="text-body-sm text-muted-foreground">
-									Domain
-								</span>
-								<span className="text-body-sm text-foreground">
-									{selectedModel.domain}
-								</span>
-							</div>
-						</div>
-					</Card>
-				</aside>
+				<ModelSummarySidebar
+					model={selectedModel}
+					inputCostPer1M={selectedProvider.inputPer1M}
+					outputCostPer1M={selectedProvider.outputPer1M}
+				/>
 
 				<section className="min-h-0 h-full min-w-0 lg:col-span-1">
 					<Card className="flex h-full flex-col overflow-hidden p-0">

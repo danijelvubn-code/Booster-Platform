@@ -94,6 +94,7 @@
     --layout-endpoint-deploy-sidebar-width: 278px;
     /* Model detail: side-nav / section title row height and KPI column x-padding. */
     --layout-model-detail-row-height: 2.5rem; /* 40px */
+    --layout-model-detail-support-row-height: 3.5rem; /* 56px */
     --layout-model-detail-kpi-x: 1.5rem; /* 24px */
 
     --overlay-scrim: rgb(0 0 0 / 0.8);

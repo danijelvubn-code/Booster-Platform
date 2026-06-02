@@ -168,6 +168,8 @@ export default {
       },
       height: {
         "model-detail-row": "var(--layout-model-detail-row-height)",
+        "model-detail-support-row":
+          "var(--layout-model-detail-support-row-height)",
         "endpoint-deploy-strip": "var(--layout-endpoint-deploy-strip-height)",
         "icon-16": "var(--icon-size-16)",
         "icon-20": "var(--icon-size-20)",

@@ -10,13 +10,28 @@ import { cn } from '@/lib/utils'
 export type EnergyScorePillProps = {
 	/** Single-letter grade (A–E); mapped to energy / sustainability styling. */
 	grade: string
+	/** When true, adds a grade-colored border at 30% opacity (model detail only). */
+	bordered?: boolean
 	className?: string
+}
+
+/** Grade-colored border at 30% opacity — detail overview only. */
+const GRADE_BORDER_CLASS: Record<string, string> = {
+	A: 'border border-success/30',
+	B: 'border border-[#65A30D]/30',
+	C: 'border border-[#D3A532]/30',
+	D: 'border border-warning/30',
+	E: 'border border-destructive/30',
 }
 
 /**
  * Compact energy score control: leaf glyph + letter grade. Tooltip after delay explains the metric.
  */
-export function EnergyScorePill({ grade, className }: EnergyScorePillProps) {
+export function EnergyScorePill({
+	grade,
+	bordered = false,
+	className,
+}: EnergyScorePillProps) {
 	const g = grade.toUpperCase().charAt(0)
 	const styles = getSustainabilityGradeStyles(g)
 	return (
@@ -26,6 +41,7 @@ export function EnergyScorePill({ grade, className }: EnergyScorePillProps) {
 					className={cn(
 						'flex h-7 shrink-0 cursor-default items-center gap-1 rounded-md px-2 py-1',
 						styles.box,
+						bordered && (GRADE_BORDER_CLASS[g] ?? GRADE_BORDER_CLASS.B),
 						className,
 					)}
 				>

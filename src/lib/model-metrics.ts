@@ -107,6 +107,12 @@ export function formatContextLength(ctx: number): string {
 	return `${ctx} ctx`
 }
 
+/** Throughput for catalog metric tiles (e.g. `105 tok/s`). */
+export function formatTokensPerSecond(tps: number): string {
+	if (!Number.isFinite(tps) || tps <= 0) return '—'
+	return `${Math.round(tps)} tok/s`
+}
+
 /** Compact window label for tables and metric tiles (e.g. `128K`, `1M`). */
 export function formatContextWindowShort(ctx: number): string {
 	if (ctx >= 1_000_000) return `${(ctx / 1_000_000).toFixed(0)}M`

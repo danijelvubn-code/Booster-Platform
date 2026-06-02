@@ -19,7 +19,7 @@ export const primaryNavItems: PrimaryNavItem[] = [
 		tooltip: '',
 	},
 	{
-		label: 'Cosmos',
+		label: 'Models',
 		path: '/cosmos',
 		icon: Sparkles,
 		alsoActive: [],
